@@ -2,8 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
 
-// For CI, you may want to set BASE_URL to the deployed application.
+// For CI or local verification against an existing server, set BASE_URL.
 const baseURL = process.env['BASE_URL'] || 'http://localhost:4200';
+const shouldStartWebServer = !process.env['BASE_URL'];
 
 /**
  * Read environment variables from file.
@@ -22,13 +23,17 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'pnpm exec nx run sandbox:serve',
-    url: 'http://localhost:4200',
-    reuseExistingServer: true,
-    cwd: workspaceRoot,
-  },
+  ...(shouldStartWebServer
+    ? {
+        /* Run your local dev server before starting the tests */
+        webServer: {
+          command: 'pnpm exec nx run sandbox:serve',
+          url: baseURL,
+          reuseExistingServer: true,
+          cwd: workspaceRoot,
+        },
+      }
+    : {}),
   projects: [
     {
       name: 'chromium',

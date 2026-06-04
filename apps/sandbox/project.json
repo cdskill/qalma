@@ -13,14 +13,14 @@
         "outputPath": "dist/apps/sandbox",
         "browser": "apps/sandbox/src/main.ts",
         "tsConfig": "apps/sandbox/tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
+        "inlineStyleLanguage": "css",
         "assets": [
           {
             "glob": "**/*",
             "input": "apps/sandbox/public"
           }
         ],
-        "styles": ["apps/sandbox/src/styles.scss"]
+        "styles": ["apps/sandbox/src/styles.css"]
       },
       "configurations": {
         "production": {

@@ -46,8 +46,20 @@
     "@nx/angular:application": {
       "e2eTestRunner": "playwright",
       "linter": "eslint",
-      "style": "scss",
+      "style": "css",
       "unitTestRunner": "vitest"
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "none",
+      "changeDetection": "OnPush",
+      "inlineTemplate": true,
+      "style": "none"
+    },
+    "@nx/angular:component": {
+      "changeDetection": "OnPush",
+      "inlineTemplate": true,
+      "style": "none"
     }
   }
 }
