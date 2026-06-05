@@ -11,6 +11,39 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
       <button
         type="button"
         [class]="commandClass"
+        rteCommand="setParagraph"
+        title="Paragraph"
+      >
+        P
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleHeading1"
+        title="Heading 1"
+      >
+        H1
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleHeading2"
+        title="Heading 2"
+      >
+        H2
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleHeading3"
+        title="Heading 3"
+      >
+        H3
+      </button>
+      <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
+      <button
+        type="button"
+        [class]="commandClass"
         rteCommand="toggleBold"
         title="Bold"
       >
@@ -39,6 +72,43 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
         title="Strikethrough"
       >
         <s>S</s>
+      </button>
+      <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleBulletList"
+        title="Bullet list"
+        aria-label="Bullet list"
+      >
+        UL
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleOrderedList"
+        title="Ordered list"
+        aria-label="Ordered list"
+      >
+        OL
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="liftListItem"
+        title="Lift list item"
+        aria-label="Lift list item"
+      >
+        Out
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="sinkListItem"
+        title="Sink list item"
+        aria-label="Sink list item"
+      >
+        In
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import {
+  HeadingsPlugin,
   HistoryPlugin,
   LinkPlugin,
+  ListsPlugin,
   RteContent,
   RteEditor,
   createRteEditor,
@@ -26,7 +28,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
       />
 
       <rte-content
-        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_p]:mb-3"
+        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="linkPopover.showPreview($event)"
@@ -60,11 +62,13 @@ import { SandboxToolbar } from './sandbox-toolbar';
 export class SandboxEditor {
   protected readonly editor = createRteEditor({
     content:
-      '<p><strong>Angular RTE</strong> starts with inline text formatting.</p><p>Try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a> from a consumer-owned toolbar.</p>',
+      '<h1><strong>Angular RTE</strong></h1><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
     placeholder: 'Start writing...',
     plugins: [
+      HeadingsPlugin,
       ...TextFormattingKit,
       LinkPlugin,
+      ListsPlugin,
       HistoryPlugin.configure({
         depth: 200,
         newGroupDelay: 750,
