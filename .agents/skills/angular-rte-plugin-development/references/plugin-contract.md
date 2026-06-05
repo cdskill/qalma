@@ -24,6 +24,7 @@ as the configurable engine-plugin example.
 | `marks`                      | Add optional ProseMirror mark specs to the editor schema. |
 | `commands(schema)`           | Register consumer-executable named commands.              |
 | `commandStates(schema)`      | Report meaningful active state for named commands.        |
+| `queries(schema)`            | Expose read-only plugin state for consumer-composed UI.   |
 | `shortcuts(schema)`          | Register keyboard shortcuts backed by commands.           |
 | `prosemirrorPlugins(schema)` | Install engine behavior such as history.                  |
 
@@ -48,8 +49,10 @@ A mark plugin normally needs:
 2. A command built from a proven ProseMirror command or a focused custom
    command.
 3. A command-state query when the feature can be active.
-4. Conventional shortcuts when they exist.
-5. A consumer-composed sandbox button using `rteCommand`.
+4. A read-only query when consumer UI needs attributes or ranges from the
+   current document state.
+5. Conventional shortcuts when they exist.
+6. A consumer-composed sandbox button using `rteCommand`.
 
 Account for both semantic HTML tags and relevant pasted inline styles when
 defining `parseDOM`. Serialize to predictable semantic HTML.
@@ -62,8 +65,9 @@ A node plugin normally needs:
    serialization.
 2. Commands for inserting, toggling, wrapping, lifting, or changing node type.
 3. State queries only when they provide useful UI state.
-4. Keyboard behavior that composes with the base keymap.
-5. Tests for schema validity, parsing, serialization, and editing behavior.
+4. Read-only queries only when consumer UI needs structured state.
+5. Keyboard behavior that composes with the base keymap.
+6. Tests for schema validity, parsing, serialization, and editing behavior.
 
 Do not introduce an Angular node view until the feature needs Angular-specific
 interactive rendering.

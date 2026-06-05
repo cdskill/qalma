@@ -15,7 +15,8 @@
 1. A consumer calls `createRteEditor()` with content, editor options, and a
    plugin array.
 2. `RteEditorController` combines plugin contributions into one schema, command
-   registry, command-state registry, and ProseMirror editor state.
+   registry, command-state registry, query registry, and ProseMirror editor
+   state.
 3. `<rte-editor [editor]="editor">` provides the controller to projected
    descendants.
 4. `<rte-content />` mounts and destroys the ProseMirror `EditorView`.
@@ -31,6 +32,7 @@ The public barrel intentionally exposes:
 - Editor primitives and `createRteEditor`.
 - The `RtePlugin` and configurable-plugin contracts.
 - First-party text-formatting plugins and `TextFormattingKit`.
+- The configurable `LinkPlugin` and its Angular RTE-owned state/options.
 - The configurable `HistoryPlugin` and its Angular RTE-owned options/defaults.
 
 Keep helpers under `lib/prosemirror` private unless a consumer use case requires
@@ -44,11 +46,13 @@ An `RtePlugin` has a unique `key` and can contribute:
 - `marks`
 - `commands(schema)`
 - `commandStates(schema)`
+- `queries(schema)`
 - `shortcuts(schema)`
 - `prosemirrorPlugins(schema)`
 
 The core validates duplicate plugin keys, schema names, commands, command
-states, and shortcuts. Preserve those checks as the extension surface grows.
+states, queries, and shortcuts. Preserve those checks as the extension surface
+grows.
 
 ## Placement Rules
 

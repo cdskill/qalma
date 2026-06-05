@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import {
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   HistoryPlugin,
+  LINK_PLUGIN_DEFAULT_OPTIONS,
+  LinkPlugin,
 } from '@angular-rte/editor';
 
 import { App } from './app';
@@ -22,8 +24,9 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      6,
+      8,
     );
+    expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
       'Angular RTE',
     );
@@ -43,5 +46,34 @@ describe('App', () => {
       depth: 200,
       newGroupDelay: 500,
     });
+  });
+
+  it('should expose configurable link defaults and validation', () => {
+    const configured = LinkPlugin.configure({
+      allowRelativeLinks: false,
+      defaultTarget: '_blank',
+      defaultRel: 'noopener noreferrer',
+    });
+
+    expect(LINK_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      allowedProtocols: ['http', 'https', 'mailto', 'tel'],
+      allowRelativeLinks: true,
+      defaultTarget: '_blank',
+      defaultRel: 'noopener noreferrer',
+    });
+    expect(LinkPlugin.options).toEqual(LINK_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      allowedProtocols: ['http', 'https', 'mailto', 'tel'],
+      allowRelativeLinks: false,
+      defaultTarget: '_blank',
+      defaultRel: 'noopener noreferrer',
+    });
+    expect(() =>
+      LinkPlugin.configure({
+        allowedProtocols: [],
+      }),
+    ).toThrowError(
+      'LinkPlugin allowedProtocols must include at least one protocol.',
+    );
   });
 });

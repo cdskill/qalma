@@ -1,13 +1,20 @@
 import { Signal, WritableSignal, signal } from '@angular/core';
 import { Schema } from 'prosemirror-model';
-import { Command, EditorState, Transaction } from 'prosemirror-state';
+import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
-import { RtePlugin, RteStateQuery } from '../plugins/rte-plugin';
+import {
+  RteCommandHandler,
+  RteCommandValue,
+  RtePlugin,
+  RteQuery,
+  RteStateQuery,
+} from '../plugins/rte-plugin';
 import { serializeHtmlDocument } from '../prosemirror/html';
 import {
   createCommandRegistry,
   createCommandStateRegistry,
+  createQueryRegistry,
 } from '../prosemirror/plugins';
 import { createRteSchema } from '../prosemirror/schema';
 import { createRteState } from '../prosemirror/state';
@@ -30,8 +37,9 @@ export class RteEditorController {
   private readonly editableState: WritableSignal<boolean>;
   private readonly placeholderState: WritableSignal<string>;
   private readonly viewVersion = signal(0);
-  private readonly commands: Record<string, Command>;
+  private readonly commands: Record<string, RteCommandHandler>;
   private readonly commandStates: Record<string, RteStateQuery>;
+  private readonly queries: Partial<Record<string, RteQuery>>;
   private editorState?: EditorState;
   private editorView?: EditorView;
   private host?: HTMLElement;
@@ -41,6 +49,7 @@ export class RteEditorController {
     this.schema = createRteSchema(this.plugins);
     this.commands = createCommandRegistry(this.schema, this.plugins);
     this.commandStates = createCommandStateRegistry(this.schema, this.plugins);
+    this.queries = createQueryRegistry(this.schema, this.plugins);
 
     this.htmlState = signal(options.content ?? '<p></p>');
     this.editableState = signal(options.editable ?? true);
@@ -87,7 +96,7 @@ export class RteEditorController {
     this.bumpViewVersion();
   }
 
-  execute(commandName: string): boolean {
+  execute(commandName: string, value?: RteCommandValue): boolean {
     const command = this.commands[commandName];
 
     if (!this.editable() || !command || !this.editorState) {
@@ -98,6 +107,7 @@ export class RteEditorController {
       this.editorState,
       (transaction) => this.dispatchTransaction(transaction),
       this.editorView,
+      value,
     );
 
     if (executed) {
@@ -107,7 +117,7 @@ export class RteEditorController {
     return executed;
   }
 
-  canExecute(commandName: string): boolean {
+  canExecute(commandName: string, value?: RteCommandValue): boolean {
     this.viewVersion();
 
     const command = this.commands[commandName];
@@ -116,7 +126,7 @@ export class RteEditorController {
       this.editable() &&
         command &&
         this.editorState &&
-        command(this.editorState, undefined, this.editorView),
+        command(this.editorState, undefined, this.editorView, value),
     );
   }
 
@@ -130,6 +140,20 @@ export class RteEditorController {
     const query = this.commandStates[commandName];
 
     return Boolean(query && this.editorState && query(this.editorState));
+  }
+
+  hasQuery(queryName: string): boolean {
+    return Boolean(this.queries[queryName]);
+  }
+
+  query<TValue = unknown>(queryName: string): TValue | null {
+    this.viewVersion();
+
+    const query = this.queries[queryName];
+
+    return query && this.editorState
+      ? (query(this.editorState) as TValue)
+      : null;
   }
 
   setHtml(html: string): void {
