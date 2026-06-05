@@ -1,1 +1,20 @@
 @import 'tailwindcss';
+
+rte-content .ProseMirror a {
+  color: #0000ee;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+rte-content .ProseMirror a:visited {
+  color: #551a8b;
+}
+
+rte-content .ProseMirror a:hover {
+  text-decoration-thickness: 2px;
+}
+
+rte-content .ProseMirror a:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}

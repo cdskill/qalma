@@ -3,7 +3,12 @@ import { baseKeymap } from 'prosemirror-commands';
 import { Schema } from 'prosemirror-model';
 import { Command, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
-import { RtePlugin, RteStateQuery } from '../plugins/rte-plugin';
+import {
+  RteCommandHandler,
+  RtePlugin,
+  RteQuery,
+  RteStateQuery,
+} from '../plugins/rte-plugin';
 
 export function createBasePlugins(
   schema: Schema,
@@ -23,8 +28,8 @@ export function createBasePlugins(
 export function createCommandRegistry(
   schema: Schema,
   rtePlugins: readonly RtePlugin[],
-): Record<string, Command> {
-  const commands: Record<string, Command> = {};
+): Record<string, RteCommandHandler> {
+  const commands: Record<string, RteCommandHandler> = {};
 
   for (const plugin of rtePlugins) {
     for (const [name, command] of Object.entries(
@@ -64,6 +69,29 @@ export function createCommandStateRegistry(
   }
 
   return states;
+}
+
+export function createQueryRegistry(
+  schema: Schema,
+  rtePlugins: readonly RtePlugin[],
+): Partial<Record<string, RteQuery>> {
+  const queries: Partial<Record<string, RteQuery>> = {};
+
+  for (const plugin of rtePlugins) {
+    for (const [name, query] of Object.entries(
+      plugin.queries?.(schema) ?? {},
+    )) {
+      if (queries[name]) {
+        throw new Error(
+          `RTE plugin "${plugin.key}" defines duplicate query "${name}".`,
+        );
+      }
+
+      queries[name] = query;
+    }
+  }
+
+  return queries;
 }
 
 function createShortcutRegistry(

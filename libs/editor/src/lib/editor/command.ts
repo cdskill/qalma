@@ -14,6 +14,7 @@ import { RTE_EDITOR_CONTEXT } from './editor-context';
 })
 export class RteCommand {
   readonly command = input.required<string>({ alias: 'rteCommand' });
+  readonly rteCommandValue = input<unknown>();
 
   private readonly context = inject(RTE_EDITOR_CONTEXT);
   private readonly editor = computed(() => this.context.editor());
@@ -22,7 +23,8 @@ export class RteCommand {
     this.editor().isCommandActive(this.command()),
   );
   protected readonly disabled = computed(
-    () => !this.editor().canExecute(this.command()),
+    () =>
+      !this.editor().canExecute(this.command(), this.rteCommandValue()),
   );
   protected readonly ariaPressed = computed(() =>
     this.editor().hasCommandState(this.command())
@@ -31,7 +33,7 @@ export class RteCommand {
   );
 
   protected execute(): void {
-    this.editor().execute(this.command());
+    this.editor().execute(this.command(), this.rteCommandValue());
   }
 
   protected preserveSelection(event: MouseEvent): void {

@@ -6,13 +6,22 @@ import {
 } from 'prosemirror-state';
 
 export type RteStateQuery = (state: EditorState) => boolean;
+export type RteQuery<TValue = unknown> = (state: EditorState) => TValue;
+export type RteCommandValue = unknown;
+export type RteCommandHandler = (
+  state: Parameters<Command>[0],
+  dispatch?: Parameters<Command>[1],
+  view?: Parameters<Command>[2],
+  value?: RteCommandValue,
+) => boolean;
 
 export interface RtePlugin {
   key: string;
   nodes?: Record<string, NodeSpec>;
   marks?: Record<string, MarkSpec>;
-  commands?: (schema: Schema) => Record<string, Command>;
+  commands?: (schema: Schema) => Record<string, RteCommandHandler>;
   commandStates?: (schema: Schema) => Record<string, RteStateQuery>;
+  queries?: (schema: Schema) => Record<string, RteQuery>;
   shortcuts?: (schema: Schema) => Record<string, Command>;
   prosemirrorPlugins?: (schema: Schema) => ProseMirrorPlugin[];
 }
