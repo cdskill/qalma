@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {
+  BlockquotePlugin,
   HeadingsPlugin,
   HistoryPlugin,
   LinkPlugin,
@@ -28,7 +29,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
       />
 
       <rte-content
-        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
+        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_blockquote]:mb-3 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-slate-300 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-slate-700 [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="linkPopover.showPreview($event)"
@@ -50,25 +51,25 @@ import { SandboxToolbar } from './sandbox-toolbar';
       (scheduleHide)="linkPopover.scheduleHide()"
     />
 
-    <section class="mt-6" aria-label="Serialized HTML">
+    <section class="mt-3" aria-label="Serialized HTML">
       <h2 class="mb-2.5 text-lg font-bold text-slate-900">Serialized HTML</h2>
       <pre
-        class="m-0 overflow-auto rounded-lg border border-slate-300 bg-white p-4 font-mono text-sm leading-6 text-slate-700"
-        >{{ editor.html() }}</pre
-      >
+        class="m-0 max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-slate-950 p-3 font-mono text-xs leading-5 text-slate-100 shadow-inner [overflow-wrap:anywhere]"
+      ><code>{{ editor.html() }}</code></pre>
     </section>
   `,
 })
 export class SandboxEditor {
   protected readonly editor = createRteEditor({
     content:
-      '<h1><strong>Angular RTE</strong></h1><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
+      '<h1><strong>Angular RTE</strong></h1><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
     placeholder: 'Start writing...',
     plugins: [
       HeadingsPlugin,
       ...TextFormattingKit,
       LinkPlugin,
       ListsPlugin,
+      BlockquotePlugin,
       HistoryPlugin.configure({
         depth: 200,
         newGroupDelay: 750,

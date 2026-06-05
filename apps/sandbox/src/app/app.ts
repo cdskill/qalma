@@ -7,9 +7,9 @@ import { SandboxEditor } from './sandbox-editor';
   selector: 'app-root',
   template: `
     <main
-      class="mx-auto min-h-screen w-[min(1080px,calc(100vw-32px))] bg-slate-100 px-0 py-12 font-sans text-slate-900"
+      class="min-h-screen w-full bg-slate-100 p-2 font-sans text-slate-900"
     >
-      <header class="mb-6">
+      <header class="mb-3">
         <p class="mb-1.5 text-sm font-bold uppercase text-slate-600">
           Angular RTE
         </p>

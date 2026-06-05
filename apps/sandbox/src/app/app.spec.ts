@@ -1,11 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import {
+  BlockquotePlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   HistoryPlugin,
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
+  createRteEditor,
 } from '@angular-rte/editor';
 
 import { App } from './app';
@@ -26,7 +28,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      16,
+      17,
     );
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
@@ -38,6 +40,31 @@ describe('App', () => {
     expect(compiled.querySelector('.ProseMirror ol')?.textContent).toContain(
       'Pick capabilities for the current product surface.',
     );
+    expect(
+      compiled.querySelector('.ProseMirror blockquote')?.textContent,
+    ).toContain(
+      'Quote important passages without taking ownership away from the consuming app.',
+    );
+  });
+
+  it('should expose blockquote commands through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Quoted text</p>',
+      plugins: [BlockquotePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(BlockquotePlugin.key).toBe('blockquote');
+    expect(editor.execute('toggleBlockquote')).toBeTrue();
+    expect(editor.isCommandActive('toggleBlockquote')).toBeTrue();
+    expect(editor.html()).toBe('<blockquote><p>Quoted text</p></blockquote>');
+    expect(editor.execute('toggleBlockquote')).toBeTrue();
+    expect(editor.isCommandActive('toggleBlockquote')).toBeFalse();
+    expect(editor.html()).toBe('<p>Quoted text</p>');
+
+    editor.unmount(host);
   });
 
   it('should expose configurable headings defaults and validation', () => {

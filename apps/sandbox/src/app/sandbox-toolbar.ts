@@ -95,6 +95,15 @@ import { RteCommand, RteEditorController, RteToolbar } from '@angular-rte/editor
       <button
         type="button"
         [class]="commandClass"
+        rteCommand="toggleBlockquote"
+        title="Blockquote"
+        aria-label="Blockquote"
+      >
+        Quote
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
         rteCommand="liftListItem"
         title="Lift list item"
         aria-label="Lift list item"
