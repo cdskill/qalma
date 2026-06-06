@@ -1,9 +1,9 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
+  afterNextRender,
   inject,
   viewChild,
 } from '@angular/core';
@@ -19,17 +19,27 @@ import { RTE_EDITOR_CONTEXT } from './editor-context';
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RteContent implements AfterViewInit, OnDestroy {
+export class RteContent {
   private readonly context = inject(RTE_EDITOR_CONTEXT);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly editorHost =
     viewChild.required<ElementRef<HTMLDivElement>>('editorHost');
 
-  ngAfterViewInit(): void {
-    this.context.editor().mount(this.editorHost().nativeElement);
-  }
+  private mountedHost?: HTMLElement;
 
-  ngOnDestroy(): void {
-    this.context.editor().unmount(this.editorHost().nativeElement);
+  constructor() {
+    afterNextRender(() => {
+      const host = this.editorHost().nativeElement;
+
+      this.context.editor().mount(host);
+      this.mountedHost = host;
+    });
+
+    this.destroyRef.onDestroy(() => {
+      if (this.mountedHost) {
+        this.context.editor().unmount(this.mountedHost);
+      }
+    });
   }
 }
