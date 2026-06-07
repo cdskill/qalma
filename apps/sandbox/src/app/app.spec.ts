@@ -15,6 +15,8 @@ import {
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
+  PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
+  PasteRulesPlugin,
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   PlaceholderPlugin,
   RteEditorController,
@@ -969,6 +971,107 @@ describe('App', () => {
       'LinkPlugin allowedProtocols must include at least one protocol.',
     );
   });
+
+  it('should autolink plain text URLs on paste through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p></p>',
+      plugins: [LinkPlugin, PasteRulesPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(PasteRulesPlugin.key).toBe('pasteRules');
+    pastePlainText(editor, 'Read https://angular.dev/docs.');
+
+    expect(editor.html()).toBe(
+      '<p>Read <a href="https://angular.dev/docs" target="_blank" rel="noopener noreferrer">https://angular.dev/docs</a>.</p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should clean pasted HTML links through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p></p>',
+      plugins: [LinkPlugin, ColorPlugin, PasteRulesPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    pasteClipboard(editor, {
+      html:
+        '<a href="/docs/features/server-side-rendering" class="text-red-500" style="color: red;"><span style="color: red;">Server-Side Rendering</span></a>',
+      text: 'Server-Side Rendering',
+    });
+
+    expect(editor.html()).toBe(
+      '<p><a href="/docs/features/server-side-rendering" target="_blank" rel="noopener noreferrer">Server-Side Rendering</a></p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should use clipboard URL metadata when pasted HTML omits the anchor', () => {
+    const editor = createRteEditor({
+      content: '<p></p>',
+      plugins: [LinkPlugin, ColorPlugin, PasteRulesPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    pasteClipboard(editor, {
+      html:
+        '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>',
+      text: 'Server-Side Rendering',
+      uriList: 'https://analogjs.org/docs/features/server-side-rendering',
+    });
+
+    expect(editor.html()).toBe(
+      '<p><a href="https://analogjs.org/docs/features/server-side-rendering" target="_blank" rel="noopener noreferrer">Server-Side Rendering</a></p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose configurable paste rule defaults and validation', () => {
+    const configured = PasteRulesPlugin.configure({
+      allowedProtocols: ['https'],
+      defaultProtocol: 'https',
+    });
+
+    expect(PASTE_RULES_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      autolink: true,
+      allowedProtocols: ['http', 'https', 'mailto', 'tel'],
+      allowRelativeLinks: true,
+      cleanHtml: true,
+      defaultProtocol: 'https',
+    });
+    expect(PasteRulesPlugin.options).toEqual(
+      PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
+    );
+    expect(configured.options).toEqual({
+      autolink: true,
+      allowedProtocols: ['https'],
+      allowRelativeLinks: true,
+      cleanHtml: true,
+      defaultProtocol: 'https',
+    });
+    expect(() =>
+      PasteRulesPlugin.configure({
+        allowedProtocols: [],
+      }),
+    ).toThrowError(
+      'PasteRulesPlugin allowedProtocols must include at least one protocol.',
+    );
+    expect(() =>
+      PasteRulesPlugin.configure({
+        allowedProtocols: ['mailto'],
+      }),
+    ).toThrowError(
+      'PasteRulesPlugin defaultProtocol must be included in allowedProtocols.',
+    );
+  });
 });
 
 function selectEditorRange(
@@ -986,6 +1089,51 @@ function selectEditorRange(
   view.dispatch(
     view.state.tr.setSelection(TextSelection.create(view.state.doc, from, to)),
   );
+}
+
+function pastePlainText(editor: RteEditorController, text: string): void {
+  pasteClipboard(editor, { text });
+}
+
+interface TestClipboardData {
+  html?: string;
+  text: string;
+  uriList?: string;
+}
+
+function pasteClipboard(
+  editor: RteEditorController,
+  clipboardData: TestClipboardData,
+): void {
+  const view = (editor as unknown as { editorView: EditorView | undefined })
+    .editorView;
+
+  if (!view) {
+    throw new Error('Editor view is not mounted.');
+  }
+
+  const event = new Event('paste', {
+    bubbles: true,
+    cancelable: true,
+  }) as ClipboardEvent;
+
+  Object.defineProperty(event, 'clipboardData', {
+    value: {
+      getData: (type: string) => {
+        if (type === 'text/html') {
+          return clipboardData.html ?? '';
+        }
+
+        if (type === 'text/uri-list') {
+          return clipboardData.uriList ?? '';
+        }
+
+        return type === 'text/plain' ? clipboardData.text : '';
+      },
+    },
+  });
+
+  view.dom.dispatchEvent(event);
 }
 
 async function flushMicrotasks(): Promise<void> {

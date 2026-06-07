@@ -10,6 +10,7 @@ import {
   HistoryPlugin,
   LinkPlugin,
   ListsPlugin,
+  PasteRulesPlugin,
   PlaceholderPlugin,
   RteContent,
   RteEditor,
@@ -89,6 +90,7 @@ export class SandboxEditor {
       HighlightPlugin,
       ColorPlugin,
       LinkPlugin,
+      PasteRulesPlugin,
       ListsPlugin,
       BlockquotePlugin,
       CodeBlockPlugin.configure({

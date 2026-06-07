@@ -1,5 +1,67 @@
 import { test, expect } from '@playwright/test';
 
+test('autolinks plain text URLs on paste', async ({ page }) => {
+  await page.goto('/');
+
+  const editor = page.locator('.ProseMirror');
+
+  await editor.click();
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
+  );
+  await page.keyboard.press('Backspace');
+  await editor.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    clipboardData.setData('text/plain', 'Read https://angular.dev/docs.');
+    element.dispatchEvent(
+      new ClipboardEvent('paste', {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      }),
+    );
+  });
+
+  await expect(page.locator('pre')).toContainText(
+    '<p>Read <a href="https://angular.dev/docs" target="_blank" rel="noopener noreferrer">https://angular.dev/docs</a>.</p>',
+  );
+});
+
+test('cleans pasted HTML links', async ({ page }) => {
+  await page.goto('/');
+
+  const editor = page.locator('.ProseMirror');
+
+  await editor.click();
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
+  );
+  await page.keyboard.press('Backspace');
+  await editor.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    clipboardData.setData(
+      'text/html',
+      '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>',
+    );
+    clipboardData.setData('text/plain', 'Server-Side Rendering');
+    clipboardData.setData(
+      'text/uri-list',
+      'https://analogjs.org/docs/features/server-side-rendering',
+    );
+    element.dispatchEvent(
+      new ClipboardEvent('paste', {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      }),
+    );
+  });
+
+  await expect(page.locator('pre')).toContainText(
+    '<p><a href="https://analogjs.org/docs/features/server-side-rendering" target="_blank" rel="noopener noreferrer">Server-Side Rendering</a></p>',
+  );
+});
+
 test('renders the configured plugin toolbar', async ({ page }) => {
   await page.goto('/');
 
