@@ -17,6 +17,13 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const alignRight = toolbar.getByRole('button', { name: 'Align right' });
   const justify = toolbar.getByRole('button', { name: 'Justify' });
   const underline = toolbar.getByRole('button', { name: 'Underline' });
+  const highlight = toolbar.getByRole('button', { name: 'Highlight' });
+  const mintHighlight = toolbar.getByRole('button', {
+    name: 'Mint highlight',
+  });
+  const clearHighlight = toolbar.getByRole('button', {
+    name: 'Clear highlight',
+  });
   const roseTextColor = toolbar.getByRole('button', {
     name: 'Rose text color',
   });
@@ -44,7 +51,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
   await expect(page.locator('rte-editor > button')).toHaveCount(0);
-  await expect(toolbar.getByRole('button')).toHaveCount(33);
+  await expect(toolbar.getByRole('button')).toHaveCount(39);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
   await expect(heading2).toHaveAttribute('title', 'Heading 2');
@@ -70,6 +77,12 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(
     toolbar.getByRole('button', { name: 'Strikethrough' }),
   ).toHaveAttribute('title', 'Strikethrough');
+  await expect(highlight).toHaveAttribute('title', 'Highlight');
+  await expect(highlight).toBeEnabled();
+  await expect(mintHighlight).toHaveAttribute('title', 'Mint highlight');
+  await expect(mintHighlight).toBeEnabled();
+  await expect(clearHighlight).toHaveAttribute('title', 'Clear highlight');
+  await expect(clearHighlight).toBeDisabled();
   await expect(roseTextColor).toHaveAttribute('title', 'Rose text color');
   await expect(roseTextColor).toBeEnabled();
   await expect(skyBackgroundColor).toHaveAttribute(
@@ -122,6 +135,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     '<blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote>',
   );
   await expect(page.locator('pre')).toContainText('<u>underline</u>');
+  await expect(page.locator('pre')).toContainText('<mark>highlight</mark>');
   await expect(page.locator('pre')).toContainText(
     '<span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>',
   );
@@ -256,6 +270,17 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     '<h1><strong>Angular RTE</strong></h1>',
   );
 
+  await page.locator('.ProseMirror').getByText('highlight').selectText();
+  await mintHighlight.click();
+  await expect(mintHighlight).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('pre')).toContainText(
+    '<mark style="background-color: rgb(187, 247, 208);">highlight</mark>',
+  );
+  await clearHighlight.click();
+  await expect(page.locator('pre')).toContainText(
+    'strikethrough</s>, highlight, <span style="color: rgb(14, 116, 144);',
+  );
+
   await page.locator('.ProseMirror').getByText('color').selectText();
   await roseTextColor.click();
   await expect(roseTextColor).toHaveAttribute('aria-pressed', 'true');
@@ -270,7 +295,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   );
   await clearBackgroundColor.click();
   await expect(page.locator('pre')).toContainText(
-    'try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, color, and <a href="https://angular.dev"',
+    'try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, highlight, color, and <a href="https://angular.dev"',
   );
 
   await page.locator('.ProseMirror').pressSequentially('X');

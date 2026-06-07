@@ -8,6 +8,8 @@ import {
   HardBreakPlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
+  HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS,
+  HighlightPlugin,
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   HistoryPlugin,
   LINK_PLUGIN_DEFAULT_OPTIONS,
@@ -42,13 +44,17 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      33,
+      39,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
     ).not.toBeNull();
     expect(
       compiled.querySelector('[aria-label="Align center"]'),
+    ).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Highlight"]')).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Yellow highlight"]'),
     ).not.toBeNull();
     expect(
       compiled.querySelector('[aria-label="Teal text color"]'),
@@ -92,6 +98,9 @@ describe('App', () => {
         '.ProseMirror span[style*="color: rgb(14, 116, 144)"]',
       )?.textContent,
     ).toContain('color');
+    expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
+      'highlight',
+    );
     expect(
       Array.from(
         compiled.querySelectorAll('.ProseMirror .sandbox-code-block-language'),
@@ -264,6 +273,53 @@ describe('App', () => {
 
     expect(editor.html()).toBe(
       '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p><p><span style="color: rgb(190, 18, 60);">Legacy color</span></p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose highlight through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Angular RTE</p>',
+      plugins: [HighlightPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 1, 12);
+
+    expect(HighlightPlugin.key).toBe('highlight');
+    expect(editor.canExecute('unsetHighlight')).toBeFalse();
+    expect(editor.execute('setHighlight', 'not-a-color')).toBeFalse();
+    expect(editor.execute('setHighlight')).toBeTrue();
+    expect(editor.isCommandActive('setHighlight')).toBeTrue();
+    expect(editor.query<string>('highlightColor')).toBe('rgb(254, 240, 138)');
+    expect(editor.html()).toBe('<p><mark>Angular RTE</mark></p>');
+    expect(editor.execute('setHighlight', 'rgb(186, 230, 253)')).toBeTrue();
+    expect(editor.query<string>('highlightColor')).toBe(
+      'rgb(186, 230, 253)',
+    );
+    expect(editor.html()).toBe(
+      '<p><mark style="background-color: rgb(186, 230, 253);">Angular RTE</mark></p>',
+    );
+    expect(editor.execute('unsetHighlight')).toBeTrue();
+    expect(editor.html()).toBe('<p>Angular RTE</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized highlights through the public plugin', () => {
+    const editor = createRteEditor({
+      content:
+        '<p><mark>Default highlight</mark></p><p><mark style="background-color: #bae6fd;">Sky highlight</mark></p>',
+      plugins: [HighlightPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe(
+      '<p><mark>Default highlight</mark></p><p><mark style="background-color: rgb(186, 230, 253);">Sky highlight</mark></p>',
     );
 
     editor.unmount(host);
@@ -686,6 +742,25 @@ describe('App', () => {
         levels: [1, 1],
       }),
     ).toThrowError('HeadingsPlugin levels entries must be unique.');
+  });
+
+  it('should expose configurable highlight defaults and validation', () => {
+    const configured = HighlightPlugin.configure({
+      defaultColor: '#bae6fd',
+    });
+
+    expect(HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      defaultColor: 'rgb(254, 240, 138)',
+    });
+    expect(HighlightPlugin.options).toEqual(HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      defaultColor: '#bae6fd',
+    });
+    expect(() =>
+      HighlightPlugin.configure({
+        defaultColor: 'not-a-color',
+      }),
+    ).toThrowError('HighlightPlugin defaultColor must be a valid CSS color.');
   });
 
   it('should expose configurable history defaults', () => {

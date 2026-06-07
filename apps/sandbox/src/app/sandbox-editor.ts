@@ -6,6 +6,7 @@ import {
   ColorPlugin,
   HardBreakPlugin,
   HeadingsPlugin,
+  HighlightPlugin,
   HistoryPlugin,
   LinkPlugin,
   ListsPlugin,
@@ -72,12 +73,13 @@ import { SandboxToolbar } from './sandbox-toolbar';
 export class SandboxEditor {
   protected readonly editor = createRteEditor({
     content:
-      '<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
+      '<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
     placeholder: 'Start writing...',
     plugins: [
       HeadingsPlugin,
       TextAlignPlugin,
       ...TextFormattingKit,
+      HighlightPlugin,
       ColorPlugin,
       LinkPlugin,
       ListsPlugin,

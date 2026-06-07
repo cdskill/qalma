@@ -21,6 +21,7 @@ import {
   lucideHeading1,
   lucideHeading2,
   lucideHeading3,
+  lucideHighlighter,
   lucideIndent,
   lucideItalic,
   lucideLink,
@@ -56,6 +57,7 @@ import {
       lucideHeading1,
       lucideHeading2,
       lucideHeading3,
+      lucideHighlighter,
       lucideIndent,
       lucideItalic,
       lucideLink,
@@ -186,6 +188,44 @@ import {
         aria-label="Strikethrough"
       >
         <ng-icon name="lucideStrikethrough" aria-hidden="true" />
+      </button>
+      <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="setHighlight"
+        title="Highlight"
+        aria-label="Highlight"
+      >
+        <ng-icon name="lucideHighlighter" aria-hidden="true" />
+      </button>
+      @for (color of highlightColors; track color.value) {
+        <button
+          type="button"
+          [class]="colorSwatchClass"
+          [class.rte-command-active]="isHighlightColorActive(color.value)"
+          [attr.aria-pressed]="isHighlightColorActive(color.value)"
+          [disabled]="!canSetHighlight(color.value)"
+          (mousedown)="preserveSelection($event)"
+          (click)="setHighlight(color.value)"
+          [title]="color.label"
+          [attr.aria-label]="color.label"
+        >
+          <span
+            class="block h-4 w-4 rounded-sm border border-slate-300"
+            [style.background-color]="color.value"
+            aria-hidden="true"
+          ></span>
+        </button>
+      }
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="unsetHighlight"
+        title="Clear highlight"
+        aria-label="Clear highlight"
+      >
+        <ng-icon name="lucideEraser" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       @for (color of textColors; track color.value) {
@@ -398,8 +438,17 @@ export class SandboxToolbar {
   protected readonly backgroundColor = computed(() =>
     this.editor().query<string>('backgroundColor'),
   );
+  protected readonly highlightColor = computed(() =>
+    this.editor().query<string>('highlightColor'),
+  );
 
   protected readonly codeBlockLanguages = SANDBOX_CODE_BLOCK_LANGUAGES;
+  protected readonly highlightColors = [
+    { label: 'Yellow highlight', value: 'rgb(254, 240, 138)' },
+    { label: 'Mint highlight', value: 'rgb(187, 247, 208)' },
+    { label: 'Sky highlight', value: 'rgb(186, 230, 253)' },
+    { label: 'Pink highlight', value: 'rgb(251, 207, 232)' },
+  ] as const;
   protected readonly textColors = [
     { label: 'Slate text color', value: 'rgb(15, 23, 42)' },
     { label: 'Teal text color', value: 'rgb(14, 116, 144)' },
@@ -439,12 +488,20 @@ export class SandboxToolbar {
     return this.backgroundColor() === color;
   }
 
+  protected isHighlightColorActive(color: string): boolean {
+    return this.highlightColor() === color;
+  }
+
   protected canSetTextColor(color: string): boolean {
     return this.editor().canExecute('setTextColor', color);
   }
 
   protected canSetBackgroundColor(color: string): boolean {
     return this.editor().canExecute('setBackgroundColor', color);
+  }
+
+  protected canSetHighlight(color: string): boolean {
+    return this.editor().canExecute('setHighlight', color);
   }
 
   protected canUnsetTextColor(): boolean {
@@ -461,6 +518,10 @@ export class SandboxToolbar {
 
   protected setBackgroundColor(color: string): void {
     this.editor().execute('setBackgroundColor', color);
+  }
+
+  protected setHighlight(color: string): void {
+    this.editor().execute('setHighlight', color);
   }
 
   protected unsetTextColor(): void {
