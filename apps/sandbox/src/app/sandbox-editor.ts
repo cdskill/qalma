@@ -10,6 +10,7 @@ import {
   HistoryPlugin,
   LinkPlugin,
   ListsPlugin,
+  PlaceholderPlugin,
   RteContent,
   RteEditor,
   TextAlignPlugin,
@@ -77,6 +78,9 @@ export class SandboxEditor {
     placeholder: 'Start writing...',
     plugins: [
       HeadingsPlugin,
+      PlaceholderPlugin.configure({
+        placeholder: 'Start writing...',
+      }),
       TextAlignPlugin,
       ...TextFormattingKit,
       HighlightPlugin,

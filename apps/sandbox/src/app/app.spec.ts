@@ -15,6 +15,8 @@ import {
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
+  PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
+  PlaceholderPlugin,
   RteEditorController,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
@@ -321,6 +323,38 @@ describe('App', () => {
     expect(editor.html()).toBe(
       '<p><mark>Default highlight</mark></p><p><mark style="background-color: rgb(186, 230, 253);">Sky highlight</mark></p>',
     );
+
+    editor.unmount(host);
+  });
+
+  it('should expose placeholder decorations through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p></p>',
+      plugins: [
+        PlaceholderPlugin.configure({
+          placeholder: 'Start here',
+          className: 'custom-placeholder',
+        }),
+      ],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    const placeholder = host.querySelector(
+      '.custom-placeholder[data-placeholder="Start here"]',
+    );
+
+    expect(PlaceholderPlugin.key).toBe('placeholder');
+    expect(placeholder?.tagName).toBe('P');
+    expect(editor.html()).toBe('<p></p>');
+
+    editor.setHtml('<p>Angular RTE</p>');
+
+    expect(
+      host.querySelector('.custom-placeholder[data-placeholder="Start here"]'),
+    ).toBeNull();
+    expect(editor.html()).toBe('<p>Angular RTE</p>');
 
     editor.unmount(host);
   });
@@ -761,6 +795,39 @@ describe('App', () => {
         defaultColor: 'not-a-color',
       }),
     ).toThrowError('HighlightPlugin defaultColor must be a valid CSS color.');
+  });
+
+  it('should expose configurable placeholder defaults and validation', () => {
+    const configured = PlaceholderPlugin.configure({
+      placeholder: 'Start here',
+      className: 'custom-placeholder',
+    });
+
+    expect(PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      placeholder: 'Write something...',
+      className: 'rte-placeholder',
+    });
+    expect(PlaceholderPlugin.options).toEqual(
+      PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
+    );
+    expect(configured.options).toEqual({
+      placeholder: 'Start here',
+      className: 'custom-placeholder',
+    });
+    expect(() =>
+      PlaceholderPlugin.configure({
+        placeholder: '',
+      }),
+    ).toThrowError(
+      'PlaceholderPlugin placeholder must be a non-empty string.',
+    );
+    expect(() =>
+      PlaceholderPlugin.configure({
+        className: 'bad placeholder',
+      }),
+    ).toThrowError(
+      'PlaceholderPlugin className must be a non-empty CSS class name.',
+    );
   });
 
   it('should expose configurable history defaults', () => {

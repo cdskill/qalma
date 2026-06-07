@@ -19,6 +19,14 @@ rte-content .ProseMirror a:focus-visible {
   outline-offset: 2px;
 }
 
+rte-content .ProseMirror .rte-placeholder::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
 rte-content .ProseMirror li[style*='text-align: center'],
 rte-content .ProseMirror li[style*='text-align: right'],
 rte-content .ProseMirror li[style*='text-align: justify'] {
