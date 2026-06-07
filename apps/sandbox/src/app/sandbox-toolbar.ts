@@ -32,6 +32,8 @@ import {
   lucideRedo2,
   lucideSquareCode,
   lucideStrikethrough,
+  lucideSubscript,
+  lucideSuperscript,
   lucideTextQuote,
   lucideUnderline,
   lucideUndo2,
@@ -68,6 +70,8 @@ import {
       lucideRedo2,
       lucideSquareCode,
       lucideStrikethrough,
+      lucideSubscript,
+      lucideSuperscript,
       lucideTextQuote,
       lucideUnderline,
       lucideUndo2,
@@ -188,6 +192,24 @@ import {
         aria-label="Strikethrough"
       >
         <ng-icon name="lucideStrikethrough" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleSubscript"
+        title="Subscript"
+        aria-label="Subscript"
+      >
+        <ng-icon name="lucideSubscript" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        rteCommand="toggleSuperscript"
+        title="Superscript"
+        aria-label="Superscript"
+      >
+        <ng-icon name="lucideSuperscript" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button

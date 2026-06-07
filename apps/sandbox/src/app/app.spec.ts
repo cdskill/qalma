@@ -18,6 +18,7 @@ import {
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   PlaceholderPlugin,
   RteEditorController,
+  SubscriptSuperscriptPlugin,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
   TextFormattingKit,
@@ -47,7 +48,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      39,
+      41,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
@@ -65,6 +66,8 @@ describe('App', () => {
     expect(
       compiled.querySelector('[aria-label="Yellow background color"]'),
     ).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Subscript"]')).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Superscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
       'Angular RTE',
@@ -104,6 +107,8 @@ describe('App', () => {
     expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
       'highlight',
     );
+    expect(compiled.querySelector('.ProseMirror sub')?.textContent).toBe('2');
+    expect(compiled.querySelector('.ProseMirror sup')?.textContent).toBe('2');
     expect(
       Array.from(
         compiled.querySelectorAll('.ProseMirror .sandbox-code-block-language'),
@@ -276,6 +281,55 @@ describe('App', () => {
 
     expect(editor.html()).toBe(
       '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p><p><span style="color: rgb(190, 18, 60);">Legacy color</span></p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose subscript and superscript through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>H2O and E=mc2</p>',
+      plugins: [SubscriptSuperscriptPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 2, 3);
+
+    expect(SubscriptSuperscriptPlugin.key).toBe('subscriptSuperscript');
+    expect(editor.execute('toggleSubscript')).toBeTrue();
+    expect(editor.isCommandActive('toggleSubscript')).toBeTrue();
+    expect(editor.html()).toBe('<p>H<sub>2</sub>O and E=mc2</p>');
+
+    selectEditorRange(editor, 13, 14);
+
+    expect(editor.execute('toggleSuperscript')).toBeTrue();
+    expect(editor.isCommandActive('toggleSuperscript')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>',
+    );
+    expect(editor.execute('toggleSubscript')).toBeTrue();
+    expect(editor.isCommandActive('toggleSubscript')).toBeTrue();
+    expect(editor.isCommandActive('toggleSuperscript')).toBeFalse();
+    expect(editor.html()).toBe('<p>H<sub>2</sub>O and E=mc<sub>2</sub></p>');
+    expect(editor.execute('toggleSubscript')).toBeTrue();
+    expect(editor.html()).toBe('<p>H<sub>2</sub>O and E=mc2</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized subscript and superscript marks', () => {
+    const editor = createRteEditor({
+      content:
+        '<p>Formula H<sub>2</sub>O and E=mc<sup>2</sup></p><p><span style="vertical-align: sub;">sub</span> <span style="vertical-align: super;">sup</span></p>',
+      plugins: [SubscriptSuperscriptPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe(
+      '<p>Formula H<sub>2</sub>O and E=mc<sup>2</sup></p><p><sub>sub</sub> <sup>sup</sup></p>',
     );
 
     editor.unmount(host);
