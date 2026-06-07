@@ -6,6 +6,7 @@ export * from './lib/editor/toolbar';
 export * from './lib/plugins/blockquote';
 export * from './lib/plugins/clear-formatting';
 export * from './lib/plugins/code-block';
+export * from './lib/plugins/color';
 export * from './lib/plugins/hard-break';
 export * from './lib/plugins/history';
 export * from './lib/plugins/headings';

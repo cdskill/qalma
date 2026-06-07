@@ -4,6 +4,7 @@ import {
   CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
   ClearFormattingPlugin,
   CodeBlockPlugin,
+  ColorPlugin,
   HardBreakPlugin,
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   HeadingsPlugin,
@@ -12,12 +13,15 @@ import {
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
+  RteEditorController,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
   TextFormattingKit,
   createRteEditor,
   createRtePlugin,
 } from '@angular-rte/editor';
+import { TextSelection } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
 
 import { App } from './app';
 import { SandboxLinkPopover } from './sandbox-link-popover';
@@ -38,13 +42,19 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      23,
+      33,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
     ).not.toBeNull();
     expect(
       compiled.querySelector('[aria-label="Align center"]'),
+    ).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Teal text color"]'),
+    ).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Yellow background color"]'),
     ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
@@ -77,6 +87,11 @@ describe('App', () => {
       compiled.querySelector('.ProseMirror code.language-go .hljs-keyword')
         ?.textContent,
     ).toContain('package');
+    expect(
+      compiled.querySelector(
+        '.ProseMirror span[style*="color: rgb(14, 116, 144)"]',
+      )?.textContent,
+    ).toContain('color');
     expect(
       Array.from(
         compiled.querySelectorAll('.ProseMirror .sandbox-code-block-language'),
@@ -196,6 +211,60 @@ describe('App', () => {
     expect(editor.html()).toBe('<p>Angular RTE</p>');
     expect(editor.canExecute('clearFormatting')).toBeFalse();
     expect(editor.execute('clearFormatting')).toBeFalse();
+
+    editor.unmount(host);
+  });
+
+  it('should expose text and background color through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Angular RTE</p>',
+      plugins: [ColorPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 1, 12);
+
+    expect(ColorPlugin.key).toBe('color');
+    expect(editor.canExecute('unsetTextColor')).toBeFalse();
+    expect(editor.execute('setTextColor', 'not-a-color')).toBeFalse();
+    expect(editor.execute('setTextColor', 'rgb(14, 116, 144)')).toBeTrue();
+    expect(editor.query<string>('textColor')).toBe('rgb(14, 116, 144)');
+    expect(editor.html()).toBe(
+      '<p><span style="color: rgb(14, 116, 144);">Angular RTE</span></p>',
+    );
+    expect(
+      editor.execute('setBackgroundColor', 'rgb(254, 240, 138)'),
+    ).toBeTrue();
+    expect(editor.query<string>('backgroundColor')).toBe(
+      'rgb(254, 240, 138)',
+    );
+    expect(editor.html()).toBe(
+      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p>',
+    );
+    expect(editor.execute('unsetTextColor')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p><span style="background-color: rgb(254, 240, 138);">Angular RTE</span></p>',
+    );
+    expect(editor.execute('unsetBackgroundColor')).toBeTrue();
+    expect(editor.html()).toBe('<p>Angular RTE</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized color marks through the public plugin', () => {
+    const editor = createRteEditor({
+      content:
+        '<p><span style="color: #0e7490; background-color: #fef08a;">Angular RTE</span></p><p><font color="#be123c">Legacy color</font></p>',
+      plugins: [ColorPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe(
+      '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p><p><span style="color: rgb(190, 18, 60);">Legacy color</span></p>',
+    );
 
     editor.unmount(host);
   });
@@ -664,3 +733,20 @@ describe('App', () => {
     );
   });
 });
+
+function selectEditorRange(
+  editor: RteEditorController,
+  from: number,
+  to: number,
+): void {
+  const view = (editor as unknown as { editorView: EditorView | undefined })
+    .editorView;
+
+  if (!view) {
+    throw new Error('Editor view is not mounted.');
+  }
+
+  view.dispatch(
+    view.state.tr.setSelection(TextSelection.create(view.state.doc, from, to)),
+  );
+}
