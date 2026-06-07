@@ -17,6 +17,8 @@ extension points over exposing raw ProseMirror details.
 - Use `angular-rte-plugin-development` whenever adding, changing, reviewing, or
   removing an editor plugin, command, mark, node, shortcut, or ProseMirror
   behavior.
+- Use `git-commit` when the user invokes `/commit` or asks to generate and
+  create a conventional commit from staged changes.
 
 ## Architectural Invariants
 

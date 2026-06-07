@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Git Commit'
+  short_description: 'Create conventional commits from staged changes'
+  default_prompt: 'Create a conventional commit for the staged changes.'
