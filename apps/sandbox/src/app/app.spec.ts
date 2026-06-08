@@ -15,6 +15,9 @@ import {
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
+  MENTION_PLUGIN_DEFAULT_OPTIONS,
+  MentionPlugin,
+  MentionState,
   PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
   PasteRulesPlugin,
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
@@ -106,6 +109,9 @@ describe('App', () => {
         '.ProseMirror span[style*="color: rgb(14, 116, 144)"]',
       )?.textContent,
     ).toContain('color');
+    expect(
+      compiled.querySelector('.ProseMirror [data-rte-mention]')?.textContent,
+    ).toBe('@Ada Lovelace');
     expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
       'highlight',
     );
@@ -972,6 +978,113 @@ describe('App', () => {
     );
   });
 
+  it('should expose mention queries and insertion through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Hello @gr</p>',
+      plugins: [MentionPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 10, 10);
+
+    expect(MentionPlugin.key).toBe('mention');
+    expect(editor.query<MentionState>('mention')).toEqual({
+      from: 7,
+      to: 10,
+      query: 'gr',
+      trigger: '@',
+    });
+    expect(
+      editor.execute('insertMention', {
+        id: 'grace-hopper',
+        label: 'Grace Hopper',
+      }),
+    ).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>Hello <span data-rte-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
+    );
+    expect(getEditorSelectionFrom(editor)).toBe(8);
+
+    editor.unmount(host);
+  });
+
+  it('should keep mentions disabled inside code blocks', () => {
+    const editor = createRteEditor({
+      content: '<pre><code>@gr</code></pre>',
+      plugins: [CodeBlockPlugin, MentionPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 4, 4);
+
+    expect(editor.query<MentionState>('mention')).toBeNull();
+    expect(
+      editor.canExecute('insertMention', {
+        id: 'grace-hopper',
+        label: 'Grace Hopper',
+      }),
+    ).toBeFalse();
+    expect(
+      editor.execute('insertMention', {
+        id: 'grace-hopper',
+        label: 'Grace Hopper',
+      }),
+    ).toBeFalse();
+    expect(editor.html()).toBe(
+      '<pre><code class="language-plaintext">@gr</code></pre>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized mentions and validate configurable defaults', () => {
+    const configured = MentionPlugin.configure({
+      trigger: '#',
+      minQueryLength: 1,
+      maxQueryLength: 24,
+      appendSpaceOnInsert: false,
+    });
+    const editor = createRteEditor({
+      content:
+        '<p>Ask <span data-rte-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>.</p>',
+      plugins: [MentionPlugin],
+    });
+
+    expect(MENTION_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      trigger: '@',
+      minQueryLength: 0,
+      maxQueryLength: 64,
+      appendSpaceOnInsert: true,
+    });
+    expect(MentionPlugin.options).toEqual(MENTION_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      trigger: '#',
+      minQueryLength: 1,
+      maxQueryLength: 24,
+      appendSpaceOnInsert: false,
+    });
+    expect(editor.html()).toBe(
+      '<p>Ask <span data-rte-mention="" data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@" contenteditable="false">@Ada Lovelace</span>.</p>',
+    );
+    expect(() =>
+      MentionPlugin.configure({
+        trigger: '::',
+      }),
+    ).toThrowError(
+      'MentionPlugin trigger must be a single non-whitespace character.',
+    );
+    expect(() =>
+      MentionPlugin.configure({
+        minQueryLength: 3,
+        maxQueryLength: 2,
+      }),
+    ).toThrowError(
+      'MentionPlugin maxQueryLength must be greater than or equal to minQueryLength.',
+    );
+  });
+
   it('should autolink plain text URLs on paste through the public plugin', () => {
     const editor = createRteEditor({
       content: '<p></p>',
@@ -1089,6 +1202,17 @@ function selectEditorRange(
   view.dispatch(
     view.state.tr.setSelection(TextSelection.create(view.state.doc, from, to)),
   );
+}
+
+function getEditorSelectionFrom(editor: RteEditorController): number {
+  const view = (editor as unknown as { editorView: EditorView | undefined })
+    .editorView;
+
+  if (!view) {
+    throw new Error('Editor view is not mounted.');
+  }
+
+  return view.state.selection.from;
 }
 
 function pastePlainText(editor: RteEditorController, text: string): void {

@@ -62,6 +62,35 @@ test('cleans pasted HTML links', async ({ page }) => {
   );
 });
 
+test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
+  await page.goto('/');
+
+  const editor = page.locator('.ProseMirror');
+
+  await editor.click();
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
+  );
+  await page.keyboard.press('Backspace');
+  await editor.pressSequentially('@');
+
+  const suggestions = page.getByRole('listbox', {
+    name: 'Mention suggestions',
+  });
+
+  await expect(suggestions).toBeVisible();
+  await expect(suggestions.getByRole('option')).toContainText([
+    'Ada Lovelace',
+    'Grace Hopper',
+  ]);
+
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Space');
+  await expect(page.locator('pre')).toContainText(
+    '<p><span data-rte-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
+  );
+});
+
 test('renders the configured plugin toolbar', async ({ page }) => {
   await page.goto('/');
 

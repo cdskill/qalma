@@ -19,6 +19,15 @@ rte-content .ProseMirror a:focus-visible {
   outline-offset: 2px;
 }
 
+rte-content .ProseMirror [data-rte-mention] {
+  border-radius: 0.25rem;
+  background: #e0f2fe;
+  color: #075985;
+  font-weight: 700;
+  padding: 0.0625rem 0.1875rem;
+  white-space: nowrap;
+}
+
 rte-content .ProseMirror .rte-placeholder::before {
   content: attr(data-placeholder);
   float: left;

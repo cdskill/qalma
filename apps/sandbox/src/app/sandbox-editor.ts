@@ -1,4 +1,11 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  inject,
+  viewChild,
+} from '@angular/core';
 import {
   BlockquotePlugin,
   ClearFormattingPlugin,
@@ -10,6 +17,7 @@ import {
   HistoryPlugin,
   LinkPlugin,
   ListsPlugin,
+  MentionPlugin,
   PasteRulesPlugin,
   PlaceholderPlugin,
   RteContent,
@@ -28,10 +36,21 @@ import {
 } from './sandbox-code-block';
 import { SandboxCodeHighlightPlugin } from './sandbox-code-highlight-plugin';
 import { SandboxLinkPopover } from './sandbox-link-popover';
+import {
+  createSandboxMentionSource,
+  SandboxMentionController,
+} from './sandbox-mention';
+import { SandboxMentionMenu } from './sandbox-mention-menu';
 import { SandboxToolbar } from './sandbox-toolbar';
 
 @Component({
-  imports: [RteContent, RteEditor, SandboxLinkPopover, SandboxToolbar],
+  imports: [
+    RteContent,
+    RteEditor,
+    SandboxLinkPopover,
+    SandboxMentionMenu,
+    SandboxToolbar,
+  ],
   selector: 'app-sandbox-editor',
   template: `
     <rte-editor
@@ -44,15 +63,29 @@ import { SandboxToolbar } from './sandbox-toolbar';
       />
 
       <rte-content
+        #mentionSurface
         class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_.hljs-attr]:text-sky-300 [&_.ProseMirror_.hljs-built_in]:text-cyan-300 [&_.ProseMirror_.hljs-comment]:text-slate-500 [&_.ProseMirror_.hljs-keyword]:text-violet-300 [&_.ProseMirror_.hljs-literal]:text-orange-300 [&_.ProseMirror_.hljs-meta]:text-slate-400 [&_.ProseMirror_.hljs-number]:text-orange-300 [&_.ProseMirror_.hljs-params]:text-slate-200 [&_.ProseMirror_.hljs-string]:text-emerald-300 [&_.ProseMirror_.hljs-title]:text-amber-200 [&_.ProseMirror_.hljs-type]:text-cyan-200 [&_.ProseMirror_.hljs-variable]:text-sky-200 [&_.ProseMirror_blockquote]:mb-3 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-slate-300 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-slate-700 [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_pre]:mb-3 [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:bg-slate-950 [&_.ProseMirror_pre]:p-3 [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:leading-6 [&_.ProseMirror_pre]:text-slate-100 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
-        (focus)="linkPopover.showPreview($event)"
+        (focus)="linkPopover.showPreview($event); mentionController.refresh()"
         (blur)="linkPopover.scheduleHideFromEvent($event)"
         (focusin)="linkPopover.showPreview($event)"
         (focusout)="linkPopover.scheduleHideFromEvent($event)"
+        (click)="mentionController.refresh()"
       />
     </rte-editor>
+
+    @if (mentionController.open()) {
+      <app-sandbox-mention-menu
+        [placement]="mentionController.placement()"
+        [suggestions]="mentionController.suggestions()"
+        [loading]="mentionController.loading()"
+        [activeIndex]="mentionController.activeIndex()"
+        (activate)="mentionController.setActiveIndex($event)"
+        (pick)="mentionController.insert($event)"
+        (dismiss)="mentionController.hide()"
+      />
+    }
 
     <app-sandbox-link-popover
       [popover]="linkPopover.popover()"
@@ -75,9 +108,13 @@ import { SandboxToolbar } from './sandbox-toolbar';
   `,
 })
 export class SandboxEditor {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly mentionSurface =
+    viewChild.required<ElementRef<HTMLElement>>('mentionSurface');
+
   protected readonly editor = createRteEditor({
     content:
-      '<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
+      '<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-rte-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
     placeholder: 'Start writing...',
     plugins: [
       HeadingsPlugin,
@@ -90,6 +127,9 @@ export class SandboxEditor {
       HighlightPlugin,
       ColorPlugin,
       LinkPlugin,
+      MentionPlugin.configure({
+        trigger: '@',
+      }),
       PasteRulesPlugin,
       ListsPlugin,
       BlockquotePlugin,
@@ -109,4 +149,28 @@ export class SandboxEditor {
   });
 
   protected readonly linkPopover = new LinkPopoverController(this.editor);
+  protected readonly mentionController = new SandboxMentionController(
+    this.editor,
+    createSandboxMentionSource('lazy'),
+  );
+
+  constructor() {
+    afterNextRender(() => {
+      const surface = this.mentionSurface().nativeElement;
+      const refreshMentions = () => this.mentionController.refresh();
+      const handleMentionKeydown = (event: Event) =>
+        this.mentionController.handleMentionKeydown(event);
+
+      surface.addEventListener('rte-mention-update', refreshMentions);
+      surface.addEventListener('rte-mention-keydown', handleMentionKeydown);
+
+      this.destroyRef.onDestroy(() => {
+        surface.removeEventListener('rte-mention-update', refreshMentions);
+        surface.removeEventListener(
+          'rte-mention-keydown',
+          handleMentionKeydown,
+        );
+      });
+    });
+  }
 }

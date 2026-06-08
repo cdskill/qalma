@@ -13,6 +13,7 @@ export * from './lib/plugins/history';
 export * from './lib/plugins/headings';
 export * from './lib/plugins/link';
 export * from './lib/plugins/lists';
+export * from './lib/plugins/mention';
 export * from './lib/plugins/paste-rules';
 export * from './lib/plugins/placeholder';
 export * from './lib/plugins/rte-plugin';
