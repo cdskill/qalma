@@ -15,6 +15,8 @@ import {
   HeadingsPlugin,
   HighlightPlugin,
   HistoryPlugin,
+  ImageCommandValue,
+  ImagePlugin,
   LinkPlugin,
   ListsPlugin,
   MentionPlugin,
@@ -40,6 +42,11 @@ import {
   createSandboxMentionSource,
   SandboxMentionController,
 } from './sandbox-mention';
+import {
+  SANDBOX_EXAMPLE_IMAGE_ALT,
+  SANDBOX_EXAMPLE_IMAGE_SRC,
+  SANDBOX_EXAMPLE_IMAGE_TITLE,
+} from './sandbox-image';
 import { SandboxMentionMenu } from './sandbox-mention-menu';
 import { SandboxToolbar } from './sandbox-toolbar';
 
@@ -59,7 +66,18 @@ import { SandboxToolbar } from './sandbox-toolbar';
     >
       <app-sandbox-toolbar
         [editor]="editor"
+        (requestImageLink)="insertImageFromUrl()"
+        (requestImageUpload)="chooseImageFile()"
         (requestLink)="linkPopover.showToolbarEditor($event)"
+      />
+
+      <input
+        #imageUpload
+        class="sr-only"
+        type="file"
+        accept="image/*"
+        aria-label="Upload image file"
+        (change)="insertUploadedImage($event)"
       />
 
       <rte-content
@@ -111,10 +129,11 @@ export class SandboxEditor {
   private readonly destroyRef = inject(DestroyRef);
   private readonly mentionSurface =
     viewChild.required<ElementRef<HTMLElement>>('mentionSurface');
+  private readonly imageUpload =
+    viewChild.required<ElementRef<HTMLInputElement>>('imageUpload');
 
   protected readonly editor = createRteEditor({
-    content:
-      '<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-rte-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>',
+    content: `<h1><strong>Angular RTE</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><img src="${SANDBOX_EXAMPLE_IMAGE_SRC}" alt="${SANDBOX_EXAMPLE_IMAGE_ALT}" title="${SANDBOX_EXAMPLE_IMAGE_TITLE}"><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-rte-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createRteEditor } from "@angular-rte/editor";&#10;&#10;const editor = createRteEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Angular RTE")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and rteCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>`,
     placeholder: 'Start writing...',
     plugins: [
       HeadingsPlugin,
@@ -126,6 +145,7 @@ export class SandboxEditor {
       SubscriptSuperscriptPlugin,
       HighlightPlugin,
       ColorPlugin,
+      ImagePlugin,
       LinkPlugin,
       MentionPlugin.configure({
         trigger: '@',
@@ -153,6 +173,7 @@ export class SandboxEditor {
     this.editor,
     createSandboxMentionSource('lazy'),
   );
+  private readonly imagePreviewUrls: string[] = [];
 
   constructor() {
     afterNextRender(() => {
@@ -170,7 +191,96 @@ export class SandboxEditor {
           'rte-mention-keydown',
           handleMentionKeydown,
         );
+        this.revokeImagePreviewUrls();
       });
     });
   }
+
+  protected insertImageFromUrl(): void {
+    const currentImage = this.editor.query<ImageCommandValue>('image');
+    const src = window.prompt(
+      'Image URL',
+      currentImage?.src ?? SANDBOX_EXAMPLE_IMAGE_SRC,
+    );
+
+    if (!src) {
+      return;
+    }
+
+    const alt = window.prompt(
+      'Alt text',
+      currentImage?.alt ?? SANDBOX_EXAMPLE_IMAGE_ALT,
+    );
+    const title =
+      window.prompt(
+        'Title',
+        currentImage?.title ?? SANDBOX_EXAMPLE_IMAGE_TITLE,
+      ) || null;
+    const commandValue: ImageCommandValue = {
+      src,
+      alt: alt ?? '',
+      title,
+    };
+
+    this.editor.execute(
+      currentImage ? 'updateImage' : 'insertImage',
+      commandValue,
+    );
+  }
+
+  protected chooseImageFile(): void {
+    const input = this.imageUpload().nativeElement;
+
+    input.value = '';
+    input.click();
+  }
+
+  protected insertUploadedImage(event: Event): void {
+    const input = event.target;
+
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const file = input.files?.item(0);
+
+    if (!file || !file.type.startsWith('image/')) {
+      return;
+    }
+
+    const previewSrc = URL.createObjectURL(file);
+
+    this.imagePreviewUrls.push(previewSrc);
+    this.editor.execute('insertImage', {
+      src: createUploadedImageSrc(file),
+      alt: createImageAltText(file),
+      title: file.name,
+      previewSrc,
+    });
+  }
+
+  private revokeImagePreviewUrls(): void {
+    for (const url of this.imagePreviewUrls) {
+      URL.revokeObjectURL(url);
+    }
+
+    this.imagePreviewUrls.length = 0;
+  }
+}
+
+function createImageAltText(file: File): string {
+  return file.name
+    .replace(/\.[^.]+$/, '')
+    .replace(/[-_]+/g, ' ')
+    .trim();
+}
+
+function createUploadedImageSrc(file: File): string {
+  const basename = file.name.trim() || 'image';
+  const safeName = basename
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `/uploads/${Date.now()}-${encodeURIComponent(safeName || 'image')}`;
 }

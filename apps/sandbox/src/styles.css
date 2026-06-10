@@ -28,6 +28,21 @@ rte-content .ProseMirror [data-rte-mention] {
   white-space: nowrap;
 }
 
+rte-content .ProseMirror img {
+  display: block;
+  max-width: 100%;
+  max-height: 18rem;
+  margin: 0 0 0.75rem;
+  border: 1px solid rgb(203 213 225);
+  border-radius: 0.375rem;
+  object-fit: contain;
+}
+
+rte-content .ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #38bdf8;
+  outline-offset: 2px;
+}
+
 rte-content .ProseMirror .rte-placeholder::before {
   content: attr(data-placeholder);
   float: left;

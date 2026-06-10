@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+const exampleImageSrc =
+  'https://i.redd.it/can-thragg-win-a-3v1-against-thaedus-nolan-and-conquest-v0-4ljwinnbdyyg1.jpg?width=1333&format=pjpg&auto=webp&s=c691acfd4ff12ddc2f2da8fd21335bbc441a90bf';
+const exampleImageHtmlSrc = exampleImageSrc.replace(/&/g, '&amp;');
+const exampleImageAlt = 'Thragg, Thaedus, Nolan, and Conquest';
+const exampleImageTitle = 'Invincible matchup example';
+
 test('autolinks plain text URLs on paste', async ({ page }) => {
   await page.goto('/');
 
@@ -136,6 +142,8 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const orderedList = toolbar.getByRole('button', { name: 'Ordered list' });
   const blockquote = toolbar.getByRole('button', { name: 'Blockquote' });
   const codeBlock = toolbar.getByRole('button', { name: 'Code block' });
+  const imageUrl = toolbar.getByRole('button', { name: 'Image URL' });
+  const uploadImage = toolbar.getByRole('button', { name: 'Upload image' });
   const liftListItem = toolbar.getByRole('button', { name: 'Lift list item' });
   const sinkListItem = toolbar.getByRole('button', { name: 'Sink list item' });
   const link = toolbar.getByRole('button', { name: 'Link' });
@@ -144,7 +152,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
   await expect(page.locator('rte-editor > button')).toHaveCount(0);
-  await expect(toolbar.getByRole('button')).toHaveCount(41);
+  await expect(toolbar.getByRole('button')).toHaveCount(43);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
   await expect(heading2).toHaveAttribute('title', 'Heading 2');
@@ -204,6 +212,10 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(blockquote).toBeEnabled();
   await expect(codeBlock).toHaveAttribute('title', 'Code block');
   await expect(codeBlock).toBeEnabled();
+  await expect(imageUrl).toHaveAttribute('title', 'Image URL');
+  await expect(imageUrl).toBeEnabled();
+  await expect(uploadImage).toHaveAttribute('title', 'Upload image');
+  await expect(uploadImage).toBeEnabled();
   await expect(liftListItem).toHaveAttribute('title', 'Lift list item');
   await expect(liftListItem).toBeDisabled();
   await expect(sinkListItem).toHaveAttribute('title', 'Sink list item');
@@ -230,6 +242,9 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   );
   await expect(page.locator('pre')).toContainText(
     '<blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote>',
+  );
+  await expect(page.locator('pre')).toContainText(
+    `<img src="${exampleImageHtmlSrc}" alt="${exampleImageAlt}" title="${exampleImageTitle}">`,
   );
   await expect(page.locator('pre')).toContainText('<u>underline</u>');
   await expect(page.locator('pre')).toContainText('<mark>highlight</mark>');
@@ -405,6 +420,16 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await clearBackgroundColor.click();
   await expect(page.locator('pre')).toContainText(
     'try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, highlight, color, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, and <a href="https://angular.dev"',
+  );
+
+  const imagePrompts = [exampleImageSrc, 'Inserted image', 'Demo image'];
+  page.on('dialog', async (dialog) => {
+    await dialog.accept(imagePrompts.shift() ?? '');
+  });
+  await imageUrl.click();
+  await expect(imageUrl).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('pre')).toContainText(
+    `<img src="${exampleImageHtmlSrc}" alt="Inserted image" title="Demo image">`,
   );
 
   await page.locator('.ProseMirror').pressSequentially('X');

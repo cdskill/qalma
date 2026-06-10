@@ -22,6 +22,8 @@ import {
   lucideHeading2,
   lucideHeading3,
   lucideHighlighter,
+  lucideImage,
+  lucideImageUp,
   lucideIndent,
   lucideItalic,
   lucideLink,
@@ -44,6 +46,10 @@ import {
   SANDBOX_CODE_BLOCK_LANGUAGES,
   SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
 } from './sandbox-code-block';
+import {
+  SANDBOX_EXAMPLE_IMAGE_ALT,
+  SANDBOX_EXAMPLE_IMAGE_SRC,
+} from './sandbox-image';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +66,8 @@ import {
       lucideHeading2,
       lucideHeading3,
       lucideHighlighter,
+      lucideImage,
+      lucideImageUp,
       lucideIndent,
       lucideItalic,
       lucideLink,
@@ -118,6 +126,31 @@ import {
         aria-label="Heading 3"
       >
         <ng-icon name="lucideHeading3" aria-hidden="true" />
+      </button>
+      <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
+      <button
+        type="button"
+        [class]="commandClass"
+        [class.rte-command-active]="imageActive()"
+        [attr.aria-pressed]="imageActive()"
+        [disabled]="!canInsertImage()"
+        (mousedown)="preserveSelection($event)"
+        (click)="requestImageLink.emit()"
+        title="Image URL"
+        aria-label="Image URL"
+      >
+        <ng-icon name="lucideImage" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        [disabled]="!canInsertUploadedImage()"
+        (mousedown)="preserveSelection($event)"
+        (click)="requestImageUpload.emit()"
+        title="Upload image"
+        aria-label="Upload image"
+      >
+        <ng-icon name="lucideImageUp" aria-hidden="true" />
       </button>
       <span class="mx-1 h-5 w-px bg-slate-300" aria-hidden="true"></span>
       <button
@@ -439,9 +472,26 @@ import {
 export class SandboxToolbar {
   readonly editor = input.required<RteEditorController>();
   readonly requestLink = output<MouseEvent>();
+  readonly requestImageLink = output<void>();
+  readonly requestImageUpload = output<void>();
 
+  protected readonly canInsertImage = computed(() =>
+    this.editor().canExecute('insertImage', {
+      src: SANDBOX_EXAMPLE_IMAGE_SRC,
+      alt: SANDBOX_EXAMPLE_IMAGE_ALT,
+    }),
+  );
+  protected readonly canInsertUploadedImage = computed(() =>
+    this.editor().canExecute('insertImage', {
+      src: '/uploads/example-image.png',
+      alt: SANDBOX_EXAMPLE_IMAGE_ALT,
+    }),
+  );
   protected readonly canSetLink = computed(() =>
     this.editor().canExecute('setLink', 'https://angular.dev'),
+  );
+  protected readonly imageActive = computed(() =>
+    this.editor().isCommandActive('insertImage'),
   );
   protected readonly linkActive = computed(() =>
     this.editor().isCommandActive('setLink'),

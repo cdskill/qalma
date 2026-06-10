@@ -12,6 +12,9 @@ import {
   HighlightPlugin,
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   HistoryPlugin,
+  IMAGE_PLUGIN_DEFAULT_OPTIONS,
+  ImagePlugin,
+  ImageState,
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
@@ -35,6 +38,11 @@ import { TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
 import { App } from './app';
+import {
+  SANDBOX_EXAMPLE_IMAGE_ALT,
+  SANDBOX_EXAMPLE_IMAGE_SRC,
+  SANDBOX_EXAMPLE_IMAGE_TITLE,
+} from './sandbox-image';
 import { SandboxLinkPopover } from './sandbox-link-popover';
 
 describe('App', () => {
@@ -53,7 +61,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      41,
+      43,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
@@ -73,6 +81,13 @@ describe('App', () => {
     ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Subscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Superscript"]')).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Image URL"]')).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Upload image"]'),
+    ).not.toBeNull();
+    expect(
+      compiled.querySelector('[aria-label="Upload image file"]'),
+    ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Link URL"]')).toBeNull();
     expect(compiled.querySelector('.ProseMirror')?.textContent).toContain(
       'Angular RTE',
@@ -112,6 +127,15 @@ describe('App', () => {
     expect(
       compiled.querySelector('.ProseMirror [data-rte-mention]')?.textContent,
     ).toBe('@Ada Lovelace');
+    expect(
+      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.alt,
+    ).toBe(SANDBOX_EXAMPLE_IMAGE_ALT);
+    expect(
+      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.src,
+    ).toBe(SANDBOX_EXAMPLE_IMAGE_SRC);
+    expect(
+      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.title,
+    ).toBe(SANDBOX_EXAMPLE_IMAGE_TITLE);
     expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
       'highlight',
     );
@@ -261,9 +285,7 @@ describe('App', () => {
     expect(
       editor.execute('setBackgroundColor', 'rgb(254, 240, 138)'),
     ).toBeTrue();
-    expect(editor.query<string>('backgroundColor')).toBe(
-      'rgb(254, 240, 138)',
-    );
+    expect(editor.query<string>('backgroundColor')).toBe('rgb(254, 240, 138)');
     expect(editor.html()).toBe(
       '<p><span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">Angular RTE</span></p>',
     );
@@ -294,6 +316,101 @@ describe('App', () => {
     editor.unmount(host);
   });
 
+  it('should expose image commands and state through the public plugin', () => {
+    const editor = createRteEditor({
+      content: '<p>Before</p>',
+      plugins: [ImagePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 7, 7);
+
+    expect(ImagePlugin.key).toBe('image');
+    expect(editor.execute('insertImage', 'javascript:alert(1)')).toBeFalse();
+    expect(
+      editor.execute('insertImage', {
+        src: 'https://example.com/photo.png',
+        alt: 'Example photo',
+        title: 'Photo',
+      }),
+    ).toBeTrue();
+    expect(editor.isCommandActive('insertImage')).toBeTrue();
+    expect(editor.query<ImageState>('image')).toEqual({
+      from: 8,
+      to: 9,
+      src: 'https://example.com/photo.png',
+      alt: 'Example photo',
+      title: 'Photo',
+      previewSrc: null,
+    });
+    expect(editor.html()).toBe(
+      '<p>Before</p><img src="https://example.com/photo.png" alt="Example photo" title="Photo">',
+    );
+    expect(
+      editor.execute('updateImage', {
+        src: 'https://example.com/updated.png',
+        alt: 'Updated photo',
+      }),
+    ).toBeTrue();
+    expect(editor.query<ImageState>('image')?.src).toBe(
+      'https://example.com/updated.png',
+    );
+    expect(editor.html()).toBe(
+      '<p>Before</p><img src="https://example.com/updated.png" alt="Updated photo" title="Photo">',
+    );
+    expect(editor.execute('removeImage')).toBeTrue();
+    expect(editor.html()).toBe('<p>Before</p>');
+    expect(editor.execute('removeImage')).toBeFalse();
+
+    editor.unmount(host);
+  });
+
+  it('should keep image upload previews out of serialized HTML', () => {
+    const editor = createRteEditor({
+      content: '<p>Before</p>',
+      plugins: [ImagePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 7, 7);
+
+    expect(
+      editor.execute('insertImage', {
+        src: '/uploads/photo.png',
+        alt: 'Uploaded photo',
+        title: 'Photo',
+        previewSrc: 'blob:http://localhost/photo-preview',
+      }),
+    ).toBeTrue();
+    expect(editor.query<ImageState>('image')?.previewSrc).toBe(
+      'blob:http://localhost/photo-preview',
+    );
+    expect(editor.html()).toBe(
+      '<p>Before</p><img src="/uploads/photo.png" alt="Uploaded photo" title="Photo">',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized images through the public plugin', () => {
+    const editor = createRteEditor({
+      content:
+        '<img src="https://example.com/photo.png" alt="Example" title="Photo"><img src="javascript:alert(1)" alt="Bad">',
+      plugins: [ImagePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(editor.html()).toBe(
+      '<img src="https://example.com/photo.png" alt="Example" title="Photo">',
+    );
+
+    editor.unmount(host);
+  });
+
   it('should expose subscript and superscript through the public plugin', () => {
     const editor = createRteEditor({
       content: '<p>H2O and E=mc2</p>',
@@ -313,9 +430,7 @@ describe('App', () => {
 
     expect(editor.execute('toggleSuperscript')).toBeTrue();
     expect(editor.isCommandActive('toggleSuperscript')).toBeTrue();
-    expect(editor.html()).toBe(
-      '<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>',
-    );
+    expect(editor.html()).toBe('<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>');
     expect(editor.execute('toggleSubscript')).toBeTrue();
     expect(editor.isCommandActive('toggleSubscript')).toBeTrue();
     expect(editor.isCommandActive('toggleSuperscript')).toBeFalse();
@@ -361,9 +476,7 @@ describe('App', () => {
     expect(editor.query<string>('highlightColor')).toBe('rgb(254, 240, 138)');
     expect(editor.html()).toBe('<p><mark>Angular RTE</mark></p>');
     expect(editor.execute('setHighlight', 'rgb(186, 230, 253)')).toBeTrue();
-    expect(editor.query<string>('highlightColor')).toBe(
-      'rgb(186, 230, 253)',
-    );
+    expect(editor.query<string>('highlightColor')).toBe('rgb(186, 230, 253)');
     expect(editor.html()).toBe(
       '<p><mark style="background-color: rgb(186, 230, 253);">Angular RTE</mark></p>',
     );
@@ -921,9 +1034,7 @@ describe('App', () => {
       PlaceholderPlugin.configure({
         placeholder: '',
       }),
-    ).toThrowError(
-      'PlaceholderPlugin placeholder must be a non-empty string.',
-    );
+    ).toThrowError('PlaceholderPlugin placeholder must be a non-empty string.');
     expect(() =>
       PlaceholderPlugin.configure({
         className: 'bad placeholder',
@@ -976,6 +1087,38 @@ describe('App', () => {
     ).toThrowError(
       'LinkPlugin allowedProtocols must include at least one protocol.',
     );
+  });
+
+  it('should expose configurable image defaults and validation', () => {
+    const configured = ImagePlugin.configure({
+      allowedProtocols: ['https'],
+      allowRelativeImages: false,
+      defaultAlt: 'Image',
+    });
+
+    expect(IMAGE_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      allowedProtocols: ['http', 'https'],
+      allowRelativeImages: true,
+      defaultAlt: '',
+    });
+    expect(ImagePlugin.options).toEqual(IMAGE_PLUGIN_DEFAULT_OPTIONS);
+    expect(configured.options).toEqual({
+      allowedProtocols: ['https'],
+      allowRelativeImages: false,
+      defaultAlt: 'Image',
+    });
+    expect(() =>
+      ImagePlugin.configure({
+        allowedProtocols: [],
+      }),
+    ).toThrowError(
+      'ImagePlugin allowedProtocols must include at least one protocol.',
+    );
+    expect(() =>
+      ImagePlugin.configure({
+        allowedProtocols: ['https', 'https'],
+      }),
+    ).toThrowError('ImagePlugin allowedProtocols entries must be unique.');
   });
 
   it('should expose mention queries and insertion through the public plugin', () => {
@@ -1113,8 +1256,7 @@ describe('App', () => {
 
     editor.mount(host);
     pasteClipboard(editor, {
-      html:
-        '<a href="/docs/features/server-side-rendering" class="text-red-500" style="color: red;"><span style="color: red;">Server-Side Rendering</span></a>',
+      html: '<a href="/docs/features/server-side-rendering" class="text-red-500" style="color: red;"><span style="color: red;">Server-Side Rendering</span></a>',
       text: 'Server-Side Rendering',
     });
 
@@ -1134,8 +1276,7 @@ describe('App', () => {
 
     editor.mount(host);
     pasteClipboard(editor, {
-      html:
-        '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>',
+      html: '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>',
       text: 'Server-Side Rendering',
       uriList: 'https://analogjs.org/docs/features/server-side-rendering',
     });
