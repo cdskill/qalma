@@ -57,7 +57,8 @@ export const ImagePlugin = createConfigurableQalmaPlugin(
       },
       atom: true,
       draggable: true,
-      group: 'block',
+      inline: true,
+      group: 'inline',
       parseDOM: [
         {
           tag: 'img[src]',
@@ -128,7 +129,7 @@ function createInsertImageCommand(
   return (state, dispatch, _view, value) => {
     const attrs = resolveImageAttrs(value, options);
 
-    if (!attrs || !canReplaceSelectionWithImage(state, image, attrs)) {
+    if (!attrs || !canReplaceSelectionWithImage(state, image)) {
       return false;
     }
 
@@ -239,15 +240,18 @@ function getImageState(state: EditorState, image: NodeType): ImageState | null {
 function canReplaceSelectionWithImage(
   state: EditorState,
   image: NodeType,
-  attrs: ImageCommandValue,
 ): boolean {
-  try {
-    state.tr.replaceSelectionWith(image.create(attrs), false);
+  const { $from } = state.selection;
 
-    return true;
-  } catch {
-    return false;
+  for (let depth = $from.depth; depth >= 0; depth--) {
+    const index = $from.index(depth);
+
+    if ($from.node(depth).canReplaceWith(index, index, image)) {
+      return true;
+    }
   }
+
+  return false;
 }
 
 function resolveImageAttrs(

@@ -29,10 +29,11 @@ qalma-content .ProseMirror [data-qalma-mention] {
 }
 
 qalma-content .ProseMirror img {
-  display: block;
+  display: inline-block;
+  vertical-align: bottom;
   max-width: 100%;
   max-height: 18rem;
-  margin: 0 0 0.75rem;
+  margin: 0 0.125rem;
   border: 1px solid rgb(203 213 225);
   border-radius: 0.375rem;
   object-fit: contain;
