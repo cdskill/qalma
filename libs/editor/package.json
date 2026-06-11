@@ -1,4 +1,40 @@
 {
   "name": "@qalma/editor",
-  "sideEffects": false
+  "version": "0.0.0",
+  "description": "Angular-first headless rich text editor toolkit built on ProseMirror.",
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdskill/angular-rte.git",
+    "directory": "libs/editor"
+  },
+  "bugs": {
+    "url": "https://github.com/cdskill/angular-rte/issues"
+  },
+  "homepage": "https://github.com/cdskill/angular-rte#readme",
+  "keywords": [
+    "angular",
+    "editor",
+    "headless",
+    "prosemirror",
+    "rich-text"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=21.0.0 <22.0.0"
+  },
+  "dependencies": {
+    "prosemirror-commands": "^1.7.1",
+    "prosemirror-history": "^1.5.0",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-model": "^1.25.7",
+    "prosemirror-schema-list": "^1.5.1",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-view": "^1.41.8",
+    "tslib": "^2.3.0"
+  }
 }

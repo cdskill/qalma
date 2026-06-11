@@ -26,6 +26,15 @@
         "{workspaceRoot}/eslint.config.mjs",
         "{workspaceRoot}/tools/eslint-rules/**/*"
       ]
+    },
+    "nx-release-publish": {
+      "dependsOn": ["build"],
+      "options": {
+        "packageRoot": "dist/libs/editor",
+        "access": "public",
+        "registry": "https://registry.npmjs.org/",
+        "tag": "alpha"
+      }
     }
   },
   "plugins": [
@@ -60,6 +69,17 @@
       "changeDetection": "OnPush",
       "inlineTemplate": true,
       "style": "none"
+    }
+  },
+  "release": {
+    "projects": ["editor"],
+    "version": {
+      "preVersionCommand": "pnpm nx build editor",
+      "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/editor"]
+    },
+    "changelog": {
+      "workspaceChangelog": false,
+      "projectChangelogs": false
     }
   }
 }

@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish npm package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+
+      - name: Use npm with trusted publishing support
+        run: npm install --global npm@latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate
+        run: |
+          pnpm nx run-many -t lint
+          pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
+          pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
+          pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
+          pnpm nx build sandbox
+
+      - name: Resolve release version
+        id: release
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+
+          if [[ "$VERSION" == "$GITHUB_REF_NAME" || -z "$VERSION" ]]; then
+            echo "Expected a tag named v<semver>, got: $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+          if npm view @qalma/editor version >/dev/null 2>&1; then
+            echo "first_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "first_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Version package from tag
+        shell: bash
+        run: |
+          FIRST_RELEASE_FLAG=""
+
+          if [[ "${{ steps.release.outputs.first_release }}" == "true" ]]; then
+            FIRST_RELEASE_FLAG="--first-release"
+          fi
+
+          pnpm nx release version "${{ steps.release.outputs.version }}" \
+            $FIRST_RELEASE_FLAG \
+            --git-commit=false \
+            --git-tag=false \
+            --stage-changes=false
+
+      - name: Publish package with trusted publishing
+        shell: bash
+        run: npm publish dist/libs/editor --access public --tag alpha --provenance
