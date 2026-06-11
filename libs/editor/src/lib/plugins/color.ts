@@ -29,6 +29,16 @@ export const ColorPlugin = createQalmaPlugin({
       'backgroundColor',
     ),
   }),
+  commandStates: (schema) => ({
+    unsetTextColor: (state) =>
+      isTextStyleAttributeActive(state, schema.marks['textStyle'], 'color'),
+    unsetBackgroundColor: (state) =>
+      isTextStyleAttributeActive(
+        state,
+        schema.marks['textStyle'],
+        'backgroundColor',
+      ),
+  }),
   queries: (schema) => ({
     textColor: (state) =>
       getActiveTextStyleAttrs(state, schema.marks['textStyle'])?.color ?? null,
