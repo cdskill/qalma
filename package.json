@@ -9,8 +9,8 @@
     "lint:editor": "nx lint editor",
     "lint:sandbox": "nx lint sandbox",
     "serve:sandbox": "nx serve sandbox",
-    "release": "bash scripts/release.sh",
-    "release:dry-run": "nx release version --dry-run"
+    "release": "nx release --skip-publish",
+    "release:dry-run": "nx release --skip-publish --dry-run"
   },
   "private": true,
   "packageManager": "pnpm@10.23.0",
