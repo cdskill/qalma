@@ -78,8 +78,13 @@
       "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/editor"]
     },
     "changelog": {
+      "automaticFromRef": true,
       "workspaceChangelog": false,
-      "projectChangelogs": false
+      "projectChangelogs": {
+        "renderOptions": {
+          "authors": false
+        }
+      }
     }
   }
 }

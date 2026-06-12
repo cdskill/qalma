@@ -21,8 +21,13 @@
     "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/editor"]
   },
   "changelog": {
+    "automaticFromRef": true,
     "workspaceChangelog": false,
-    "projectChangelogs": false
+    "projectChangelogs": {
+      "renderOptions": {
+        "authors": false
+      }
+    }
   }
 }
 ```
@@ -32,8 +37,22 @@
   `on: push: tags: 'v*'` trigger in the workflow).
 - `preVersionCommand` rebuilds the lib so `dist/libs/editor/package.json`
   exists before its version is rewritten.
-- Changelog generation is off; rely on conventional commits in git history
-  instead.
+- `projectChangelogs` generates `libs/editor/CHANGELOG.md` from conventional
+  commits and commits it alongside the version bump in the local
+  `chore(release): publish {version}` commit. `workspaceChangelog` stays off
+  (single-project repo, so a workspace-level changelog would be redundant).
+- `renderOptions.authors: false` drops the "❤️ Thank You" contributor section
+  (the only built-in toggle for it — the heart emoji is hardcoded in nx's
+  default renderer, so disabling the section is the way to remove it). The
+  section heading emojis (🚀/🩹/⚠️) are nx defaults and remain.
+- `automaticFromRef: true` lets changelog generation fall back to the first
+  commit when no previous `v*` tag exists, so the first nx-managed changelog
+  (and the CI release-notes extraction) don't hard-fail. Once a `v*` tag
+  exists, nx diffs tag-to-tag as usual.
+- `createRelease` is intentionally **not** set in `nx.json`: it is config-only
+  (no CLI flag) and would fire during the local `nx release` too, where the tag
+  isn't on the remote yet. The GitHub release is created in CI instead (see
+  below).
 
 `targetDefaults.nx-release-publish` (also in `nx.json`) configures the publish
 target used by CI:
@@ -62,15 +81,20 @@ target used by CI:
 
 - `git.commit = true`, message `chore(release): publish {version}`.
 - `git.tag = true`, pattern `v{version}`, `stageChanges = true`.
+- Changelog step writes `libs/editor/CHANGELOG.md` and stages it into the same
+  release commit (no GitHub release locally — `createRelease` is unset).
 - Publish step is skipped (auto-answers "no" to the publish prompt).
 
-This intentionally leaves the actual `npm publish` to CI.
+This intentionally leaves the actual `npm publish` and the GitHub release to CI.
+
+`prerelease` / `release:dry-run` use the `prerelease` specifier so repeated
+alpha cuts bump `0.0.1-alpha.N` automatically.
 
 ## GitHub Actions Workflow (`.github/workflows/release.yml`)
 
 - Trigger: `push: tags: 'v*'`.
-- Permissions: `contents: read`, `id-token: write` (required for npm OIDC
-  Trusted Publishing).
+- Permissions: `contents: write` (to create the GitHub release),
+  `id-token: write` (required for npm OIDC Trusted Publishing).
 - Steps:
   1. Checkout with full history (`fetch-depth: 0`).
   2. Setup pnpm 10.23.0, Node 24.x with `registry-url:
@@ -88,6 +112,14 @@ This intentionally leaves the actual `npm publish` to CI.
      `libs/editor/package.json` and `dist/libs/editor/package.json` inside the
      CI checkout (independent of whatever was committed locally).
   8. `npm publish dist/libs/editor --access public --tag alpha --provenance`.
+  9. Create the GitHub release with the `gh` CLI (pre-installed on the runner,
+     authenticated via `GITHUB_TOKEN`): an `awk` step extracts the current
+     version's section from the committed `libs/editor/CHANGELOG.md` into
+     `release-notes.md`, then `gh release create v<version> --title v<version>
+     --notes-file release-notes.md` runs — adding `--prerelease` when the
+     version contains a `-` (i.e. an `alpha`/`rc` preid). The committed
+     changelog is the source of truth; nx's `createRelease` is not used (it has
+     no CLI flag and would fire during the local release too).
 
 ## npm Trusted Publisher (OIDC)
 

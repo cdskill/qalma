@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -88,3 +88,30 @@ jobs:
       - name: Publish package with trusted publishing
         shell: bash
         run: npm publish dist/libs/editor --access public --tag alpha --provenance
+
+      - name: Create GitHub release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+
+          # Extract this version's section from the committed changelog.
+          awk -v v="$VERSION" '
+            /^## / {
+              if (capture) exit
+              header = $0; sub(/^## /, "", header); split(header, parts, " ")
+              if (parts[1] == v) { capture = 1; next }
+            }
+            capture { print }
+          ' libs/editor/CHANGELOG.md > release-notes.md
+
+          PRERELEASE_FLAG=""
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes-file release-notes.md \
+            $PRERELEASE_FLAG
