@@ -87,7 +87,7 @@ jobs:
 
       - name: Publish package with trusted publishing
         shell: bash
-        run: npm publish dist/libs/editor --access public --tag alpha --provenance
+        run: npm publish dist/libs/editor --access public --tag latest --provenance
 
       - name: Create GitHub release
         shell: bash

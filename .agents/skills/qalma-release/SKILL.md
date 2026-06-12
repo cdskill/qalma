@@ -5,10 +5,15 @@ description: Guide npm releases and the publish pipeline for @qalma/editor. Use 
 
 # Qalma Release
 
-`@qalma/editor` is published to npm under the `alpha` dist-tag while the public
-API stabilizes. Releases are tag-driven: a `vX.Y.Z[-prerelease]` git tag pushed
-to `main` triggers GitHub Actions, which builds, re-derives the version from the
-tag, and publishes via npm's OIDC Trusted Publisher (no npm token in CI).
+`@qalma/editor` is published to npm under the `latest` dist-tag while the public
+API stabilizes. The package is alpha-only (`0.0.x-alpha.N`), so there is no
+stable version to reserve `latest` for yet — `latest` tracks the newest alpha so
+it is what npmjs features and what `npm install @qalma/editor` resolves.
+Releases are tag-driven: a `vX.Y.Z[-prerelease]` git tag pushed to `main`
+triggers GitHub Actions, which builds, re-derives the version from the tag, and
+publishes via npm's OIDC Trusted Publisher (no npm token in CI). When a stable
+`1.0.0` is cut, publish it as `latest` and move prereleases back to a `next`/
+`alpha` dist-tag.
 
 For the full architecture, history, and troubleshooting, read
 [release-pipeline.md](references/release-pipeline.md).
@@ -30,15 +35,17 @@ For the full architecture, history, and troubleshooting, read
    - Skips publishing (CI does that).
 4. `git push --follow-tags` to push the commit and the tag. Pushing the tag is
    the actual deploy trigger — `.github/workflows/release.yml` runs, publishes
-   `@qalma/editor@<version>` with the `alpha` dist-tag, then creates a GitHub
+   `@qalma/editor@<version>` under the `latest` dist-tag, then creates a GitHub
    release whose notes are this version's section of `CHANGELOG.md`.
 5. Watch the "Release" workflow run in GitHub Actions to confirm the publish
    and the GitHub release both succeeded.
 
 ## Versioning Conventions
 
-- Stay on `0.0.x-alpha.N` prereleases and the `alpha` dist-tag until the public
-  API is stable enough for `latest`.
+- Stay on `0.0.x-alpha.N` prereleases published under the `latest` dist-tag
+  until the first stable `1.0.0`. `latest` always tracks the newest alpha so the
+  npmjs page and default installs stay current. At `1.0.0`, switch stable to
+  `latest` and prereleases to a separate `next`/`alpha` dist-tag.
 - Never push a `v*` tag for a version already published to npm — the workflow's
   `first_release` check only guards the very first publish; re-publishing an
   existing version will fail.

@@ -33,7 +33,7 @@
         "packageRoot": "dist/libs/editor",
         "access": "public",
         "registry": "https://registry.npmjs.org/",
-        "tag": "alpha"
+        "tag": "latest"
       }
     }
   },

@@ -5,7 +5,7 @@
 - `@qalma/editor` — scoped, public npm package, built from `libs/editor` with
   `@nx/angular:package` (ng-packagr, partial Angular compilation).
 - `libs/editor/package.json` carries `publishConfig: { access: "public", tag:
-  "alpha" }`, `repository`, `bugs`, `homepage`, `keywords`, and the
+  "latest" }`, `repository`, `bugs`, `homepage`, `keywords`, and the
   `@angular/core` peer range. This file is the manifest that ships to npm.
 - `libs/editor/ng-package.json` configures the ng-packagr build:
   `dest: "../../dist/libs/editor"`, `allowedNonPeerDependencies` for the
@@ -64,7 +64,7 @@ target used by CI:
     "packageRoot": "dist/libs/editor",
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "tag": "alpha"
+    "tag": "latest"
   }
 }
 ```
@@ -111,7 +111,12 @@ alpha cuts bump `0.0.1-alpha.N` automatically.
      --git-tag=false --stage-changes=false` — re-applies the version to
      `libs/editor/package.json` and `dist/libs/editor/package.json` inside the
      CI checkout (independent of whatever was committed locally).
-  8. `npm publish dist/libs/editor --access public --tag alpha --provenance`.
+  8. `npm publish dist/libs/editor --access public --tag latest --provenance`.
+     The package is alpha-only, so `latest` tracks the newest alpha (it is what
+     npmjs features and what a plain `npm install` resolves). Publishing under
+     `latest` keeps this inside the single OIDC-authenticated publish call — a
+     separate `npm dist-tag add` step would not be authenticated by the
+     trusted-publishing token and would need a long-lived npm token secret.
   9. Create the GitHub release with the `gh` CLI (pre-installed on the runner,
      authenticated via `GITHUB_TOKEN`): an `awk` step extracts the current
      version's section from the committed `libs/editor/CHANGELOG.md` into

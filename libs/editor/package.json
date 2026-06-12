@@ -22,7 +22,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "tag": "alpha"
+    "tag": "latest"
   },
   "peerDependencies": {
     "@angular/core": ">=21.0.0 <22.0.0"
