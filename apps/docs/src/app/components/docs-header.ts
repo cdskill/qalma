@@ -15,12 +15,8 @@ import { ThemeToggle } from './theme-toggle';
   imports: [NgIcon, HlmButton, ThemeToggle],
   providers: [provideIcons({ lucideFeather, lucideGithub, lucideSearch })],
   template: `
-    <header
-      class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md"
-    >
-      <div
-        class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
-      >
+    <header class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
+      <div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
         <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
           <ng-icon
             name="lucideFeather"
@@ -63,7 +59,7 @@ import { ThemeToggle } from './theme-toggle';
             appBtn
             variant="ghost"
             size="icon"
-            href="https://github.com"
+            href="https://github.com/cdskill/qalma"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub repository"

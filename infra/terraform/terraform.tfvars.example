@@ -2,7 +2,7 @@
 aws_region        = "eu-west-1"
 domain_name       = "qalma.dev" # served at the apex
 route53_zone_name = "qalma.dev" # existing Route 53 hosted zone
-github_repo       = "cdskill/angular-rte"
+github_repo       = "cdskill/qalma"
 github_branch     = "main"
 
 # PriceClass_All = every edge location worldwide. Still €0 under CloudFront's

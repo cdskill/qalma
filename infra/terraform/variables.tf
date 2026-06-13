@@ -17,7 +17,7 @@ variable "route53_zone_name" {
 variable "github_repo" {
   description = "owner/repo allowed to assume the deploy role via GitHub OIDC."
   type        = string
-  default     = "cdskill/angular-rte"
+  default     = "cdskill/qalma"
 }
 
 variable "github_branch" {

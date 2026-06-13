@@ -61,7 +61,7 @@ One `terraform apply` creates ~14 resources:
   (hosted zone must already exist; referenced as `data`).
 - **IAM/OIDC**: GitHub OIDC provider + least-privilege deploy role (S3 sync +
   CloudFront invalidation only), trust scoped to
-  `repo:cdskill/angular-rte:ref:refs/heads/main`.
+  `repo:cdskill/qalma:ref:refs/heads/main`.
 
 ## CI deploy mechanism
 
@@ -96,7 +96,7 @@ Read concrete values from source, never inline:
 
 ```bash
 cd infra/terraform && tofu output            # bucket_name, distribution_id, deploy_role_arn, cloudfront_domain
-gh variable list --repo cdskill/angular-rte  # AWS_REGION, DOCS_S3_BUCKET, DOCS_CF_DISTRIBUTION_ID, DOCS_DEPLOY_ROLE_ARN
+gh variable list --repo cdskill/qalma  # AWS_REGION, DOCS_S3_BUCKET, DOCS_CF_DISTRIBUTION_ID, DOCS_DEPLOY_ROLE_ARN
 ```
 
 ## Runbook
@@ -114,7 +114,7 @@ tofu init && tofu apply
 
 **Wire/refresh GitHub variables** (gh is admin on the repo):
 ```bash
-R=cdskill/angular-rte
+R=cdskill/qalma
 gh variable set AWS_REGION              --repo "$R" --body "eu-west-1"
 gh variable set DOCS_S3_BUCKET          --repo "$R" --body "$(tofu output -raw bucket_name)"
 gh variable set DOCS_CF_DISTRIBUTION_ID --repo "$R" --body "$(tofu output -raw distribution_id)"

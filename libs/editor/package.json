@@ -6,13 +6,13 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cdskill/angular-rte.git",
+    "url": "git+https://github.com/cdskill/qalma.git",
     "directory": "libs/editor"
   },
   "bugs": {
-    "url": "https://github.com/cdskill/angular-rte/issues"
+    "url": "https://github.com/cdskill/qalma/issues"
   },
-  "homepage": "https://github.com/cdskill/angular-rte#readme",
+  "homepage": "https://qalma.dev/",
   "keywords": [
     "angular",
     "editor",

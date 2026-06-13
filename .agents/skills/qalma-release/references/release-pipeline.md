@@ -131,7 +131,7 @@ alpha cuts bump `0.0.1-alpha.N` automatically.
 Configured on the `@qalma/editor` npm package settings page:
 
 - Publisher: GitHub Actions
-- Organization or user / Repository: `cdskill` / `angular-rte`
+- Organization or user / Repository: `cdskill` / `qalma`
 - Workflow filename: `release.yml` (file lives at
   `.github/workflows/release.yml`)
 - Environment name: empty (the `publish` job has no `environment:` key)
