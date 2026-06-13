@@ -1,0 +1,80 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideFeather, lucideGithub, lucideSearch } from '@ng-icons/lucide';
+
+import { HlmButton } from '../ui/button';
+import { ThemeToggle } from './theme-toggle';
+
+/**
+ * Minimal top bar in the shadcn / plate spirit: short height, no dividing
+ * border, backdrop blur. The art direction lives in the page, not the chrome.
+ */
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-docs-header',
+  imports: [NgIcon, HlmButton, ThemeToggle],
+  providers: [provideIcons({ lucideFeather, lucideGithub, lucideSearch })],
+  template: `
+    <header
+      class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md"
+    >
+      <div
+        class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
+      >
+        <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
+          <ng-icon
+            name="lucideFeather"
+            class="text-lg text-accent"
+            aria-hidden="true"
+          />
+          <span class="font-serif text-lg font-medium tracking-tight">
+            Qalma
+          </span>
+        </a>
+
+        <nav
+          class="hidden items-center gap-5 text-sm text-muted-foreground md:flex"
+        >
+          <a class="transition-colors hover:text-foreground" href="#playground">
+            Playground
+          </a>
+          <a class="transition-colors hover:text-foreground" href="#">Docs</a>
+          <a class="transition-colors hover:text-foreground" href="#">
+            Components
+          </a>
+        </nav>
+
+        <div class="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary sm:inline-flex"
+            aria-label="Search documentation"
+          >
+            <ng-icon name="lucideSearch" class="text-sm" aria-hidden="true" />
+            <span>Search docs…</span>
+            <kbd
+              class="ml-2 rounded border border-border px-1.5 font-mono text-[10px]"
+            >
+              ⌘K
+            </kbd>
+          </button>
+
+          <a
+            appBtn
+            variant="ghost"
+            size="icon"
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub repository"
+          >
+            <ng-icon name="lucideGithub" aria-hidden="true" />
+          </a>
+
+          <app-theme-toggle />
+        </div>
+      </div>
+    </header>
+  `,
+})
+export class DocsHeader {}

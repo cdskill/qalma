@@ -1,0 +1,456 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Qalma design system
+ * ------------------------------------------------------------------ *
+ * Built on the shadcn / spartan-ng token contract so every primitive
+ * (brain + helm) and every Tailwind utility reads from the same source
+ * of truth. The palette is "ink on paper": a warm off-white surface in
+ * light mode, deep ink in dark mode, with a sepia accent (the qalam).
+ * ------------------------------------------------------------------ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+
+  /* paper / ink surfaces */
+  --background: #faf7f1;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  /* ink is the primary action color in light mode */
+  --primary: #1c1917;
+  --primary-foreground: #faf7f1;
+  --secondary: #f3eadb;
+  --secondary-foreground: #44403c;
+  --muted: #f1ece2;
+  --muted-foreground: #78716c;
+
+  /* sepia accent — the calligraphic ink */
+  --accent: #8c5a2b;
+  --accent-foreground: #ffffff;
+  --accent-subtle: #f0e2c8;
+
+  --destructive: #b91c1c;
+  --border: #e6dfd3;
+  --input: #e6dfd3;
+  --ring: #8c5a2b;
+
+  /* syntax-highlight palette (light) */
+  --hl-attr: #1d4ed8;
+  --hl-builtin: #0f766e;
+  --hl-comment: #8a8377;
+  --hl-keyword: #7c3aed;
+  --hl-number: #c2410c;
+  --hl-meta: #57534e;
+  --hl-string: #15803d;
+  --hl-title: #b45309;
+  --hl-type: #0e7490;
+  --hl-variable: #0369a1;
+}
+
+.dark {
+  --background: #100f0d;
+  --foreground: #ede7db;
+  --card: #181613;
+  --card-foreground: #ede7db;
+  --popover: #181613;
+  --popover-foreground: #ede7db;
+
+  --primary: #ede7db;
+  --primary-foreground: #100f0d;
+  --secondary: #251e14;
+  --secondary-foreground: #d6ccbc;
+  --muted: #1f1b16;
+  --muted-foreground: #9b9287;
+
+  --accent: #d9a45b;
+  --accent-foreground: #1c1917;
+  --accent-subtle: #3a2e1c;
+
+  --destructive: #f0997b;
+  --border: #2b2722;
+  --input: #2b2722;
+  --ring: #d9a45b;
+
+  /* syntax-highlight palette (dark) */
+  --hl-attr: #7dd3fc;
+  --hl-builtin: #5eead4;
+  --hl-comment: #78716c;
+  --hl-keyword: #c4b5fd;
+  --hl-number: #fdba74;
+  --hl-meta: #a8a29e;
+  --hl-string: #86efac;
+  --hl-title: #fcd34d;
+  --hl-type: #67e8f9;
+  --hl-variable: #7dd3fc;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-script: 'Imperial Script', cursive;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-foreground);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Calligraphic signature — the pen stroke that draws itself
+ * ------------------------------------------------------------------ */
+@keyframes qalma-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.qalma-swash path {
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  animation: qalma-draw 1.3s cubic-bezier(0.65, 0, 0.35, 1) 0.45s forwards;
+}
+
+@keyframes qalma-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.qalma-caret {
+  animation: qalma-caret-blink 1.1s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qalma-swash path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .qalma-caret {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Editor content surface (qalma-content / ProseMirror)
+ * Headless library ships no styling — this is the consumer's art
+ * direction, themed against the design tokens above.
+ * ------------------------------------------------------------------ */
+qalma-content .ProseMirror {
+  outline: none;
+}
+
+qalma-content .ProseMirror p {
+  margin-bottom: 0.75rem;
+}
+
+qalma-content .ProseMirror h1 {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.875rem;
+  font-weight: 560;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+qalma-content .ProseMirror h2 {
+  margin-bottom: 0.625rem;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 560;
+  line-height: 1.2;
+}
+
+qalma-content .ProseMirror h3 {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 560;
+}
+
+qalma-content .ProseMirror ul {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+qalma-content .ProseMirror ol {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  list-style: decimal;
+}
+
+qalma-content .ProseMirror li > p {
+  margin-bottom: 0.25rem;
+}
+
+qalma-content .ProseMirror blockquote {
+  margin: 0 0 0.75rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-accent);
+  color: var(--color-muted-foreground);
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+qalma-content .ProseMirror a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+qalma-content .ProseMirror a:hover {
+  text-decoration-thickness: 2px;
+}
+
+qalma-content .ProseMirror a:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+qalma-content .ProseMirror [data-qalma-mention] {
+  border-radius: 0.25rem;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+  font-weight: 600;
+  padding: 0.0625rem 0.25rem;
+  white-space: nowrap;
+}
+
+.dark qalma-content .ProseMirror [data-qalma-mention] {
+  color: var(--color-accent);
+}
+
+qalma-content .ProseMirror img {
+  display: inline-block;
+  vertical-align: bottom;
+  max-width: 100%;
+  max-height: 18rem;
+  margin: 0 0.125rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  object-fit: contain;
+}
+
+qalma-content .ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+qalma-content .ProseMirror .qalma-placeholder::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+}
+
+qalma-content .ProseMirror li[style*='text-align: center'],
+qalma-content .ProseMirror li[style*='text-align: right'],
+qalma-content .ProseMirror li[style*='text-align: justify'] {
+  list-style-position: inside;
+}
+
+qalma-content .ProseMirror li[style*='text-align: center'] > p,
+qalma-content .ProseMirror li[style*='text-align: right'] > p,
+qalma-content .ProseMirror li[style*='text-align: justify'] > p {
+  display: inline;
+}
+
+qalma-content .ProseMirror blockquote[style*='text-align: right'] {
+  border-left-width: 0;
+  border-right: 2px solid var(--color-accent);
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+/* Code block node view (provided by the playground's highlight plugin) */
+qalma-content .ProseMirror .qalma-code-block {
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-muted);
+}
+
+qalma-content .ProseMirror .qalma-code-block-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.25rem;
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+}
+
+qalma-content .ProseMirror .qalma-code-block-language {
+  overflow: hidden;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1rem;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 4.25rem;
+  height: 1.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: var(--color-card);
+  color: var(--color-secondary-foreground);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy-icon {
+  display: inline-flex;
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy:hover {
+  border-color: var(--color-accent);
+  color: var(--color-foreground);
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy[data-copied='true'] {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+qalma-content .ProseMirror .qalma-code-block-copy[data-copied='fallback'] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+qalma-content .ProseMirror .qalma-code-block pre {
+  margin: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-foreground);
+  padding: 0.85rem 1rem 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+qalma-content .ProseMirror .hljs-attr {
+  color: var(--hl-attr);
+}
+qalma-content .ProseMirror .hljs-built_in {
+  color: var(--hl-builtin);
+}
+qalma-content .ProseMirror .hljs-comment {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+qalma-content .ProseMirror .hljs-keyword {
+  color: var(--hl-keyword);
+}
+qalma-content .ProseMirror .hljs-literal,
+qalma-content .ProseMirror .hljs-number {
+  color: var(--hl-number);
+}
+qalma-content .ProseMirror .hljs-meta {
+  color: var(--hl-meta);
+}
+qalma-content .ProseMirror .hljs-params {
+  color: var(--color-foreground);
+}
+qalma-content .ProseMirror .hljs-string {
+  color: var(--hl-string);
+}
+qalma-content .ProseMirror .hljs-title {
+  color: var(--hl-title);
+}
+qalma-content .ProseMirror .hljs-type {
+  color: var(--hl-type);
+}
+qalma-content .ProseMirror .hljs-variable {
+  color: var(--hl-variable);
+}
