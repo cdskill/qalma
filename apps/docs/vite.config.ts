@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
           discover: true,
           // Sitemap pour le SEO. ⚠️ Remplace `host` par ton vrai domaine Route 53.
           sitemap: {
-            host: 'https://example.com/',
+            host: 'https://qalma.dev/',
           },
         },
       }),

@@ -1,13 +1,14 @@
 # Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
 aws_region        = "eu-west-1"
-domain_name       = "docs.qalma.dev" # ← your real docs domain
-route53_zone_name = "qalma.dev"      # ← existing Route 53 hosted zone
+domain_name       = "qalma.dev" # served at the apex
+route53_zone_name = "qalma.dev" # existing Route 53 hosted zone
 github_repo       = "cdskill/angular-rte"
 github_branch     = "main"
 
-# PriceClass_100 = NA + EU (cheapest). Bump to PriceClass_200 / PriceClass_All
-# for more edge locations (Asia, South America, etc.).
-price_class = "PriceClass_100"
+# PriceClass_All = every edge location worldwide. Still €0 under CloudFront's
+# always-free tier (1 TB + 10M requests/month). Use PriceClass_100 (NA + EU)
+# only if you want to cap egress cost at very high traffic.
+price_class = "PriceClass_All"
 
 # Set to false if your AWS account ALREADY has a GitHub OIDC provider
 # (token.actions.githubusercontent.com).
