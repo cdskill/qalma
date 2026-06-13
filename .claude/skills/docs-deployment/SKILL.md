@@ -142,10 +142,14 @@ curl -I https://qalma.dev/sitemap.xml  # 200
 
 ## Status (2026-06-13)
 
-Infra **applied** (14 resources live), GitHub variables **wired**. PR
-`feat/docs-deploy-cloudfront` (#4) is **open, not yet merged** → the first deploy
-fires on merge (which affects `docs`). Until merged + deployed the bucket is
-empty and `qalma.dev` returns an error.
+**Live.** Infra applied (14 resources), GitHub variables wired, PR #4 merged to
+`main`, first deploy succeeded. `https://qalma.dev/` serves over HTTP/2+Brotli
+from CloudFront; HTML is `must-revalidate`, hashed assets are `immutable`.
+Subsequent deploys fire automatically when a push to `main` affects `docs`.
+
+Known follow-up: the CI actions (`nrwl/nx-set-shas`, `pnpm/action-setup`,
+`aws-actions/configure-aws-credentials`) emit a Node 20 deprecation warning —
+non-blocking, bump when convenient.
 
 Related: [[docs-hosting]] (memory), and the deploy workflow lives next to the
 npm `release.yml`.
