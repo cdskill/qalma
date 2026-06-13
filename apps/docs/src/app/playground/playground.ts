@@ -135,8 +135,13 @@ import { PlaygroundToolbar } from './toolbar';
 })
 export class Playground {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly mentionSurface =
-    viewChild.required<ElementRef<HTMLElement>>('mentionSurface');
+  // `#mentionSurface` sits on the <qalma-content> component, so without an
+  // explicit `read` the query resolves to the component instance (whose
+  // `.nativeElement` is undefined). Read the host ElementRef instead.
+  private readonly mentionSurface = viewChild.required<
+    HTMLElement,
+    ElementRef<HTMLElement>
+  >('mentionSurface', { read: ElementRef });
   private readonly imageUpload =
     viewChild.required<ElementRef<HTMLInputElement>>('imageUpload');
 

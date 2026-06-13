@@ -1,6 +1,6 @@
 import {
   ApplicationConfig,
-  
+  provideZonelessChangeDetection,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import {
@@ -12,8 +12,9 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideBrowserGlobalErrorListeners(),
-    
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZonelessChangeDetection(),
     provideFileRouter(),
     provideClientHydration(),
     provideHttpClient(
