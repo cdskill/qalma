@@ -1,0 +1,4 @@
+interface:
+  display_name: "Qalma Docs Sync"
+  short_description: "Sync Qalma docs after plugin changes"
+  default_prompt: "Use $qalma-docs-sync to synchronize Qalma docs after adding or changing a plugin."

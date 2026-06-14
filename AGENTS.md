@@ -17,6 +17,9 @@ extension points over exposing raw ProseMirror details.
 - Use `qalma-plugin-development` whenever adding, changing, reviewing, or
   removing an editor plugin, command, mark, node, shortcut, or ProseMirror
   behavior.
+- Use `qalma-docs-sync` after adding, changing, reviewing, or removing a public
+  plugin capability that affects `apps/docs`, docs navigation, playground
+  behavior, `libs/editor/README.md`, or durable workflow guidance.
 - Use `git-commit` when the user invokes `/commit` or asks to generate and
   create a conventional commit from staged changes.
 - Use `qalma-release` when discussing or changing versioning, the release

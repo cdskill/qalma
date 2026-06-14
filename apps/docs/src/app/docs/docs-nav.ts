@@ -62,6 +62,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
   {
     title: 'Productivity',
     items: [
+      { title: 'Slash Commands', href: '/docs/slash-command' },
       { title: 'Mention', href: '/docs/mention' },
       { title: 'History (Undo/Redo)', href: '/docs/history' },
       { title: 'Paste Rules', href: '/docs/paste-rules' },

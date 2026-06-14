@@ -97,6 +97,36 @@ test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
   );
 });
 
+test('runs block commands from the consumer-owned slash menu', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const editor = page.locator('.ProseMirror');
+
+  await editor.click();
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
+  );
+  await page.keyboard.press('Backspace');
+  await editor.pressSequentially('/he');
+
+  const slashMenu = page.getByRole('listbox', {
+    name: 'Slash command suggestions',
+  });
+
+  await expect(slashMenu).toBeVisible();
+  await expect(slashMenu.getByRole('option')).toContainText([
+    'Heading 1',
+    'Heading 2',
+    'Heading 3',
+  ]);
+
+  await page.keyboard.press('Enter');
+  await editor.pressSequentially('Roadmap');
+  await expect(page.locator('pre')).toContainText('<h1>Roadmap</h1>');
+});
+
 test('renders the configured plugin toolbar', async ({ page }) => {
   await page.goto('/');
 

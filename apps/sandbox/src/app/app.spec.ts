@@ -26,6 +26,9 @@ import {
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   PlaceholderPlugin,
   QalmaEditorController,
+  SLASH_COMMAND_PLUGIN_DEFAULT_OPTIONS,
+  SlashCommandPlugin,
+  SlashCommandState,
   SubscriptSuperscriptPlugin,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
@@ -1150,6 +1153,111 @@ describe('App', () => {
     expect(getEditorSelectionFrom(editor)).toBe(8);
 
     editor.unmount(host);
+  });
+
+  it('should expose slash command state through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content: '<p>/he</p>',
+      plugins: [SlashCommandPlugin, HeadingsPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 4, 4);
+
+    expect(SlashCommandPlugin.key).toBe('slashCommand');
+    expect(editor.query<SlashCommandState>('slashCommand')).toEqual({
+      from: 1,
+      to: 4,
+      query: 'he',
+      trigger: '/',
+    });
+    expect(editor.execute('deleteSlashCommand')).toBeTrue();
+    expect(editor.html()).toBe('<p></p>');
+    expect(editor.execute('toggleHeading1')).toBeTrue();
+    expect(editor.html()).toBe('<h1></h1>');
+
+    editor.unmount(host);
+  });
+
+  it('should dismiss slash commands without changing content', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Ask /</p>',
+      plugins: [SlashCommandPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 6, 6);
+
+    expect(editor.query<SlashCommandState>('slashCommand')).toEqual({
+      from: 5,
+      to: 6,
+      query: '',
+      trigger: '/',
+    });
+    expect(editor.execute('dismissSlashCommand')).toBeTrue();
+    expect(editor.query<SlashCommandState>('slashCommand')).toBeNull();
+    expect(editor.html()).toBe('<p>Ask /</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should keep slash commands disabled inside code blocks', () => {
+    const editor = createQalmaEditor({
+      content: '<pre><code>/he</code></pre>',
+      plugins: [CodeBlockPlugin, SlashCommandPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 4, 4);
+
+    expect(editor.query<SlashCommandState>('slashCommand')).toBeNull();
+    expect(editor.canExecute('deleteSlashCommand')).toBeFalse();
+    expect(editor.execute('deleteSlashCommand')).toBeFalse();
+    expect(editor.html()).toBe(
+      '<pre><code class="language-plaintext">/he</code></pre>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should expose configurable slash command defaults and validation', () => {
+    const configured = SlashCommandPlugin.configure({
+      trigger: '+',
+      minQueryLength: 1,
+      maxQueryLength: 24,
+    });
+
+    expect(SLASH_COMMAND_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      trigger: '/',
+      minQueryLength: 0,
+      maxQueryLength: 64,
+    });
+    expect(SlashCommandPlugin.options).toEqual(
+      SLASH_COMMAND_PLUGIN_DEFAULT_OPTIONS,
+    );
+    expect(configured.options).toEqual({
+      trigger: '+',
+      minQueryLength: 1,
+      maxQueryLength: 24,
+    });
+    expect(() =>
+      SlashCommandPlugin.configure({
+        trigger: '//',
+      }),
+    ).toThrowError(
+      'SlashCommandPlugin trigger must be a single non-whitespace character.',
+    );
+    expect(() =>
+      SlashCommandPlugin.configure({
+        minQueryLength: 3,
+        maxQueryLength: 2,
+      }),
+    ).toThrowError(
+      'SlashCommandPlugin maxQueryLength must be greater than or equal to minQueryLength.',
+    );
   });
 
   it('should keep mentions disabled inside code blocks', () => {

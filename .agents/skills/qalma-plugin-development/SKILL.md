@@ -31,9 +31,11 @@ the headless Qalma architecture.
 6. Export only consumer-facing symbols from `libs/editor/src/index.ts`.
 7. Configure the plugin in the sandbox TypeScript and compose its controls
    explicitly in the sandbox template. Never make the core auto-render buttons.
-8. Add focused tests for public behavior, configuration, invalid options, state,
+8. Use `qalma-docs-sync` to update `apps/docs`, docs navigation, and
+   `libs/editor/README.md` for the public plugin surface.
+9. Add focused tests for public behavior, configuration, invalid options, state,
    and keyboard behavior as applicable.
-9. Run the definition-of-done checks and stop every server started for testing.
+10. Run the definition-of-done checks and stop every server started for testing.
 
 ## Configurable Plugin Rules
 

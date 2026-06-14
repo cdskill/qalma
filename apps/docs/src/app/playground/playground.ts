@@ -4,6 +4,7 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  effect,
   inject,
   viewChild,
 } from '@angular/core';
@@ -25,6 +26,7 @@ import {
   PlaceholderPlugin,
   QalmaContent,
   QalmaEditor,
+  SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
   TextAlignPlugin,
   TextFormattingKit,
@@ -52,6 +54,11 @@ import {
   createPlaygroundMentionSource,
 } from './mention';
 import { PlaygroundMentionMenu } from './mention-menu';
+import {
+  PlaygroundSlashCommandController,
+  PlaygroundSlashCommandOption,
+} from './slash-command';
+import { PlaygroundSlashCommandMenu } from './slash-command-menu';
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
 
@@ -62,6 +69,7 @@ import { PosthogService } from '../services/posthog.service';
     QalmaEditor,
     PlaygroundLinkPopover,
     PlaygroundMentionMenu,
+    PlaygroundSlashCommandMenu,
     PlaygroundToolbar,
   ],
   selector: 'app-playground',
@@ -91,13 +99,28 @@ import { PosthogService } from '../services/posthog.service';
         class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
-        (focus)="linkPopover.showPreview($event); mentionController.refresh()"
+        (focus)="
+          linkPopover.showPreview($event);
+          mentionController.refresh();
+          slashCommandController.refresh()
+        "
         (blur)="linkPopover.scheduleHideFromEvent($event)"
         (focusin)="linkPopover.showPreview($event)"
         (focusout)="linkPopover.scheduleHideFromEvent($event)"
         (click)="mentionController.refresh()"
       />
     </qalma-editor>
+
+    @if (slashCommandController.open()) {
+      <app-playground-slash-command-menu
+        [placement]="slashCommandController.placement()"
+        [options]="slashCommandController.options()"
+        [activeIndex]="slashCommandController.activeIndex()"
+        (activate)="slashCommandController.setActiveIndex($event)"
+        (pick)="onSlashCommandPick($event)"
+        (dismiss)="slashCommandController.dismiss()"
+      />
+    }
 
     @if (mentionController.open()) {
       <app-playground-mention-menu
@@ -166,6 +189,7 @@ export class Playground {
       MentionPlugin.configure({
         trigger: '@',
       }),
+      SlashCommandPlugin,
       PasteRulesPlugin,
       ListsPlugin,
       BlockquotePlugin,
@@ -189,23 +213,49 @@ export class Playground {
     this.editor,
     createPlaygroundMentionSource('lazy'),
   );
+  protected readonly slashCommandController =
+    new PlaygroundSlashCommandController(this.editor);
   private readonly imagePreviewUrls: string[] = [];
 
   constructor() {
+    effect(() => {
+      this.editor.query('slashCommand');
+      queueMicrotask(() => this.slashCommandController.refresh());
+    });
+
     afterNextRender(() => {
       const surface = this.mentionSurface().nativeElement;
       const refreshMentions = () => this.mentionController.refresh();
       const handleMentionKeydown = (event: Event) =>
         this.mentionController.handleMentionKeydown(event);
+      const refreshSlashCommands = () => this.slashCommandController.refresh();
+      const handleSlashCommandKeydown = (event: Event) =>
+        this.slashCommandController.handleSlashCommandKeydown(event);
 
       surface.addEventListener('qalma-mention-update', refreshMentions);
       surface.addEventListener('qalma-mention-keydown', handleMentionKeydown);
+      surface.addEventListener(
+        'qalma-slash-command-update',
+        refreshSlashCommands,
+      );
+      surface.addEventListener(
+        'qalma-slash-command-keydown',
+        handleSlashCommandKeydown,
+      );
 
       this.destroyRef.onDestroy(() => {
         surface.removeEventListener('qalma-mention-update', refreshMentions);
         surface.removeEventListener(
           'qalma-mention-keydown',
           handleMentionKeydown,
+        );
+        surface.removeEventListener(
+          'qalma-slash-command-update',
+          refreshSlashCommands,
+        );
+        surface.removeEventListener(
+          'qalma-slash-command-keydown',
+          handleSlashCommandKeydown,
         );
         this.revokeImagePreviewUrls();
       });
@@ -291,6 +341,13 @@ export class Playground {
   protected onMentionPick(option: PlaygroundMentionOption): void {
     this.mentionController.insert(option);
     this.posthogService.posthog.capture('playground_mention_inserted');
+  }
+
+  protected onSlashCommandPick(option: PlaygroundSlashCommandOption): void {
+    this.slashCommandController.insert(option);
+    this.posthogService.posthog.capture('playground_slash_command_inserted', {
+      command: option.command,
+    });
   }
 
   private revokeImagePreviewUrls(): void {

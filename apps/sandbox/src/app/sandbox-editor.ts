@@ -2,7 +2,10 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
+  NgZone,
   afterNextRender,
+  effect,
   inject,
   viewChild,
 } from '@angular/core';
@@ -24,6 +27,7 @@ import {
   PlaceholderPlugin,
   QalmaContent,
   QalmaEditor,
+  SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
   TextAlignPlugin,
   createQalmaEditor,
@@ -48,6 +52,8 @@ import {
   SANDBOX_EXAMPLE_IMAGE_TITLE,
 } from './sandbox-image';
 import { SandboxMentionMenu } from './sandbox-mention-menu';
+import { SandboxSlashCommandController } from './sandbox-slash-command';
+import { SandboxSlashCommandMenu } from './sandbox-slash-command-menu';
 import { SandboxToolbar } from './sandbox-toolbar';
 
 @Component({
@@ -56,6 +62,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
     QalmaEditor,
     SandboxLinkPopover,
     SandboxMentionMenu,
+    SandboxSlashCommandMenu,
     SandboxToolbar,
   ],
   selector: 'app-sandbox-editor',
@@ -80,18 +87,38 @@ import { SandboxToolbar } from './sandbox-toolbar';
         (change)="insertUploadedImage($event)"
       />
 
-      <qalma-content
+      <div
         #mentionSurface
         class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_.hljs-attr]:text-sky-300 [&_.ProseMirror_.hljs-built_in]:text-cyan-300 [&_.ProseMirror_.hljs-comment]:text-slate-500 [&_.ProseMirror_.hljs-keyword]:text-violet-300 [&_.ProseMirror_.hljs-literal]:text-orange-300 [&_.ProseMirror_.hljs-meta]:text-slate-400 [&_.ProseMirror_.hljs-number]:text-orange-300 [&_.ProseMirror_.hljs-params]:text-slate-200 [&_.ProseMirror_.hljs-string]:text-emerald-300 [&_.ProseMirror_.hljs-title]:text-amber-200 [&_.ProseMirror_.hljs-type]:text-cyan-200 [&_.ProseMirror_.hljs-variable]:text-sky-200 [&_.ProseMirror_blockquote]:mb-3 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-slate-300 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-slate-700 [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_pre]:mb-3 [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:bg-slate-950 [&_.ProseMirror_pre]:p-3 [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:leading-6 [&_.ProseMirror_pre]:text-slate-100 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
-        (focus)="linkPopover.showPreview($event); mentionController.refresh()"
+        (focus)="
+          linkPopover.showPreview($event);
+          mentionController.refresh();
+          slashCommandController.refresh()
+        "
         (blur)="linkPopover.scheduleHideFromEvent($event)"
         (focusin)="linkPopover.showPreview($event)"
         (focusout)="linkPopover.scheduleHideFromEvent($event)"
-        (click)="mentionController.refresh()"
-      />
+        (qalma-slash-command-update)="slashCommandController.refresh()"
+        (qalma-slash-command-keydown)="
+          slashCommandController.handleSlashCommandKeydown($event)
+        "
+      >
+        <qalma-content />
+      </div>
     </qalma-editor>
+
+    @if (slashCommandController.open()) {
+      <app-sandbox-slash-command-menu
+        [placement]="slashCommandController.placement()"
+        [options]="slashCommandController.options()"
+        [activeIndex]="slashCommandController.activeIndex()"
+        (activate)="slashCommandController.setActiveIndex($event)"
+        (pick)="slashCommandController.insert($event)"
+        (dismiss)="slashCommandController.dismiss()"
+      />
+    }
 
     @if (mentionController.open()) {
       <app-sandbox-mention-menu
@@ -127,6 +154,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
 })
 export class SandboxEditor {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly zone = inject(NgZone);
   private readonly mentionSurface =
     viewChild.required<ElementRef<HTMLElement>>('mentionSurface');
   private readonly imageUpload =
@@ -149,6 +177,7 @@ export class SandboxEditor {
       MentionPlugin.configure({
         trigger: '@',
       }),
+      SlashCommandPlugin,
       PasteRulesPlugin,
       ListsPlugin,
       BlockquotePlugin,
@@ -172,17 +201,40 @@ export class SandboxEditor {
     this.editor,
     createSandboxMentionSource('lazy'),
   );
+  protected readonly slashCommandController = new SandboxSlashCommandController(
+    this.editor,
+  );
   private readonly imagePreviewUrls: string[] = [];
 
   constructor() {
+    effect(() => {
+      this.editor.query('slashCommand');
+      queueMicrotask(() => this.slashCommandController.refresh());
+    });
+
     afterNextRender(() => {
       const surface = this.mentionSurface().nativeElement;
-      const refreshMentions = () => this.mentionController.refresh();
+      const refreshMentions = () =>
+        this.zone.run(() => this.mentionController.refresh());
+      const refreshSlashCommands = () =>
+        this.zone.run(() => this.slashCommandController.refresh());
       const handleMentionKeydown = (event: Event) =>
-        this.mentionController.handleMentionKeydown(event);
+        this.zone.run(() => this.mentionController.handleMentionKeydown(event));
+      const handleSlashCommandKeydown = (event: Event) =>
+        this.zone.run(() =>
+          this.slashCommandController.handleSlashCommandKeydown(event),
+        );
 
       surface.addEventListener('qalma-mention-update', refreshMentions);
       surface.addEventListener('qalma-mention-keydown', handleMentionKeydown);
+      surface.addEventListener(
+        'qalma-slash-command-update',
+        refreshSlashCommands,
+      );
+      surface.addEventListener(
+        'qalma-slash-command-keydown',
+        handleSlashCommandKeydown,
+      );
 
       this.destroyRef.onDestroy(() => {
         surface.removeEventListener('qalma-mention-update', refreshMentions);
@@ -190,9 +242,24 @@ export class SandboxEditor {
           'qalma-mention-keydown',
           handleMentionKeydown,
         );
+        surface.removeEventListener(
+          'qalma-slash-command-update',
+          refreshSlashCommands,
+        );
+        surface.removeEventListener(
+          'qalma-slash-command-keydown',
+          handleSlashCommandKeydown,
+        );
         this.revokeImagePreviewUrls();
       });
     });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  protected handleDocumentKeydown(event: KeyboardEvent): void {
+    if (this.editorContainsFocus()) {
+      this.slashCommandController.handleEditorKeydown(event);
+    }
   }
 
   protected insertImageFromUrl(): void {
@@ -264,6 +331,19 @@ export class SandboxEditor {
     }
 
     this.imagePreviewUrls.length = 0;
+  }
+
+  private editorContainsFocus(): boolean {
+    const activeElement = document.activeElement;
+
+    try {
+      return Boolean(
+        activeElement &&
+          this.mentionSurface().nativeElement.contains(activeElement),
+      );
+    } catch {
+      return false;
+    }
   }
 }
 

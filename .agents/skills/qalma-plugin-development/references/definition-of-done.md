@@ -23,6 +23,8 @@ Use the applicable items. Do not add meaningless tests merely to tick a box.
 - No dead code, compatibility alias, or unrelated refactor remains.
 - Repository skills are updated when the plugin changes the durable contract or
   development workflow.
+- `qalma-docs-sync` has been used when the plugin changes public docs, docs
+  navigation, playground behavior, or `libs/editor/README.md`.
 
 ## Consumer Experience
 

@@ -22,11 +22,7 @@ npm install @qalma/editor
 ## Quick start
 
 ```ts
-import {
-  createQalmaEditor,
-  HistoryPlugin,
-  TextFormattingKit,
-} from '@qalma/editor';
+import { createQalmaEditor, HistoryPlugin, TextFormattingKit } from '@qalma/editor';
 
 const editor = createQalmaEditor({
   content: '<p>Hello world</p>',
@@ -58,17 +54,17 @@ const editor = createQalmaEditor({
 
 Builds a `QalmaEditorController`, the headless API your components bind to:
 
-| Member | Description |
-| --- | --- |
-| `html: Signal<string>` | Serialized HTML of the current document, kept in sync with every edit. |
-| `editable: Signal<boolean>` | Whether the document can be edited. |
-| `execute(command, value?)` | Runs a registered command, e.g. `editor.execute('toggleBold')`. |
-| `canExecute(command, value?)` | Whether a command would currently succeed. |
-| `isCommandActive(command)` | Whether a toggleable command is active for the current selection. |
-| `query<T>(name)` | Reads plugin-provided state, e.g. the link or image under the cursor. |
-| `setHtml(html)` | Replaces the document content. |
-| `setEditable(editable)` | Toggles editability at runtime. |
-| `focus()` | Focuses the editor view. |
+| Member                        | Description                                                            |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `html: Signal<string>`        | Serialized HTML of the current document, kept in sync with every edit. |
+| `editable: Signal<boolean>`   | Whether the document can be edited.                                    |
+| `execute(command, value?)`    | Runs a registered command, e.g. `editor.execute('toggleBold')`.        |
+| `canExecute(command, value?)` | Whether a command would currently succeed.                             |
+| `isCommandActive(command)`    | Whether a toggleable command is active for the current selection.      |
+| `query<T>(name)`              | Reads plugin-provided state, e.g. the link or image under the cursor.  |
+| `setHtml(html)`               | Replaces the document content.                                         |
+| `setEditable(editable)`       | Toggles editability at runtime.                                        |
+| `focus()`                     | Focuses the editor view.                                               |
 
 `options.content` accepts an initial HTML string, and `options.plugins`
 accepts the list of `QalmaPlugin`s that define the schema, commands, and
@@ -100,30 +96,32 @@ plugin instance with merged options, e.g.
 
 ## Available plugins
 
-| Plugin | Commands |
-| --- | --- |
-| `BoldPlugin`, `ItalicPlugin`, `UnderlinePlugin`, `StrikePlugin` (`TextFormattingKit`) | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike` |
-| `SubscriptSuperscriptPlugin` | `toggleSubscript`, `toggleSuperscript` |
-| `HeadingsPlugin` | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels) |
-| `BlockquotePlugin` | `toggleBlockquote` |
-| `ListsPlugin` | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem` |
-| `CodeBlockPlugin` | `toggleCodeBlock`, `setCodeBlockLanguage` |
-| `LinkPlugin` | `setLink`, `unsetLink` |
-| `ImagePlugin` | `insertImage`, `updateImage` |
-| `MentionPlugin` | `insertMention` |
-| `ColorPlugin` | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor` |
-| `HighlightPlugin` | `setHighlight`, `unsetHighlight` |
-| `TextAlignPlugin` | alignment commands for configured node types |
-| `ClearFormattingPlugin` | `clearFormatting` |
-| `HardBreakPlugin` | `insertHardBreak` |
-| `HistoryPlugin` | `undo`, `redo` (`Mod-z`, `Shift-Mod-z`, `Mod-y`) |
-| `PasteRulesPlugin` | normalizes pasted content |
-| `PlaceholderPlugin` | shows placeholder text in an empty document |
-| `TrailingParagraphPlugin` | keeps a trailing empty paragraph at the end of the document |
+| Plugin                                                                                | Commands                                                                                 |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `BoldPlugin`, `ItalicPlugin`, `UnderlinePlugin`, `StrikePlugin` (`TextFormattingKit`) | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                          |
+| `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                   |
+| `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                  |
+| `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                       |
+| `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem` |
+| `CodeBlockPlugin`                                                                     | `toggleCodeBlock`, `setCodeBlockLanguage`                                                |
+| `LinkPlugin`                                                                          | `setLink`, `unsetLink`                                                                   |
+| `ImagePlugin`                                                                         | `insertImage`, `updateImage`                                                             |
+| `MentionPlugin`                                                                       | `insertMention`                                                                          |
+| `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                              |
+| `ColorPlugin`                                                                         | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`           |
+| `HighlightPlugin`                                                                     | `setHighlight`, `unsetHighlight`                                                         |
+| `TextAlignPlugin`                                                                     | alignment commands for configured node types                                             |
+| `ClearFormattingPlugin`                                                               | `clearFormatting`                                                                        |
+| `HardBreakPlugin`                                                                     | `insertHardBreak`                                                                        |
+| `HistoryPlugin`                                                                       | `undo`, `redo` (`Mod-z`, `Shift-Mod-z`, `Mod-y`)                                         |
+| `PasteRulesPlugin`                                                                    | normalizes pasted content                                                                |
+| `PlaceholderPlugin`                                                                   | shows placeholder text in an empty document                                              |
+| `TrailingParagraphPlugin`                                                             | keeps a trailing empty paragraph at the end of the document                              |
 
 Read each plugin's source under `src/lib/plugins` for configuration options
 (e.g. `HeadingsPlugin.configure({ levels: [1, 2, 3] })`,
 `MentionPlugin.configure({ trigger: '@' })`,
+`SlashCommandPlugin.configure({ trigger: '/' })`,
 `LinkPlugin.configure({ allowedProtocols: [...] })`).
 
 ## Learn more
