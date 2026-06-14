@@ -1,3 +1,9 @@
+## 0.0.1-alpha.5 (2026-06-14)
+
+### 🚀 Features
+
+- **docs:** add qalma brand mark ([dcba972](https://github.com/cdskill/qalma/commit/dcba972))
+
 ## 0.0.1-alpha.4 (2026-06-14)
 
 This was a version bump only for editor to align it with other projects, there were no code changes.
