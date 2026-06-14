@@ -11,6 +11,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Scrollable region without a visible scrollbar (sidebar / TOC columns). */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 :root {
   --radius: 0.625rem;
 
@@ -317,6 +327,366 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   border-right: 2px solid var(--color-accent);
   padding-left: 0;
   padding-right: 1rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Docs prose — typography for markdown content pages (`/docs/*`)
+ * ------------------------------------------------------------------ */
+:where(.qalma-prose, .analog-markdown-route) {
+  max-width: 48rem;
+  color: var(--color-foreground);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+:where(.qalma-prose, .analog-markdown-route) > :first-child {
+  margin-top: 0;
+}
+
+:where(.qalma-prose, .analog-markdown-route) h1,
+:where(.qalma-prose, .analog-markdown-route) h2,
+:where(.qalma-prose, .analog-markdown-route) h3 {
+  font-family: var(--font-serif);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 5rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) h1 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+:where(.qalma-prose, .analog-markdown-route) h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+:where(.qalma-prose, .analog-markdown-route) h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1875rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) p {
+  margin-bottom: 1.1rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) ul,
+:where(.qalma-prose, .analog-markdown-route) ol {
+  margin-bottom: 1.1rem;
+  padding-left: 1.5rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) ul {
+  list-style: disc;
+}
+
+:where(.qalma-prose, .analog-markdown-route) ol {
+  list-style: decimal;
+}
+
+:where(.qalma-prose, .analog-markdown-route) li {
+  margin-bottom: 0.35rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) li > ul,
+:where(.qalma-prose, .analog-markdown-route) li > ol {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+:where(.qalma-prose, .analog-markdown-route) strong {
+  font-weight: 600;
+}
+
+:where(.qalma-prose, .analog-markdown-route) a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+:where(.qalma-prose, .analog-markdown-route) a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:where(.qalma-prose, .analog-markdown-route) blockquote {
+  margin: 0 0 1.1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-accent);
+  color: var(--color-muted-foreground);
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+:where(.qalma-prose, .analog-markdown-route) hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+:where(.qalma-prose, .analog-markdown-route) :not(pre) > code {
+  border-radius: 0.25rem;
+  background: var(--color-muted);
+  padding: 0.15rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) pre {
+  margin-bottom: 1.1rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-muted);
+  padding: 0.85rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+:where(.qalma-prose, .analog-markdown-route) pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Prism syntax highlighting for fenced code blocks (AnalogJS content pipeline),
+   mapped onto the same palette the playground editor uses. */
+:where(.qalma-prose, .analog-markdown-route) .token.comment,
+:where(.qalma-prose, .analog-markdown-route) .token.prolog,
+:where(.qalma-prose, .analog-markdown-route) .token.doctype,
+:where(.qalma-prose, .analog-markdown-route) .token.cdata {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.punctuation {
+  color: var(--color-muted-foreground);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.property,
+:where(.qalma-prose, .analog-markdown-route) .token.tag,
+:where(.qalma-prose, .analog-markdown-route) .token.constant,
+:where(.qalma-prose, .analog-markdown-route) .token.symbol,
+:where(.qalma-prose, .analog-markdown-route) .token.deleted {
+  color: var(--hl-attr);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.boolean,
+:where(.qalma-prose, .analog-markdown-route) .token.number {
+  color: var(--hl-number);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.selector,
+:where(.qalma-prose, .analog-markdown-route) .token.attr-name,
+:where(.qalma-prose, .analog-markdown-route) .token.string,
+:where(.qalma-prose, .analog-markdown-route) .token.char,
+:where(.qalma-prose, .analog-markdown-route) .token.builtin,
+:where(.qalma-prose, .analog-markdown-route) .token.inserted {
+  color: var(--hl-string);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.operator,
+:where(.qalma-prose, .analog-markdown-route) .token.entity,
+:where(.qalma-prose, .analog-markdown-route) .token.url {
+  color: var(--hl-type);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.atrule,
+:where(.qalma-prose, .analog-markdown-route) .token.attr-value,
+:where(.qalma-prose, .analog-markdown-route) .token.keyword {
+  color: var(--hl-keyword);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.function,
+:where(.qalma-prose, .analog-markdown-route) .token.class-name {
+  color: var(--hl-title);
+}
+
+:where(.qalma-prose, .analog-markdown-route) .token.regex,
+:where(.qalma-prose, .analog-markdown-route) .token.important,
+:where(.qalma-prose, .analog-markdown-route) .token.variable {
+  color: var(--hl-variable);
+}
+
+/* ------------------------------------------------------------------ *
+ * Docs tables
+ * ------------------------------------------------------------------ */
+:where(.qalma-prose, .analog-markdown-route) table {
+  width: 100%;
+  margin: 1.4rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  border-spacing: 0;
+  border-collapse: separate;
+  overflow: hidden;
+  font-size: 0.8125rem;
+}
+
+:where(.qalma-prose, .analog-markdown-route) thead {
+  background: var(--color-muted);
+}
+
+:where(.qalma-prose, .analog-markdown-route) th {
+  padding: 0.55rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+:where(.qalma-prose, .analog-markdown-route) td {
+  padding: 0.55rem 0.9rem;
+  vertical-align: top;
+  color: var(--color-muted-foreground);
+}
+
+:where(.qalma-prose, .analog-markdown-route) tbody tr + tr td,
+:where(.qalma-prose, .analog-markdown-route) thead + tbody td {
+  border-top: 1px solid var(--color-border);
+}
+
+:where(.qalma-prose, .analog-markdown-route) td > code {
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ *
+ * Docs code blocks — hover copy button (added by DocsContent directive)
+ * ------------------------------------------------------------------ */
+.docs-code {
+  position: relative;
+}
+
+.docs-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.85rem;
+  width: 1.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  background: var(--color-background);
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.docs-copy:hover {
+  color: var(--color-foreground);
+  border-color: var(--color-muted-foreground);
+}
+
+.docs-copy:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.docs-copy .docs-copy-done {
+  display: none;
+  color: var(--color-accent);
+}
+
+.docs-copy.is-copied .docs-copy-idle {
+  display: none;
+}
+
+.docs-copy.is-copied .docs-copy-done {
+  display: inline-flex;
+}
+
+/* Standalone code block: button floats top-right, revealed on hover. */
+.docs-code-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0;
+}
+
+.docs-code:hover .docs-code-copy,
+.docs-code-copy:focus-visible {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * Docs package-manager tabs (added by DocsContent directive)
+ * ------------------------------------------------------------------ */
+.docs-pm {
+  margin: 1.4rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--color-muted);
+}
+
+.docs-pm-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.docs-pm-glyph {
+  display: inline-flex;
+  color: var(--color-muted-foreground);
+}
+
+.docs-pm-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.docs-pm-tab {
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.78125rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.docs-pm-tab:hover {
+  color: var(--color-foreground);
+}
+
+.docs-pm-tab.is-active {
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
+  font-weight: 600;
+}
+
+.docs-pm-tab:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 1px;
+}
+
+.docs-pm-copy {
+  flex-shrink: 0;
+}
+
+/* The original highlighted <pre> blocks, reframed inside the card. */
+.docs-pm-body .docs-pm-panel {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 /* Code block node view (provided by the playground's highlight plugin) */

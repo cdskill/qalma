@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
+import { provideContent, withMarkdownRenderer } from '@analogjs/content';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideFileRouter(),
     provideClientHydration(),
+    provideContent(withMarkdownRenderer()),
     provideHttpClient(
       withFetch(),
       withInterceptors([requestContextInterceptor])

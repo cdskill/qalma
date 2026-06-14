@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideFeather, lucideGithub, lucideSearch } from '@ng-icons/lucide';
+import {
+  lucideFeather,
+  lucideGithub,
+  lucideMenu,
+  lucideSearch,
+  lucideX,
+} from '@ng-icons/lucide';
 
 import { HlmButton } from '../ui/button';
 import { ThemeToggle } from './theme-toggle';
@@ -12,11 +19,13 @@ import { ThemeToggle } from './theme-toggle';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-docs-header',
-  imports: [NgIcon, HlmButton, ThemeToggle],
-  providers: [provideIcons({ lucideFeather, lucideGithub, lucideSearch })],
+  imports: [RouterLink, RouterLinkActive, NgIcon, HlmButton, ThemeToggle],
+  providers: [
+    provideIcons({ lucideFeather, lucideGithub, lucideMenu, lucideSearch, lucideX }),
+  ],
   template: `
     <header class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
-      <div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
         <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
           <ng-icon
             name="lucideFeather"
@@ -31,12 +40,15 @@ import { ThemeToggle } from './theme-toggle';
         <nav
           class="hidden items-center gap-5 text-sm text-muted-foreground md:flex"
         >
-          <a class="transition-colors hover:text-foreground" href="#playground">
+          <a class="transition-colors hover:text-foreground" href="/#playground">
             Playground
           </a>
-          <a class="transition-colors hover:text-foreground" href="#">Docs</a>
-          <a class="transition-colors hover:text-foreground" href="#">
-            Components
+          <a
+            routerLink="/docs/introduction"
+            routerLinkActive="text-foreground"
+            class="transition-colors hover:text-foreground"
+          >
+            Docs
           </a>
         </nav>
 
@@ -68,9 +80,49 @@ import { ThemeToggle } from './theme-toggle';
           </a>
 
           <app-theme-toggle />
+
+          <button
+            appBtn
+            variant="ghost"
+            size="icon"
+            type="button"
+            class="md:hidden"
+            [attr.aria-label]="mobileNavOpen() ? 'Close menu' : 'Open menu'"
+            [attr.aria-expanded]="mobileNavOpen()"
+            (click)="mobileNavOpen.set(!mobileNavOpen())"
+          >
+            <ng-icon
+              [name]="mobileNavOpen() ? 'lucideX' : 'lucideMenu'"
+              aria-hidden="true"
+            />
+          </button>
         </div>
+
+        @if (mobileNavOpen()) {
+          <nav
+            class="absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-card px-4 py-3 shadow-lg sm:px-6 md:hidden"
+          >
+            <a
+              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              href="/#playground"
+              (click)="mobileNavOpen.set(false)"
+            >
+              Playground
+            </a>
+            <a
+              routerLink="/docs/introduction"
+              routerLinkActive="bg-accent-subtle !text-accent"
+              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              (click)="mobileNavOpen.set(false)"
+            >
+              Docs
+            </a>
+          </nav>
+        }
       </div>
     </header>
   `,
 })
-export class DocsHeader {}
+export class DocsHeader {
+  protected readonly mobileNavOpen = signal(false);
+}
