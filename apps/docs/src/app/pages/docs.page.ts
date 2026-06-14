@@ -60,7 +60,7 @@ import { HlmButton } from '../ui/button';
           Menu
         </button>
 
-        <div docsContent class="mx-auto max-w-3xl">
+        <div appDocsContent class="mx-auto max-w-3xl">
           <router-outlet />
         </div>
       </main>
@@ -73,10 +73,12 @@ import { HlmButton } from '../ui/button';
     </div>
 
     @if (mobileNavOpen()) {
-      <div
+      <button
+        type="button"
         class="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+        aria-label="Close navigation"
         (click)="mobileNavOpen.set(false)"
-      ></div>
+      ></button>
 
       <div
         class="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-border bg-card p-6 shadow-xl md:hidden"

@@ -20,7 +20,7 @@ import {
  * page content. All work is idempotent (processed nodes are marked).
  */
 @Directive({
-  selector: '[docsContent]',
+  selector: '[appDocsContent]',
 })
 export class DocsContent {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
