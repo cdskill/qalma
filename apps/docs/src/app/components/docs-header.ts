@@ -73,7 +73,6 @@ import { PosthogService } from '../services/posthog.service';
           <button
             type="button"
             class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary sm:inline-flex"
-            aria-label="Search documentation"
           >
             <ng-icon name="lucideSearch" class="text-sm" aria-hidden="true" />
             <span>Search docs…</span>
@@ -83,6 +82,28 @@ import { PosthogService } from '../services/posthog.service';
               ⌘K
             </kbd>
           </button>
+
+          <a
+            appBtn
+            variant="ghost"
+            size="icon"
+            href="https://www.npmjs.com/package/@qalma/editor"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="@qalma/editor on npm"
+            (click)="trackNpmClick()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="h-[1.05em] w-[1.05em]"
+              aria-hidden="true"
+            >
+              <path
+                d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"
+              />
+            </svg>
+          </a>
 
           <a
             appBtn
@@ -152,6 +173,10 @@ export class DocsHeader {
     if (opening) {
       this.posthogService.posthog.capture('mobile_nav_opened');
     }
+  }
+
+  protected trackNpmClick(): void {
+    this.posthogService.posthog.capture('npm_link_clicked');
   }
 
   protected trackGithubClick(): void {
