@@ -1,21 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {
-  lucideArrowRight,
-  lucideCheck,
-  lucideCopy,
-  lucideSparkles,
-} from '@ng-icons/lucide';
+import { lucideArrowRight, lucideSparkles } from '@ng-icons/lucide';
 
 import { HlmButton } from '../ui/button';
+import { InstallTabs } from './install-tabs';
 import { PosthogService } from '../services/posthog.service';
-
-const INSTALL_COMMAND = 'pnpm add @qalma/editor';
 
 /**
  * Compact hero. Keeps vertical footprint small so the live playground sits
@@ -25,10 +14,8 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-hero',
-  imports: [NgIcon, HlmButton],
-  providers: [
-    provideIcons({ lucideArrowRight, lucideCheck, lucideCopy, lucideSparkles }),
-  ],
+  imports: [NgIcon, HlmButton, InstallTabs],
+  providers: [provideIcons({ lucideArrowRight, lucideSparkles })],
   template: `
     <section
       class="mx-auto max-w-3xl px-4 pb-10 pt-12 text-center sm:pb-12 sm:pt-16"
@@ -71,50 +58,19 @@ const INSTALL_COMMAND = 'pnpm add @qalma/editor';
         primitives, Tailwind-first styling, and zero opinions about your design.
       </p>
 
-      <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+      <div class="mt-7 flex justify-center">
         <a appBtn size="lg" href="#playground" (click)="trackGetStarted()">
           Get started
           <ng-icon name="lucideArrowRight" aria-hidden="true" />
         </a>
-        <button
-          appBtn
-          variant="outline"
-          size="lg"
-          type="button"
-          class="font-mono text-sm"
-          (click)="copyInstall()"
-        >
-          {{ installCommand }}
-          @if (copied()) {
-            <ng-icon
-              name="lucideCheck"
-              class="text-accent"
-              aria-hidden="true"
-            />
-          } @else {
-            <ng-icon name="lucideCopy" aria-hidden="true" />
-          }
-        </button>
       </div>
+
+      <app-install-tabs class="mx-auto mt-5 w-full max-w-md text-left" />
     </section>
   `,
 })
 export class Hero {
   private readonly posthogService = inject(PosthogService);
-
-  protected readonly installCommand = INSTALL_COMMAND;
-  protected readonly copied = signal(false);
-
-  protected copyInstall(): void {
-    void navigator.clipboard?.writeText(INSTALL_COMMAND).then(() => {
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 1400);
-    });
-
-    this.posthogService.posthog.capture('install_command_copied', {
-      command: INSTALL_COMMAND,
-    });
-  }
 
   protected trackGetStarted(): void {
     this.posthogService.posthog.capture('get_started_clicked');

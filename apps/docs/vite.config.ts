@@ -12,7 +12,9 @@ export default defineConfig(() => {
     build: {
       outDir: '../../dist/apps/docs/client',
       reportCompressedSize: true,
-      target: ['es2020'],
+      // Modern evergreen + Safari 16+ baseline: drops legacy transpilation
+      // helpers/polyfills Vite would otherwise emit for older targets.
+      target: ['es2022'],
     },
     server: {
       fs: {

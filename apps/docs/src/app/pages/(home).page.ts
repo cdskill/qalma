@@ -19,7 +19,7 @@ import { Playground } from '../playground/playground';
         class="mx-auto max-w-5xl px-4 pb-24 sm:px-6"
         aria-label="Live editor playground"
       >
-        @defer (on idle) {
+        @defer (on viewport) {
           <app-playground />
         } @placeholder {
           <div
