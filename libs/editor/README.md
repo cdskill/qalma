@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cdskill/qalma/main/apps/docs/public/qalma-mark-dark.svg" />
+    <img src="https://raw.githubusercontent.com/cdskill/qalma/main/apps/docs/public/qalma-mark-light.svg" alt="Qalma" width="56" height="56" />
+  </picture>
+</p>
+
 # @qalma/editor
 
 Angular-first, headless rich text editor toolkit built on [ProseMirror](https://prosemirror.net/).

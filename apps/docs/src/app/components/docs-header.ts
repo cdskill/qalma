@@ -7,7 +7,6 @@ import {
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  lucideFeather,
   lucideGithub,
   lucideMenu,
   lucideSearch,
@@ -28,7 +27,6 @@ import { PosthogService } from '../services/posthog.service';
   imports: [RouterLink, RouterLinkActive, NgIcon, HlmButton, ThemeToggle],
   providers: [
     provideIcons({
-      lucideFeather,
       lucideGithub,
       lucideMenu,
       lucideSearch,
@@ -41,9 +39,16 @@ import { PosthogService } from '../services/posthog.service';
         class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
       >
         <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
-          <ng-icon
-            name="lucideFeather"
-            class="text-lg text-accent"
+          <img
+            src="/qalma-mark-light.svg"
+            class="size-5 dark:hidden"
+            alt=""
+            aria-hidden="true"
+          />
+          <img
+            src="/qalma-mark-dark.svg"
+            class="hidden size-5 dark:block"
+            alt=""
             aria-hidden="true"
           />
           <span class="font-serif text-lg font-medium tracking-tight">
