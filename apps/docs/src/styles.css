@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+/* CDK overlay positioning — required by the Spartan (brain) popovers used in
+ * the playground toolbar's color pickers. */
+@import '@angular/cdk/overlay-prebuilt.css';
 
 /* ------------------------------------------------------------------ *
  * Qalma design system
