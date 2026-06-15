@@ -43,15 +43,17 @@ export interface PlaygroundColorSwatch {
         [attr.aria-label]="label()"
       >
         <span class="relative flex flex-col items-center justify-center">
-          <ng-icon class="text-[1.05rem]" [name]="icon()" aria-hidden="true" />
+          <ng-icon class="text-[0.9rem]" [name]="icon()" aria-hidden="true" />
           <span
-            class="mt-0.5 h-[3px] w-4 rounded-full"
-            [style.background-color]="activeColor() || 'var(--color-muted-foreground)'"
+            class="mt-0.5 h-[3px] w-3 rounded-full"
+            [style.background-color]="
+              activeColor() || 'var(--color-muted-foreground)'
+            "
             aria-hidden="true"
           ></span>
         </span>
         <ng-icon
-          class="text-[0.7rem] text-muted-foreground"
+          class="absolute right-0.5 top-0.5 text-[0.5rem] text-muted-foreground"
           name="lucideChevronDown"
           aria-hidden="true"
         />
@@ -59,18 +61,18 @@ export interface PlaygroundColorSwatch {
 
       <div
         *brnPopoverContent
-        class="w-52 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-lg outline-none"
+        class="w-40 rounded-lg border border-border bg-popover p-2.5 text-popover-foreground shadow-lg outline-none"
       >
         <p
           class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
         >
           {{ label() }}
         </p>
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-4 gap-1.5">
           @for (swatch of colors(); track swatch.value) {
             <button
               type="button"
-              class="group relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-40"
+              class="group relative inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-[0.35rem] border border-border transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-40"
               [class.ring-2]="isActive(swatch.value)"
               [class.ring-accent]="isActive(swatch.value)"
               [class.ring-offset-2]="isActive(swatch.value)"
@@ -85,7 +87,7 @@ export interface PlaygroundColorSwatch {
             >
               @if (isActive(swatch.value)) {
                 <ng-icon
-                  class="text-base text-foreground mix-blend-luminosity"
+                  class="text-sm text-foreground mix-blend-luminosity"
                   name="lucideCheck"
                   aria-hidden="true"
                 />
@@ -95,7 +97,7 @@ export interface PlaygroundColorSwatch {
         </div>
         <button
           type="button"
-          class="mt-3 flex w-full items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+          class="mt-3 flex w-full cursor-pointer items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           [class.qalma-command-active]="!activeColor()"
           [disabled]="!canClear()"
           (mousedown)="preserveSelection($event)"
@@ -130,7 +132,7 @@ export class PlaygroundColorPicker {
   );
 
   protected readonly triggerClass =
-    'inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-1.5 text-muted-foreground transition hover:border-accent hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent [&.qalma-command-active]:text-foreground';
+    'relative inline-flex h-[1.85rem] w-[1.85rem] cursor-pointer items-center justify-center rounded-[0.4rem] border border-border bg-card text-muted-foreground transition hover:border-accent hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent [&.qalma-command-active]:text-foreground';
 
   protected isActive(color: string): boolean {
     return this.activeColor() === color;

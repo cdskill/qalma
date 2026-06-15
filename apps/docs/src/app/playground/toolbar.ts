@@ -5,7 +5,11 @@ import {
   input,
   output,
 } from '@angular/core';
-import { QalmaCommand, QalmaEditorController, QalmaToolbar } from '@qalma/editor';
+import {
+  QalmaCommand,
+  QalmaEditorController,
+  QalmaToolbar,
+} from '@qalma/editor';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAlignCenter,
@@ -90,344 +94,374 @@ import {
   selector: 'app-playground-toolbar',
   template: `
     <qalma-toolbar
-      class="flex flex-wrap items-center gap-1 border-b border-border bg-secondary/40 p-2"
+      class="flex w-fit max-w-full flex-wrap items-center gap-0.5 border-b border-border bg-secondary/40 px-1.5 py-1.5"
     >
       <!-- Block style -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="setParagraph"
-          title="Paragraph"
-          aria-label="Paragraph"
-        >
-          <ng-icon name="lucidePilcrow" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleHeading1"
-          title="Heading 1"
-          aria-label="Heading 1"
-        >
-          <ng-icon name="lucideHeading1" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleHeading2"
-          title="Heading 2"
-          aria-label="Heading 2"
-        >
-          <ng-icon name="lucideHeading2" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleHeading3"
-          title="Heading 3"
-          aria-label="Heading 3"
-        >
-          <ng-icon name="lucideHeading3" aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="setParagraph"
+        title="Paragraph"
+        aria-label="Paragraph"
+      >
+        <ng-icon [class]="iconClass" name="lucidePilcrow" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleHeading1"
+        title="Heading 1"
+        aria-label="Heading 1"
+      >
+        <ng-icon [class]="iconClass" name="lucideHeading1" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleHeading2"
+        title="Heading 2"
+        aria-label="Heading 2"
+      >
+        <ng-icon [class]="iconClass" name="lucideHeading2" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleHeading3"
+        title="Heading 3"
+        aria-label="Heading 3"
+      >
+        <ng-icon [class]="iconClass" name="lucideHeading3" aria-hidden="true" />
+      </button>
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Inline formatting -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleBold"
-          title="Bold"
-          aria-label="Bold"
-        >
-          <ng-icon name="lucideBold" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleItalic"
-          title="Italic"
-          aria-label="Italic"
-        >
-          <ng-icon name="lucideItalic" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleUnderline"
-          title="Underline"
-          aria-label="Underline"
-        >
-          <ng-icon name="lucideUnderline" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleStrike"
-          title="Strikethrough"
-          aria-label="Strikethrough"
-        >
-          <ng-icon name="lucideStrikethrough" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleSubscript"
-          title="Subscript"
-          aria-label="Subscript"
-        >
-          <ng-icon name="lucideSubscript" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleSuperscript"
-          title="Superscript"
-          aria-label="Superscript"
-        >
-          <ng-icon name="lucideSuperscript" aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleBold"
+        title="Bold"
+        aria-label="Bold"
+      >
+        <ng-icon [class]="iconClass" name="lucideBold" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleItalic"
+        title="Italic"
+        aria-label="Italic"
+      >
+        <ng-icon [class]="iconClass" name="lucideItalic" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleUnderline"
+        title="Underline"
+        aria-label="Underline"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideUnderline"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleStrike"
+        title="Strikethrough"
+        aria-label="Strikethrough"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideStrikethrough"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleSubscript"
+        title="Subscript"
+        aria-label="Subscript"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideSubscript"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleSuperscript"
+        title="Superscript"
+        aria-label="Superscript"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideSuperscript"
+          aria-hidden="true"
+        />
+      </button>
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Color: three distinct, labelled pickers -->
-      <div class="flex items-center gap-0.5">
-        <app-playground-color-picker
-          [editor]="editor()"
-          label="Text color"
-          icon="lucideBaseline"
-          [colors]="textColors"
-          setCommand="setTextColor"
-          unsetCommand="unsetTextColor"
-          queryKey="textColor"
-        />
-        <app-playground-color-picker
-          [editor]="editor()"
-          label="Highlight"
-          icon="lucideHighlighter"
-          [colors]="highlightColors"
-          setCommand="setHighlight"
-          unsetCommand="unsetHighlight"
-          queryKey="highlightColor"
-        />
-        <app-playground-color-picker
-          [editor]="editor()"
-          label="Background"
-          icon="lucidePaintBucket"
-          [colors]="backgroundColors"
-          setCommand="setBackgroundColor"
-          unsetCommand="unsetBackgroundColor"
-          queryKey="backgroundColor"
-        />
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="clearFormatting"
-          title="Clear formatting"
-          aria-label="Clear formatting"
-        >
-          <ng-icon name="lucideEraser" aria-hidden="true" />
-        </button>
-      </div>
+      <app-playground-color-picker
+        [editor]="editor()"
+        label="Text color"
+        icon="lucideBaseline"
+        [colors]="textColors"
+        setCommand="setTextColor"
+        unsetCommand="unsetTextColor"
+        queryKey="textColor"
+      />
+      <app-playground-color-picker
+        [editor]="editor()"
+        label="Highlight"
+        icon="lucideHighlighter"
+        [colors]="highlightColors"
+        setCommand="setHighlight"
+        unsetCommand="unsetHighlight"
+        queryKey="highlightColor"
+      />
+      <app-playground-color-picker
+        [editor]="editor()"
+        label="Background"
+        icon="lucidePaintBucket"
+        [colors]="backgroundColors"
+        setCommand="setBackgroundColor"
+        unsetCommand="unsetBackgroundColor"
+        queryKey="backgroundColor"
+      />
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="clearFormatting"
+        title="Clear formatting"
+        aria-label="Clear formatting"
+      >
+        <ng-icon [class]="iconClass" name="lucideEraser" aria-hidden="true" />
+      </button>
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Alignment -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="setTextAlignLeft"
-          title="Align left"
-          aria-label="Align left"
-        >
-          <ng-icon name="lucideAlignLeft" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="setTextAlignCenter"
-          title="Align center"
-          aria-label="Align center"
-        >
-          <ng-icon name="lucideAlignCenter" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="setTextAlignRight"
-          title="Align right"
-          aria-label="Align right"
-        >
-          <ng-icon name="lucideAlignRight" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="setTextAlignJustify"
-          title="Justify"
-          aria-label="Justify"
-        >
-          <ng-icon name="lucideAlignJustify" aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="setTextAlignLeft"
+        title="Align left"
+        aria-label="Align left"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideAlignLeft"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="setTextAlignCenter"
+        title="Align center"
+        aria-label="Align center"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideAlignCenter"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="setTextAlignRight"
+        title="Align right"
+        aria-label="Align right"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideAlignRight"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="setTextAlignJustify"
+        title="Justify"
+        aria-label="Justify"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideAlignJustify"
+          aria-hidden="true"
+        />
+      </button>
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Lists & blocks -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleBulletList"
-          title="Bullet list"
-          aria-label="Bullet list"
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleBulletList"
+        title="Bullet list"
+        aria-label="Bullet list"
+      >
+        <ng-icon [class]="iconClass" name="lucideList" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleOrderedList"
+        title="Ordered list"
+        aria-label="Ordered list"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideListOrdered"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="liftListItem"
+        title="Outdent"
+        aria-label="Outdent"
+      >
+        <ng-icon [class]="iconClass" name="lucideOutdent" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="sinkListItem"
+        title="Indent"
+        aria-label="Indent"
+      >
+        <ng-icon [class]="iconClass" name="lucideIndent" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleBlockquote"
+        title="Blockquote"
+        aria-label="Blockquote"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideTextQuote"
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleCodeBlock"
+        title="Code block"
+        aria-label="Code block"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideSquareCode"
+          aria-hidden="true"
+        />
+      </button>
+      @if (codeBlockActive()) {
+        <select
+          [class]="languageSelectClass"
+          [value]="codeBlockLanguage()"
+          (change)="setCodeBlockLanguage($event)"
+          aria-label="Code block language"
         >
-          <ng-icon name="lucideList" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleOrderedList"
-          title="Ordered list"
-          aria-label="Ordered list"
-        >
-          <ng-icon name="lucideListOrdered" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="liftListItem"
-          title="Outdent"
-          aria-label="Outdent"
-        >
-          <ng-icon name="lucideOutdent" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="sinkListItem"
-          title="Indent"
-          aria-label="Indent"
-        >
-          <ng-icon name="lucideIndent" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleBlockquote"
-          title="Blockquote"
-          aria-label="Blockquote"
-        >
-          <ng-icon name="lucideTextQuote" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleCodeBlock"
-          title="Code block"
-          aria-label="Code block"
-        >
-          <ng-icon name="lucideSquareCode" aria-hidden="true" />
-        </button>
-        @if (codeBlockActive()) {
-          <select
-            [class]="languageSelectClass"
-            [value]="codeBlockLanguage()"
-            (change)="setCodeBlockLanguage($event)"
-            aria-label="Code block language"
-          >
-            @for (language of codeBlockLanguages; track language.value) {
-              <option
-                [value]="language.value"
-                [selected]="language.value === codeBlockLanguage()"
-              >
-                {{ language.label }}
-              </option>
-            }
-          </select>
-        }
-      </div>
+          @for (language of codeBlockLanguages; track language.value) {
+            <option
+              [value]="language.value"
+              [selected]="language.value === codeBlockLanguage()"
+            >
+              {{ language.label }}
+            </option>
+          }
+        </select>
+      }
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Insert -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          [class.qalma-command-active]="imageActive()"
-          [attr.aria-pressed]="imageActive()"
-          [disabled]="!canInsertImage()"
-          (mousedown)="preserveSelection($event)"
-          (click)="requestImageLink.emit()"
-          title="Image URL"
-          aria-label="Image URL"
-        >
-          <ng-icon name="lucideImage" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          [disabled]="!canInsertUploadedImage()"
-          (mousedown)="preserveSelection($event)"
-          (click)="requestImageUpload.emit()"
-          title="Upload image"
-          aria-label="Upload image"
-        >
-          <ng-icon name="lucideImageUp" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          [class.qalma-command-active]="linkActive()"
-          [attr.aria-pressed]="linkActive()"
-          [disabled]="!canSetLink()"
-          (mousedown)="preserveSelection($event)"
-          (click)="requestLink.emit($event)"
-          title="Link"
-          aria-label="Link"
-        >
-          <ng-icon name="lucideLink" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="unsetLink"
-          title="Unlink"
-          aria-label="Unlink"
-        >
-          <ng-icon name="lucideUnlink" aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        type="button"
+        [class]="commandClass"
+        [class.qalma-command-active]="imageActive()"
+        [attr.aria-pressed]="imageActive()"
+        [disabled]="!canInsertImage()"
+        (mousedown)="preserveSelection($event)"
+        (click)="requestImageLink.emit()"
+        title="Image URL"
+        aria-label="Image URL"
+      >
+        <ng-icon [class]="iconClass" name="lucideImage" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        [disabled]="!canInsertUploadedImage()"
+        (mousedown)="preserveSelection($event)"
+        (click)="requestImageUpload.emit()"
+        title="Upload image"
+        aria-label="Upload image"
+      >
+        <ng-icon [class]="iconClass" name="lucideImageUp" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        [class.qalma-command-active]="linkActive()"
+        [attr.aria-pressed]="linkActive()"
+        [disabled]="!canSetLink()"
+        (mousedown)="preserveSelection($event)"
+        (click)="requestLink.emit($event)"
+        title="Link"
+        aria-label="Link"
+      >
+        <ng-icon [class]="iconClass" name="lucideLink" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="unsetLink"
+        title="Unlink"
+        aria-label="Unlink"
+      >
+        <ng-icon [class]="iconClass" name="lucideUnlink" aria-hidden="true" />
+      </button>
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- History -->
-      <div class="flex items-center gap-0.5">
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="undo"
-          title="Undo"
-          aria-label="Undo"
-        >
-          <ng-icon name="lucideUndo2" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="redo"
-          title="Redo"
-          aria-label="Redo"
-        >
-          <ng-icon name="lucideRedo2" aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="undo"
+        title="Undo"
+        aria-label="Undo"
+      >
+        <ng-icon [class]="iconClass" name="lucideUndo2" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="redo"
+        title="Redo"
+        aria-label="Redo"
+      >
+        <ng-icon [class]="iconClass" name="lucideRedo2" aria-hidden="true" />
+      </button>
     </qalma-toolbar>
   `,
 })
@@ -488,10 +522,12 @@ export class PlaygroundToolbar {
   ];
 
   protected readonly commandClass =
-    'inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent/40 [&.qalma-command-active]:bg-accent-subtle [&.qalma-command-active]:text-accent';
-  protected readonly separatorClass = 'mx-1 h-6 w-px shrink-0 bg-border';
+    'inline-flex h-[1.85rem] w-[1.85rem] cursor-pointer items-center justify-center rounded-[0.4rem] border border-transparent text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent/40 [&.qalma-command-active]:bg-accent-subtle [&.qalma-command-active]:text-accent';
+  protected readonly iconClass = 'text-[0.9rem]';
+  protected readonly separatorClass =
+    'mx-0.5 h-5 w-px shrink-0 self-center bg-border';
   protected readonly languageSelectClass =
-    'h-9 rounded-md border border-border bg-card px-2 text-xs font-medium text-foreground transition hover:border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-ring/30';
+    'h-[1.85rem] cursor-pointer rounded-[0.4rem] border border-border bg-card px-1.5 text-xs font-medium text-foreground transition hover:border-accent focus:border-accent focus:outline-none focus:ring-2 focus:ring-ring/30';
 
   protected preserveSelection(event: MouseEvent): void {
     event.preventDefault();
