@@ -15,10 +15,11 @@ import {
 } from '@ng-icons/lucide';
 
 import { LinkPopover } from './link-popover.model';
+import { HlmButton } from '../ui/button';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon],
+  imports: [NgIcon, HlmButton],
   providers: [
     provideIcons({
       lucideCheck,
@@ -36,7 +37,7 @@ import { LinkPopover } from './link-popover.model';
         data-link-popover
         role="dialog"
         aria-label="Link preview"
-        class="fixed z-20 w-[min(360px,calc(100vw-32px))] rounded-lg border border-border bg-popover p-2 text-sm text-popover-foreground shadow-lg"
+        class="fixed z-20 w-[min(360px,calc(100vw-32px))] rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg outline-none"
         [style.left.px]="popover.left"
         [style.top.px]="popover.top"
         (mouseenter)="keepOpen.emit()"
@@ -45,9 +46,9 @@ import { LinkPopover } from './link-popover.model';
         (focusout)="scheduleHide.emit()"
       >
         @if (popover.editing) {
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <label
-              class="flex min-h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-border px-2 text-sm focus-within:border-accent focus-within:ring-2 focus-within:ring-ring/30"
+              class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border border-input bg-background px-2 text-sm transition focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30"
             >
               <ng-icon
                 class="shrink-0 text-muted-foreground"
@@ -55,7 +56,7 @@ import { LinkPopover } from './link-popover.model';
                 aria-hidden="true"
               />
               <input
-                class="min-w-0 flex-1 bg-transparent outline-none"
+                class="min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
                 type="url"
                 aria-label="Edit link URL"
                 [value]="href()"
@@ -63,8 +64,9 @@ import { LinkPopover } from './link-popover.model';
               />
             </label>
             <button
+              appBtn
+              size="icon"
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-45"
               [disabled]="!href().trim()"
               (click)="save.emit(popover)"
               title="Save link"
@@ -73,8 +75,10 @@ import { LinkPopover } from './link-popover.model';
               <ng-icon name="lucideCheck" aria-hidden="true" />
             </button>
             <button
+              appBtn
+              variant="outline"
+              size="icon"
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-foreground transition hover:bg-secondary"
               (click)="dismiss.emit()"
               title="Cancel"
               aria-label="Cancel"
@@ -83,15 +87,17 @@ import { LinkPopover } from './link-popover.model';
             </button>
           </div>
         } @else {
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <a
-              class="inline-flex min-w-0 flex-1 items-center gap-1.5 text-accent underline"
+              class="inline-flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-accent transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               [href]="popover.href"
               [target]="popover.target ?? '_blank'"
               [rel]="popover.rel ?? 'noopener noreferrer'"
               title="Open link"
             >
-              <span class="min-w-0 truncate font-medium">{{ popover.href }}</span>
+              <span class="min-w-0 truncate font-medium">{{
+                popover.href
+              }}</span>
               <ng-icon
                 class="shrink-0 text-base"
                 name="lucideExternalLink"
@@ -99,8 +105,10 @@ import { LinkPopover } from './link-popover.model';
               />
             </a>
             <button
+              appBtn
+              variant="outline"
+              size="icon"
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-foreground transition hover:border-accent hover:bg-secondary"
               (click)="edit.emit(popover)"
               title="Edit link"
               aria-label="Edit link"
@@ -108,8 +116,11 @@ import { LinkPopover } from './link-popover.model';
               <ng-icon name="lucidePencil" aria-hidden="true" />
             </button>
             <button
+              appBtn
+              variant="ghost"
+              size="icon"
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-foreground transition hover:border-destructive hover:text-destructive"
+              class="text-destructive hover:bg-destructive/10 hover:text-destructive"
               (click)="remove.emit(popover)"
               title="Unlink"
               aria-label="Unlink"
