@@ -6,7 +6,7 @@ import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
 const SITE = 'https://qalma.dev';
 const BRAND = 'Qalma';
 // Home (no route title) — targets the head query "angular rich text editor".
-const HOME_TITLE = 'Qalma — Headless Angular Rich Text Editor';
+const HOME_TITLE = 'Qalma — Headless rich text editor for Angular';
 
 /**
  * Runs on every navigation (including SSR/prerender, so social scrapers that
@@ -37,13 +37,17 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.meta.updateTag({ name: 'twitter:title', content: fullTitle });
     if (description) {
       this.meta.updateTag({ property: 'og:description', content: description });
-      this.meta.updateTag({ name: 'twitter:description', content: description });
+      this.meta.updateTag({
+        name: 'twitter:description',
+        content: description,
+      });
     }
   }
 
   private setCanonical(url: string): void {
-    let link =
-      this.doc.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    let link = this.doc.head.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
     if (!link) {
       link = this.doc.createElement('link');
       link.setAttribute('rel', 'canonical');

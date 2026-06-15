@@ -31,7 +31,7 @@ import { PosthogService } from '../services/posthog.service';
       <h1
         class="mx-auto max-w-2xl font-serif text-4xl font-medium leading-[1.1] tracking-tight sm:text-5xl"
       >
-        Rich text editing,
+        Rich text editor,
         <span class="relative whitespace-nowrap text-accent">
           <span class="font-script text-[1.35em] leading-[0]">beautifully</span>
           <svg
