@@ -38,7 +38,7 @@ A Qalma editor is composed from three layers:
 2. **Plugins** (`QalmaPlugin`) — each plugin contributes schema nodes/marks,
    keymaps, input rules and commands. The
    [Core Concepts](/docs/architecture) section covers how they're composed.
-3. **Your UI** — a toolbar, the content surface (`<qalma-content>`), and any
+3. **Your UI** — a toolbar, the content surface (`&lt;qalma-content&gt;`), and any
    popovers or menus (link editor, mention list, slash menu...) are regular
    Angular components that read from the controller and call its commands.
 

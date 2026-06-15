@@ -21,9 +21,10 @@ const editor = createQalmaEditor({
 
 | Contract                                   | Description                                                                    |
 | ------------------------------------------ | ------------------------------------------------------------------------------ |
-| `query<SlashCommandState>('slashCommand')` | Returns `{ from, to, query, trigger }` while a slash command is active.        |
+| `query&lt;SlashCommandState&gt;('slashCommand')` | Returns `{ from, to, query, trigger }` while a slash command is active.        |
 | `deleteSlashCommand`                       | Deletes the active `/query` range before you execute the selected command.     |
 | `dismissSlashCommand`                      | Closes the active slash command without changing document content.             |
+| `splitSlashCommandBlock`                   | Splits a non-empty block before applying a picked command on its own line.     |
 | `qalma-slash-command-update`               | DOM event emitted from the editor view when the slash state may have changed.  |
 | `qalma-slash-command-keydown`              | Cancelable DOM event for `ArrowUp`, `ArrowDown`, `Enter`, `Tab`, and `Escape`. |
 
@@ -31,15 +32,18 @@ const editor = createQalmaEditor({
 
 Keep the menu in your app or docs playground. A typical selection flow is:
 
-1. Read `editor.query<SlashCommandState>('slashCommand')`.
+1. Read `editor.query&lt;SlashCommandState&gt;('slashCommand')`.
 2. Filter your own command list with `state.query`.
 3. Render an Angular overlay near the current DOM selection.
 4. On pick, run `editor.execute('deleteSlashCommand')`.
-5. Run the selected command, such as `editor.execute('toggleHeading1')`.
+5. Optionally run `editor.execute('splitSlashCommandBlock')` for non-empty
+   paragraphs.
+6. Run the selected command, such as `editor.execute('toggleHeading1')`.
 
 ```typescript
 function pickHeading1() {
   if (editor.execute('deleteSlashCommand')) {
+    editor.execute('splitSlashCommandBlock');
     editor.execute('toggleHeading1');
   }
 }

@@ -57,8 +57,8 @@ A few things to notice:
 
 ## 2. Render the editor
 
-`<qalma-editor>` takes the controller as an input and provides it to everything
-projected inside it. `<qalma-content>` is the editable surface.
+`&lt;qalma-editor&gt;` takes the controller as an input and provides it to everything
+projected inside it. `&lt;qalma-content&gt;` is the editable surface.
 
 ```typescript
 import { ChangeDetectionStrategy, Component } from '@angular/core';
@@ -104,7 +104,7 @@ for H2…) all work already.
 ## 3. Add a toolbar
 
 Toolbar buttons use the `qalmaCommand` directive. Put them **inside**
-`<qalma-editor>` so they pick up the editor from context. Each button
+`&lt;qalma-editor&gt;` so they pick up the editor from context. Each button
 auto-disables when its command can't run and gets a `.qalma-command-active`
 class plus `aria-pressed` when the command is active — so you only style state,
 never track it.

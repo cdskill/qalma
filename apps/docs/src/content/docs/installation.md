@@ -14,7 +14,7 @@ Qalma has a single peer dependency — Angular itself.
 
 | Package         | Required version   |
 | --------------- | ------------------ |
-| `@angular/core` | `>=21.0.0 <22.0.0` |
+| `@angular/core` | `&gt;=21.0.0 &lt;22.0.0` |
 
 It relies on Angular's modern signal APIs, so 21 is the floor. There is nothing
 else to install: TypeScript comes with your Angular toolchain, and the
@@ -89,7 +89,7 @@ an empty document. The plugin tags the empty block with the
 
 Everything else — typography, lists, blockquotes, code blocks — is styled the
 same way, by targeting elements inside `.ProseMirror`. With Tailwind you can do
-this inline on `<qalma-content>`:
+this inline on `&lt;qalma-content&gt;`:
 
 ```html
 <qalma-content
@@ -103,7 +103,7 @@ this inline on `<qalma-content>`:
 
 ## Server-side rendering
 
-Qalma is SSR-safe. The `<qalma-content>` component only mounts the ProseMirror
+Qalma is SSR-safe. The `&lt;qalma-content&gt;` component only mounts the ProseMirror
 view in the browser (inside `afterNextRender`), so it won't run during
 server rendering and won't break hydration. No extra configuration is needed.
 

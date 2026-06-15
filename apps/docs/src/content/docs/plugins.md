@@ -28,10 +28,10 @@ menus, and styling remain consumer-owned Angular code.
 
 | Plugin               | What it adds                                         | Commands                                    |
 | -------------------- | ---------------------------------------------------- | ------------------------------------------- |
-| `LinkPlugin`         | Links with protocol validation                       | `setLink`, `unsetLink`, `selectLink`        |
+| `LinkPlugin`         | Links with protocol validation                       | `setLink`, `selectLink`, `unsetLink`        |
 | `ImagePlugin`        | Inline images with alt/title metadata                | `insertImage`, `updateImage`, `removeImage` |
 | `MentionPlugin`      | Inline mention nodes and trigger state               | `insertMention`                             |
-| `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus | `deleteSlashCommand`, `dismissSlashCommand` |
+| `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock` |
 
 ## Styling And Layout
 

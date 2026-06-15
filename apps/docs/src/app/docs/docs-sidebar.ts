@@ -45,15 +45,25 @@ import { PosthogService } from '../services/posthog.service';
           <ul class="space-y-0.5">
             @for (item of group.items; track item.href) {
               <li>
-                <a
-                  [routerLink]="item.href"
-                  routerLinkActive="bg-accent-subtle !text-accent font-medium"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="onLinkClick(item.title, item.href)"
-                  class="block rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                >
-                  {{ item.title }}
-                </a>
+                @if (isDocsRoute(item.href)) {
+                  <a
+                    [routerLink]="item.href"
+                    routerLinkActive="bg-accent-subtle !text-accent font-medium"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="onLinkClick(item.title, item.href)"
+                    class="block rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    {{ item.title }}
+                  </a>
+                } @else {
+                  <a
+                    [href]="item.href"
+                    (click)="onLinkClick(item.title, item.href)"
+                    class="block rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    {{ item.title }}
+                  </a>
+                }
               </li>
             }
           </ul>
@@ -113,5 +123,9 @@ export class DocsSidebar implements AfterViewInit {
       title,
       href,
     });
+  }
+
+  protected isDocsRoute(href: string): boolean {
+    return href.startsWith('/docs/');
   }
 }
