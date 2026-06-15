@@ -6,6 +6,7 @@
     "start": "nx serve sandbox",
     "build": "nx build sandbox",
     "lint": "nx run-many -t lint",
+    "reset": "nx reset",
     "lint:editor": "nx lint editor",
     "lint:sandbox": "nx lint sandbox",
     "serve:sandbox": "nx serve sandbox",
