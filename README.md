@@ -1,101 +1,122 @@
-# Qalma
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cdskill/qalma/main/apps/docs/public/qalma-mark-dark.svg" />
+    <img src="https://raw.githubusercontent.com/cdskill/qalma/main/apps/docs/public/qalma-mark-light.svg" alt="Qalma" width="72" height="72" />
+  </picture>
+</p>
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+<h1 align="center">Qalma</h1>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+<p align="center">
+  Angular-first, headless rich text editor toolkit built on <a href="https://prosemirror.net/">ProseMirror</a>.
+</p>
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+<p align="center">
+  <a href="https://www.npmjs.com/package/@qalma/editor"><img alt="npm version" src="https://img.shields.io/npm/v/@qalma/editor?color=d9a45b&label=%40qalma%2Feditor&logo=npm" /></a>
+  <a href="https://www.npmjs.com/package/@qalma/editor"><img alt="npm downloads" src="https://img.shields.io/npm/dm/@qalma/editor?color=d9a45b&logo=npm" /></a>
+  <a href="https://packagephobia.com/result?p=@qalma/editor"><img alt="install size" src="https://packagephobia.com/badge?p=@qalma/editor" /></a>
+  <a href="https://www.npmjs.com/package/@qalma/editor"><img alt="license" src="https://img.shields.io/npm/l/@qalma/editor?color=d9a45b" /></a>
+  <br />
+  <img alt="Angular" src="https://img.shields.io/badge/Angular-%E2%89%A521-dd0031?logo=angular&logoColor=white" />
+  <img alt="Built on ProseMirror" src="https://img.shields.io/badge/built%20on-ProseMirror-6c5ce7" />
+  <img alt="Types included" src="https://img.shields.io/badge/types-included-3178c6?logo=typescript&logoColor=white" />
+  <a href="https://github.com/cdskill/qalma/actions/workflows/deploy.yml"><img alt="Deploy" src="https://img.shields.io/github/actions/workflow/status/cdskill/qalma/deploy.yml?branch=main&label=docs&logo=github" /></a>
+</p>
 
-## Run tasks
+<p align="center">
+  <a href="https://qalma.dev/">Documentation</a>
+  ·
+  <a href="https://www.npmjs.com/package/@qalma/editor">npm</a>
+  ·
+  <a href="https://github.com/cdskill/qalma/issues">Issues</a>
+</p>
 
-To run the dev server for your app, use:
+---
 
-```sh
-npx nx serve sandbox
-```
+> **Status:** alpha (`0.0.x`). The public API may still change between releases.
 
-To create a production bundle:
+Qalma gives you a typed editor controller, signal-based state, and a small set
+of unstyled Angular primitives (`<qalma-editor>`, `<qalma-content>`,
+`<qalma-toolbar>`, `qalmaCommand`). Everything else — toolbar UI, styling,
+menus, popovers — stays in your app. You choose the plugins, you own the markup.
 
-```sh
-npx nx build sandbox
-```
+## Why Qalma
 
-To see all available targets to run for a project, run:
+- **Angular-native** — standalone components, signal-based state, `OnPush`, and
+  typed contracts instead of leaked ProseMirror internals.
+- **Headless** — no baked-in toolbar, theme, or feature set. The library ships
+  behavior; your app owns every pixel.
+- **Plugin-based** — compose schema nodes/marks, commands, shortcuts, and
+  ProseMirror plugins through `QalmaPlugin`s and ready-made kits.
+- **ProseMirror under the hood** — a battle-tested document engine, kept
+  internal until an API is deliberately designed.
 
-```sh
-npx nx show project sandbox
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/angular:app demo
-```
-
-To generate a new library, use:
-
-```sh
-npx nx g @nx/angular:lib mylib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
+## Quick start
 
 ```sh
-npx nx connect
+npm install @qalma/editor
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+`@angular/core` `>=21 <22` is a peer dependency.
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```ts
+import { createQalmaEditor, HistoryPlugin, TextFormattingKit } from '@qalma/editor';
 
-### Step 2
+const editor = createQalmaEditor({
+  content: '<p>Hello world</p>',
+  plugins: [
+    ...TextFormattingKit,
+    HistoryPlugin.configure({ depth: 200, newGroupDelay: 750 }),
+  ],
+});
+```
 
-Use the following command to configure a CI workflow for your workspace:
+```html
+<qalma-editor [editor]="editor">
+  <qalma-toolbar>
+    <button qalmaCommand="toggleBold">Bold</button>
+    <button qalmaCommand="undo">Undo</button>
+    <button qalmaCommand="redo">Redo</button>
+  </qalma-toolbar>
+
+  <qalma-content />
+</qalma-editor>
+```
+
+See the [`@qalma/editor` README](libs/editor/README.md) for the full controller
+API, components, and the list of available plugins.
+
+## Repository layout
+
+This is an [Nx](https://nx.dev) monorepo.
+
+| Path           | Description                                                          |
+| -------------- | ------------------------------------------------------------------- |
+| `libs/editor`  | `@qalma/editor` — the published, headless editor toolkit.           |
+| `apps/sandbox` | A real consumer app and executable documentation of the public API. |
+| `apps/docs`    | The documentation site published to [qalma.dev](https://qalma.dev/). |
+| `infra`        | Infrastructure (S3 + CloudFront) for the docs site.                 |
+
+## Development
+
+Requires [pnpm](https://pnpm.io/) (`pnpm@10`).
 
 ```sh
-npx nx g ci-workflow
+pnpm install
+
+pnpm nx serve sandbox      # run the sandbox consumer app
+pnpm nx serve docs         # run the documentation site
+pnpm nx run-many -t lint   # lint everything
+pnpm nx build sandbox      # production bundle
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Run `pnpm nx graph` to explore the project graph.
 
-## Install Nx Console
+## Contributing
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+Issues and pull requests are welcome. Please read [AGENTS.md](AGENTS.md) for the
+architectural invariants and working agreement before opening a PR.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## License
 
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+MIT © Qalma

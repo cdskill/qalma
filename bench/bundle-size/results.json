@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-06-15T21:04:00.528Z",
+  "node": "v24.13.1",
+  "note": "Gzip/brotli of an esbuild-bundled, tree-shaken, minified standard editor. Angular + rxjs marked external.",
+  "standard": [
+    {
+      "id": "quill",
+      "label": "Quill (ngx-quill)",
+      "pkg": "quill",
+      "engine": "Quill",
+      "version": "2.0.3",
+      "raw": 204382,
+      "gzip": 59407,
+      "brotli": 51514
+    },
+    {
+      "id": "qalma",
+      "label": "@qalma/editor",
+      "pkg": "@qalma/editor",
+      "engine": "ProseMirror",
+      "version": "0.0.1-alpha.5",
+      "raw": 265947,
+      "gzip": 79831,
+      "brotli": 69860
+    },
+    {
+      "id": "ngx-editor",
+      "label": "ngx-editor",
+      "pkg": "ngx-editor",
+      "engine": "ProseMirror",
+      "version": "18.0.0",
+      "raw": 332828,
+      "gzip": 93148,
+      "brotli": 80464
+    },
+    {
+      "id": "tiptap",
+      "label": "Tiptap (ngx-tiptap)",
+      "pkg": "@tiptap/core",
+      "engine": "ProseMirror",
+      "version": "3.26.1",
+      "raw": 404808,
+      "gzip": 127164,
+      "brotli": 100484
+    }
+  ],
+  "qalmaMinimal": {
+    "id": "qalma-minimal",
+    "label": "@qalma/editor (minimal)",
+    "pkg": "@qalma/editor",
+    "engine": "ProseMirror",
+    "version": "0.0.1-alpha.5",
+    "raw": 265929,
+    "gzip": 79811,
+    "brotli": 69787
+  },
+  "prosemirrorBaseline": {
+    "id": "prosemirror-baseline",
+    "label": "ProseMirror engine only",
+    "pkg": "prosemirror-view",
+    "engine": "ProseMirror",
+    "version": "1.41.9",
+    "raw": 207885,
+    "gzip": 64245,
+    "brotli": 56227
+  }
+}

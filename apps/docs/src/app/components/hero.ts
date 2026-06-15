@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideSparkles } from '@ng-icons/lucide';
 
@@ -14,7 +15,7 @@ import { PosthogService } from '../services/posthog.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-hero',
-  imports: [NgIcon, HlmButton, InstallTabs],
+  imports: [NgIcon, HlmButton, InstallTabs, RouterLink],
   providers: [provideIcons({ lucideArrowRight, lucideSparkles })],
   template: `
     <section
@@ -66,6 +67,21 @@ import { PosthogService } from '../services/posthog.service';
       </div>
 
       <app-install-tabs class="mx-auto mt-5 w-full max-w-md text-left" />
+
+      <a
+        routerLink="/docs/bundle-size"
+        (click)="trackBundleSize()"
+        class="group mx-auto mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <span class="font-medium text-foreground">~78&nbsp;KB</span> gzip for a
+        full editor —
+        <span class="text-accent">37% lighter than Tiptap</span>
+        <ng-icon
+          name="lucideArrowRight"
+          class="transition-transform group-hover:translate-x-0.5"
+          aria-hidden="true"
+        />
+      </a>
     </section>
   `,
 })
@@ -74,5 +90,9 @@ export class Hero {
 
   protected trackGetStarted(): void {
     this.posthogService.posthog.capture('get_started_clicked');
+  }
+
+  protected trackBundleSize(): void {
+    this.posthogService.posthog.capture('bundle_size_teaser_clicked');
   }
 }

@@ -1,0 +1,22 @@
+{
+  "name": "qalma-bundle-size-bench",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reproducible bundle-size benchmark: tree-shaken, minified, gzipped payload that each Angular rich-text editor adds to an app bundle (Angular itself excluded).",
+  "scripts": {
+    "bench": "node build.mjs"
+  },
+  "dependencies": {
+    "@qalma/editor": "0.0.1-alpha.5",
+    "@tiptap/core": "3.26.1",
+    "@tiptap/pm": "3.26.1",
+    "@tiptap/starter-kit": "3.26.1",
+    "@tiptap/extension-link": "3.26.1",
+    "ngx-editor": "18.0.0",
+    "quill": "2.0.3"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0"
+  }
+}
