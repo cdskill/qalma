@@ -1,3 +1,9 @@
+## 0.0.1-alpha.7 (2026-06-16)
+
+### 🚀 Features
+
+- **editor:** link plugin no longer invoke window but instead expose onClick handler ([a55bef9](https://github.com/cdskill/qalma/commit/a55bef9))
+
 ## 0.0.1-alpha.6 (2026-06-16)
 
 ### 🚀 Features
