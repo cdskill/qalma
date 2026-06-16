@@ -113,6 +113,15 @@ export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly PlaygroundSlashCommandOp
       icon: 'lucideSquareCode',
       keywords: ['pre', 'code', 'snippet'],
     },
+    {
+      id: 'horizontal-rule',
+      label: 'Divider',
+      description: 'Insert a horizontal rule',
+      command: 'insertHorizontalRule',
+      shortcut: '---',
+      icon: 'lucideMinus',
+      keywords: ['hr', 'divider', 'rule', 'separator'],
+    },
   ];
 
 export class PlaygroundSlashCommandController {

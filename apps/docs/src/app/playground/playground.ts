@@ -17,6 +17,7 @@ import {
   HeadingsPlugin,
   HighlightPlugin,
   HistoryPlugin,
+  HorizontalRulePlugin,
   ImageCommandValue,
   ImagePlugin,
   LinkPlugin,
@@ -195,6 +196,7 @@ export class Playground {
       ListsPlugin,
       TaskListPlugin,
       BlockquotePlugin,
+      HorizontalRulePlugin,
       CodeBlockPlugin.configure({
         languages: PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,
         defaultLanguage: PLAYGROUND_DEFAULT_CODE_BLOCK_LANGUAGE,
