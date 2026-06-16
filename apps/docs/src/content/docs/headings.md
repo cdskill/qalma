@@ -31,8 +31,10 @@ By default, `HeadingsPlugin` enables heading levels 1, 2, and 3.
 | Contract | Default |
 | -------- | ------- |
 | `levels` | `[1, 2, 3]` |
+| `inputRules` | `true` |
 | Commands | `setParagraph`, `toggleHeading1`, `toggleHeading2`, `toggleHeading3` |
 | Shortcuts | `Mod-Alt-1`, `Mod-Alt-2`, `Mod-Alt-3` |
+| Input rules | `# `, `## `, `### ` |
 
 ```html
 <qalma-editor [editor]="editor">
@@ -67,9 +69,29 @@ const editor = createQalmaEditor({
 | At least one level | Empty array. |
 | Levels must be 1 through 6 | Unsupported entry. |
 | Levels must be unique | Duplicate entry. |
+| `inputRules` must be a boolean | Non-boolean value. |
 
 Commands and shortcuts are created only for configured levels. If you configure
 `levels: [2, 3]`, `toggleHeading1` is not registered.
+
+## Input rules
+
+At the start of a textblock, typing one to six `#` characters followed by a
+space converts the block to the matching heading. The shortcut respects
+`levels`: only configured levels get a rule, so with `levels: [1, 2, 3]` typing
+`#### ` leaves the paragraph untouched.
+
+The conversion is one-way, not a toggle. Pressing `Backspace` immediately after
+a rule fires reverts the block to the literal characters you typed (`## `),
+matching the editor-wide input-rule undo.
+
+Disable the shortcut while keeping the commands and toolbar buttons:
+
+```typescript
+const editor = createQalmaEditor({
+  plugins: [HeadingsPlugin.configure({ inputRules: false })],
+});
+```
 
 ## Toggle behavior
 
