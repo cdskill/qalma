@@ -1142,6 +1142,7 @@ describe('App', () => {
       allowRelativeLinks: true,
       defaultTarget: '_blank',
       defaultRel: 'noopener noreferrer',
+      onClick: null,
     });
     expect(LinkPlugin.options).toEqual(LINK_PLUGIN_DEFAULT_OPTIONS);
     expect(configured.options).toEqual({
@@ -1149,6 +1150,7 @@ describe('App', () => {
       allowRelativeLinks: false,
       defaultTarget: '_blank',
       defaultRel: 'noopener noreferrer',
+      onClick: null,
     });
     expect(() =>
       LinkPlugin.configure({
@@ -1157,6 +1159,11 @@ describe('App', () => {
     ).toThrowError(
       'LinkPlugin allowedProtocols must include at least one protocol.',
     );
+    expect(() =>
+      LinkPlugin.configure({
+        onClick: 'open' as never,
+      }),
+    ).toThrowError('LinkPlugin onClick must be a function or null.');
   });
 
   it('should expose configurable image defaults and validation', () => {

@@ -19,12 +19,12 @@ const editor = createQalmaEditor({
 
 ## Commands and query
 
-| Contract | Description |
-| -------- | ----------- |
-| `setLink` | Applies a link to the selection or stores it for future typed text. |
-| `selectLink` | Selects an existing link by current state, document range, or anchor element. |
-| `unsetLink` | Removes the active link mark. |
-| `query&lt;LinkState&gt;('link')` | Returns link range, attributes, and text for the active or selected link. |
+| Contract                         | Description                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `setLink`                        | Applies a link to the selection or stores it for future typed text.           |
+| `selectLink`                     | Selects an existing link by current state, document range, or anchor element. |
+| `unsetLink`                      | Removes the active link mark.                                                 |
+| `query&lt;LinkState&gt;('link')` | Returns link range, attributes, and text for the active or selected link.     |
 
 `setLink` accepts a string or an object.
 
@@ -64,17 +64,19 @@ const editor = createQalmaEditor({
       allowRelativeLinks: true,
       defaultTarget: '_blank',
       defaultRel: 'noopener noreferrer',
+      onClick: null,
     }),
   ],
 });
 ```
 
-| Option | Default | Description |
-| ------ | ------- | ----------- |
-| `allowedProtocols` | `['http', 'https', 'mailto', 'tel']` | Protocol allow-list. Entries are names without `:`. |
-| `allowRelativeLinks` | `true` | Allows links without a protocol. |
-| `defaultTarget` | `'_blank'` | Applied when command values or pasted DOM do not provide a target. Only `'_blank'` is preserved. |
-| `defaultRel` | `'noopener noreferrer'` | Applied when command values or pasted DOM do not provide `rel`. Empty strings become `null`. |
+| Option               | Default                              | Description                                                                                                                           |
+| -------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowedProtocols`   | `['http', 'https', 'mailto', 'tel']` | Protocol allow-list. Entries are names without `:`.                                                                                   |
+| `allowRelativeLinks` | `true`                               | Allows links without a protocol.                                                                                                      |
+| `defaultTarget`      | `'_blank'`                           | Applied when command values or pasted DOM do not provide a target. Only `'_blank'` is preserved.                                      |
+| `defaultRel`         | `'noopener noreferrer'`              | Applied when command values or pasted DOM do not provide `rel`. Empty strings become `null`.                                          |
+| `onClick`            | `null`                               | Optional callback for editor link clicks. When configured, Qalma prevents the native click and passes the link event to the host app. |
 
 Invalid or empty hrefs make `setLink` return `false`.
 
@@ -118,10 +120,36 @@ editor.execute('selectLink', { from: link.from, to: link.to });
 
 ## Click behavior
 
-The plugin handles clicks on editor links. It prevents the editor click,
-normalizes the href with the same options, and opens `_blank` links with
-`window.open(href, '_blank', 'noopener,noreferrer')`. Other links assign
-`window.location.href`.
+The plugin does not navigate on editor link clicks by default. Navigation,
+routing, analytics, previews, and confirmation flows stay in your app.
 
-If your product needs a different link-click policy, wrap the editor or build a
-custom plugin that handles those DOM events first.
+Configure `onClick` when you want Qalma to turn editor link clicks into a
+consumer-owned event. Qalma normalizes the href with the same options, prevents
+the native click, and passes the DOM event, anchor element, href, target, rel,
+and text to your callback.
+
+```typescript
+import { LinkClickHandler, LinkPlugin } from '@qalma/editor';
+
+const handleLinkClick: LinkClickHandler = ({ href, target }) => {
+  if (target === '_blank') {
+    window.open(href, '_blank', 'noopener,noreferrer');
+
+    return;
+  }
+
+  window.location.assign(href);
+};
+
+const editor = createQalmaEditor({
+  plugins: [
+    LinkPlugin.configure({
+      onClick: handleLinkClick,
+    }),
+  ],
+});
+```
+
+That example intentionally keeps navigation in application code. A routed
+Angular app can call its router, open a product-specific preview, or ignore the
+click entirely.

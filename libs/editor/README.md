@@ -112,7 +112,7 @@ plugin instance with merged options, e.g.
 | `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
 | `TaskListPlugin`                                                                      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |
 | `CodeBlockPlugin`                                                                     | `toggleCodeBlock`, `setCodeBlockLanguage`                                                                        |
-| `LinkPlugin`                                                                          | `setLink`, `unsetLink`                                                                                           |
+| `LinkPlugin`                                                                          | `setLink`, `selectLink`, `unsetLink`                                                                             |
 | `ImagePlugin`                                                                         | `insertImage`, `updateImage`                                                                                     |
 | `MentionPlugin`                                                                       | `insertMention`                                                                                                  |
 | `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                                                      |
@@ -130,7 +130,7 @@ Read each plugin's source under `src/lib/plugins` for configuration options
 (e.g. `HeadingsPlugin.configure({ levels: [1, 2, 3] })`,
 `MentionPlugin.configure({ trigger: '@' })`,
 `SlashCommandPlugin.configure({ trigger: '/' })`,
-`LinkPlugin.configure({ allowedProtocols: [...] })`).
+`LinkPlugin.configure({ allowedProtocols: [...], onClick })`).
 
 ## Learn more
 

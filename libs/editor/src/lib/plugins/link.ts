@@ -27,6 +27,16 @@ export interface LinkState extends LinkCommandValue {
   text: string;
 }
 
+export interface LinkClickEvent extends LinkCommandValue {
+  target: '_blank' | null;
+  rel: string | null;
+  event: MouseEvent;
+  element: HTMLAnchorElement;
+  text: string;
+}
+
+export type LinkClickHandler = (event: LinkClickEvent) => void;
+
 export interface LinkElementTarget {
   element: HTMLAnchorElement;
 }
@@ -43,6 +53,7 @@ export interface LinkPluginOptions {
   allowRelativeLinks: boolean;
   defaultTarget: '_blank' | null;
   defaultRel: string | null;
+  onClick: LinkClickHandler | null;
 }
 
 export const LINK_PLUGIN_DEFAULT_OPTIONS: Readonly<LinkPluginOptions> =
@@ -51,6 +62,7 @@ export const LINK_PLUGIN_DEFAULT_OPTIONS: Readonly<LinkPluginOptions> =
     allowRelativeLinks: true,
     defaultTarget: '_blank',
     defaultRel: 'noopener noreferrer',
+    onClick: null,
   });
 
 export const LinkPlugin = createConfigurableQalmaPlugin(
@@ -124,7 +136,10 @@ export const LinkPlugin = createConfigurableQalmaPlugin(
       queries: (schema) => ({
         link: (state) => getLinkState(state, schema.marks['link']),
       }),
-      prosemirrorPlugins: () => [createOpenLinkPlugin(options)],
+      prosemirrorPlugins: () =>
+        options.onClick
+          ? [createLinkClickPlugin(options, options.onClick)]
+          : [],
     });
   },
 );
@@ -148,7 +163,11 @@ function createSetLinkCommand(
       } else {
         for (const range of state.selection.ranges) {
           transaction.removeMark(range.$from.pos, range.$to.pos, mark);
-          transaction.addMark(range.$from.pos, range.$to.pos, mark.create(attrs));
+          transaction.addMark(
+            range.$from.pos,
+            range.$to.pos,
+            mark.create(attrs),
+          );
         }
       }
 
@@ -199,8 +218,9 @@ function createSelectLinkCommand(mark: MarkType): QalmaCommandHandler {
   };
 }
 
-function createOpenLinkPlugin(
+function createLinkClickPlugin(
   options: Readonly<LinkPluginOptions>,
+  onClick: LinkClickHandler,
 ): ProseMirrorPlugin {
   return new ProseMirrorPlugin({
     props: {
@@ -220,15 +240,20 @@ function createOpenLinkPlugin(
 
           event.preventDefault();
 
-          const linkTarget =
+          const target =
             normalizeTarget(link.getAttribute('target')) ??
             options.defaultTarget;
+          const rel =
+            normalizeRel(link.getAttribute('rel')) ?? options.defaultRel;
 
-          if (linkTarget === '_blank') {
-            window.open(href, '_blank', 'noopener,noreferrer');
-          } else {
-            window.location.href = href;
-          }
+          onClick({
+            event,
+            element: link,
+            href,
+            target,
+            rel,
+            text: link.textContent ?? '',
+          });
 
           return true;
         },
@@ -242,8 +267,7 @@ function findClickedLink(target: EventTarget | null): HTMLAnchorElement | null {
     return null;
   }
 
-  const element =
-    target instanceof Element ? target : target.parentElement;
+  const element = target instanceof Element ? target : target.parentElement;
 
   if (!element) {
     return null;
@@ -306,21 +330,25 @@ function getLinkState(state: EditorState, mark: MarkType): LinkState | null {
 
   let found: LinkRange | null = null;
 
-  state.doc.nodesBetween(state.selection.from, state.selection.to, (_node, pos) => {
-    if (found) {
-      return false;
-    }
+  state.doc.nodesBetween(
+    state.selection.from,
+    state.selection.to,
+    (_node, pos) => {
+      if (found) {
+        return false;
+      }
 
-    const range = findLinkRange(state.doc.resolve(pos), mark);
+      const range = findLinkRange(state.doc.resolve(pos), mark);
 
-    if (range) {
-      found = range;
+      if (range) {
+        found = range;
 
-      return false;
-    }
+        return false;
+      }
 
-    return undefined;
-  });
+      return undefined;
+    },
+  );
 
   return found ? createLinkState(state, found) : null;
 }
@@ -331,7 +359,10 @@ interface LinkRange {
   mark: Mark;
 }
 
-function findLinkRange($position: ResolvedPos, mark: MarkType): LinkRange | null {
+function findLinkRange(
+  $position: ResolvedPos,
+  mark: MarkType,
+): LinkRange | null {
   const parent = $position.parent;
   const after = parent.childAfter($position.parentOffset);
   const before = parent.childBefore($position.parentOffset);
@@ -347,7 +378,8 @@ function findLinkRange($position: ResolvedPos, mark: MarkType): LinkRange | null
   let endIndex = startIndex + 1;
   let from = $position.start() + (current ? after.offset : before.offset);
   let to =
-    from + (current ? after.node?.nodeSize ?? 0 : before.node?.nodeSize ?? 0);
+    from +
+    (current ? (after.node?.nodeSize ?? 0) : (before.node?.nodeSize ?? 0));
 
   while (
     startIndex > 0 &&
@@ -518,9 +550,7 @@ function selectionAllowsMark(state: EditorState, mark: MarkType): boolean {
   });
 }
 
-function assertLinkPluginOptions(
-  options: Readonly<LinkPluginOptions>,
-): void {
+function assertLinkPluginOptions(options: Readonly<LinkPluginOptions>): void {
   if (!Array.isArray(options.allowedProtocols)) {
     throw new TypeError('LinkPlugin allowedProtocols must be an array.');
   }
@@ -532,10 +562,7 @@ function assertLinkPluginOptions(
   }
 
   for (const protocol of options.allowedProtocols) {
-    if (
-      typeof protocol !== 'string' ||
-      !/^[a-z][a-z0-9+.-]*$/.test(protocol)
-    ) {
+    if (typeof protocol !== 'string' || !/^[a-z][a-z0-9+.-]*$/.test(protocol)) {
       throw new TypeError(
         'LinkPlugin allowedProtocols entries must be protocol names without colons.',
       );
@@ -546,10 +573,7 @@ function assertLinkPluginOptions(
     throw new TypeError('LinkPlugin allowRelativeLinks must be a boolean.');
   }
 
-  if (
-    options.defaultTarget !== null &&
-    options.defaultTarget !== '_blank'
-  ) {
+  if (options.defaultTarget !== null && options.defaultTarget !== '_blank') {
     throw new TypeError('LinkPlugin defaultTarget must be "_blank" or null.');
   }
 
@@ -557,6 +581,12 @@ function assertLinkPluginOptions(
     options.defaultRel !== null &&
     (typeof options.defaultRel !== 'string' || options.defaultRel.trim() === '')
   ) {
-    throw new TypeError('LinkPlugin defaultRel must be a non-empty string or null.');
+    throw new TypeError(
+      'LinkPlugin defaultRel must be a non-empty string or null.',
+    );
+  }
+
+  if (options.onClick !== null && typeof options.onClick !== 'function') {
+    throw new TypeError('LinkPlugin onClick must be a function or null.');
   }
 }
