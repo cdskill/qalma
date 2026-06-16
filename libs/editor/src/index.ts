@@ -11,6 +11,7 @@ export * from './lib/plugins/hard-break';
 export * from './lib/plugins/highlight';
 export * from './lib/plugins/history';
 export * from './lib/plugins/headings';
+export * from './lib/plugins/horizontal-rule';
 export * from './lib/plugins/image';
 export * from './lib/plugins/link';
 export * from './lib/plugins/lists';

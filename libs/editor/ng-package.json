@@ -4,6 +4,7 @@
   "allowedNonPeerDependencies": [
     "prosemirror-commands",
     "prosemirror-history",
+    "prosemirror-inputrules",
     "prosemirror-keymap",
     "prosemirror-model",
     "prosemirror-schema-list",
