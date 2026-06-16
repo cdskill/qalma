@@ -1,4 +1,9 @@
 import { setBlockType } from 'prosemirror-commands';
+import {
+  InputRule,
+  inputRules,
+  textblockTypeInputRule,
+} from 'prosemirror-inputrules';
 import { NodeSpec, NodeType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 
@@ -13,6 +18,12 @@ export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface HeadingsPluginOptions {
   levels: readonly HeadingLevel[];
+  /**
+   * Enable markdown-style input rules: typing `#`…`######` followed by a
+   * space at the start of a textblock converts it to the matching heading.
+   * Backspace immediately after reverts to the literal characters.
+   */
+  inputRules: boolean;
 }
 
 export const HEADING_LEVELS: readonly HeadingLevel[] = Object.freeze([
@@ -22,6 +33,7 @@ export const HEADING_LEVELS: readonly HeadingLevel[] = Object.freeze([
 export const HEADINGS_PLUGIN_DEFAULT_OPTIONS: Readonly<HeadingsPluginOptions> =
   Object.freeze({
     levels: Object.freeze([1, 2, 3] satisfies HeadingLevel[]),
+    inputRules: true,
   });
 
 export const HeadingsPlugin = createConfigurableQalmaPlugin(
@@ -61,6 +73,16 @@ export const HeadingsPlugin = createConfigurableQalmaPlugin(
         ...createHeadingCommandStates(schema.nodes['heading'], options.levels),
       }),
       shortcuts: (schema) => createHeadingShortcuts(schema, options.levels),
+      prosemirrorPlugins: options.inputRules
+        ? (schema) => [
+            inputRules({
+              rules: createHeadingInputRules(
+                schema.nodes['heading'],
+                options.levels,
+              ),
+            }),
+          ]
+        : undefined,
     });
   },
 );
@@ -116,6 +138,18 @@ function createHeadingCommandStates(
   );
 }
 
+function createHeadingInputRules(
+  heading: NodeType,
+  levels: readonly HeadingLevel[],
+): InputRule[] {
+  return levels.map((level) =>
+    // One anchored rule per allowed level so a subset like [1, 3] never
+    // accidentally matches a level it was not configured for. Fires on the
+    // trailing space; `undoInputRule` (Backspace) reverts it.
+    textblockTypeInputRule(new RegExp(`^#{${level}}\\s$`), heading, { level }),
+  );
+}
+
 function createHeadingShortcuts(
   schema: Parameters<NonNullable<QalmaPlugin['shortcuts']>>[0],
   levels: readonly HeadingLevel[],
@@ -161,6 +195,10 @@ function assertHeadingsPluginOptions(
     throw new RangeError(
       'HeadingsPlugin levels must include at least one heading level.',
     );
+  }
+
+  if (typeof options.inputRules !== 'boolean') {
+    throw new TypeError('HeadingsPlugin inputRules must be a boolean.');
   }
 
   const seen = new Set<HeadingLevel>();

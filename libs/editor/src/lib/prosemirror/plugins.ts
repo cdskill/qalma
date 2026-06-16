@@ -1,5 +1,6 @@
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
+import { undoInputRule } from 'prosemirror-inputrules';
 import { Schema } from 'prosemirror-model';
 import { Command, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
@@ -21,6 +22,7 @@ export function createBasePlugins(
       (plugin) => plugin.prosemirrorPlugins?.(schema) ?? [],
     ),
     ...(Object.keys(shortcuts).length > 0 ? [keymap(shortcuts)] : []),
+    keymap({ Backspace: undoInputRule }),
     keymap(baseKeymap),
   ];
 }
