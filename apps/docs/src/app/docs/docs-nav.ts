@@ -50,6 +50,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { title: 'Lists', href: '/docs/lists' },
       { title: 'Task List', href: '/docs/task-list' },
       { title: 'Blockquote', href: '/docs/blockquote' },
+      { title: 'Horizontal Rule', href: '/docs/horizontal-rule' },
       { title: 'Hard Break & Trailing Paragraph', href: '/docs/hard-break' },
     ],
   },
