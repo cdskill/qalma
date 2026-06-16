@@ -28,6 +28,7 @@ import {
   QalmaEditor,
   SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
+  TaskListPlugin,
   TextAlignPlugin,
   TextFormattingKit,
   TrailingParagraphPlugin,
@@ -192,6 +193,7 @@ export class Playground {
       SlashCommandPlugin,
       PasteRulesPlugin,
       ListsPlugin,
+      TaskListPlugin,
       BlockquotePlugin,
       CodeBlockPlugin.configure({
         languages: PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,

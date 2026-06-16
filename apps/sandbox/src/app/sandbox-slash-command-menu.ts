@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  effect,
   inject,
   input,
   output,
@@ -13,6 +14,7 @@ import {
   lucideHeading3,
   lucideList,
   lucideListOrdered,
+  lucideListTodo,
   lucidePilcrow,
   lucideSquareCode,
   lucideTextQuote,
@@ -33,6 +35,7 @@ import {
       lucideHeading3,
       lucideList,
       lucideListOrdered,
+      lucideListTodo,
       lucidePilcrow,
       lucideSquareCode,
       lucideTextQuote,
@@ -44,16 +47,21 @@ import {
       <div
         role="listbox"
         aria-label="Slash command suggestions"
-        class="fixed z-20 w-[min(376px,calc(100vw-24px))] overflow-hidden rounded-lg border border-slate-200 bg-white text-sm text-slate-900 shadow-xl"
+        class="fixed z-20 flex w-[min(376px,calc(100vw-24px))] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white text-sm text-slate-900 shadow-xl"
         [style.left.px]="placement.left"
         [style.top.px]="placement.top"
         [style.bottom.px]="placement.bottom"
         [style.max-height.px]="placement.maxHeight"
       >
-        <div class="px-3 pb-1.5 pt-3 text-xs font-semibold text-slate-500">
+        <div
+          class="shrink-0 px-3 pb-1.5 pt-3 text-xs font-semibold text-slate-500"
+        >
           Basic blocks
         </div>
-        <div class="max-h-[calc(100%-44px)] overflow-y-auto px-1.5 pb-1.5">
+        <div
+          data-slash-command-options
+          class="min-h-0 flex-1 overflow-y-auto px-1.5 pb-1.5"
+        >
           @for (option of options(); track option.id; let index = $index) {
             <button
               type="button"
@@ -83,7 +91,7 @@ import {
           }
         </div>
         <div
-          class="flex h-11 items-center justify-between border-t border-slate-200 px-3 text-sm text-slate-700"
+          class="flex h-11 shrink-0 items-center justify-between border-t border-slate-200 px-3 text-sm text-slate-700"
         >
           <span>Close menu</span>
           <span class="text-xs text-slate-400">esc</span>
@@ -102,6 +110,15 @@ export class SandboxSlashCommandMenu {
   readonly dismiss = output<void>();
 
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  constructor() {
+    effect(() => {
+      const activeIndex = this.activeIndex();
+
+      this.options();
+      queueMicrotask(() => this.scrollOptionIntoView(activeIndex));
+    });
+  }
 
   protected preserveSelection(event: MouseEvent): void {
     event.preventDefault();
@@ -150,8 +167,41 @@ export class SandboxSlashCommandMenu {
   }
 
   private focusOption(index: number): void {
-    this.elementRef.nativeElement
-      .querySelector<HTMLButtonElement>(`[data-slash-command-index="${index}"]`)
-      ?.focus();
+    const option = this.getOptionElement(index);
+
+    option?.focus();
+    this.scrollOptionIntoView(index);
+  }
+
+  private scrollOptionIntoView(index: number): void {
+    const scroller = this.getOptionsScroller();
+    const option = this.getOptionElement(index);
+
+    if (!scroller || !option) {
+      return;
+    }
+
+    const optionTop = option.offsetTop - scroller.offsetTop;
+    const optionBottom = optionTop + option.offsetHeight;
+    const visibleTop = scroller.scrollTop;
+    const visibleBottom = visibleTop + scroller.clientHeight;
+
+    if (optionTop < visibleTop) {
+      scroller.scrollTop = optionTop;
+    } else if (optionBottom > visibleBottom) {
+      scroller.scrollTop = optionBottom - scroller.clientHeight;
+    }
+  }
+
+  private getOptionElement(index: number): HTMLButtonElement | null {
+    return this.elementRef.nativeElement.querySelector<HTMLButtonElement>(
+      `[data-slash-command-index="${index}"]`,
+    );
+  }
+
+  private getOptionsScroller(): HTMLElement | null {
+    return this.elementRef.nativeElement.querySelector<HTMLElement>(
+      '[data-slash-command-options]',
+    );
   }
 }

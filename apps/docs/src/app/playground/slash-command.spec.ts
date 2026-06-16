@@ -27,7 +27,9 @@ describe('PlaygroundSlashCommandController.insert', () => {
     // caret right after the trigger inside the non-empty heading
     selectRange(editor, 8, 8);
 
-    new PlaygroundSlashCommandController(editor).insert(option('toggleHeading2'));
+    new PlaygroundSlashCommandController(editor).insert(
+      option('toggleHeading2'),
+    );
 
     expect(editor.html()).toBe('<h1>Title </h1><h2></h2>');
 
@@ -42,7 +44,9 @@ describe('PlaygroundSlashCommandController.insert', () => {
     ]);
     selectRange(editor, 2, 2);
 
-    new PlaygroundSlashCommandController(editor).insert(option('toggleHeading1'));
+    new PlaygroundSlashCommandController(editor).insert(
+      option('toggleHeading1'),
+    );
 
     expect(editor.html()).toBe('<h1></h1>');
 
@@ -58,7 +62,9 @@ describe('PlaygroundSlashCommandController.insert', () => {
     // caret right after the trigger inside the list item paragraph
     selectRange(editor, 9, 9);
 
-    new PlaygroundSlashCommandController(editor).insert(option('toggleHeading1'));
+    new PlaygroundSlashCommandController(editor).insert(
+      option('toggleHeading1'),
+    );
 
     expect(editor.html()).toBe('<ul><li><p>Item </p></li></ul><h1></h1>');
 
@@ -84,6 +90,25 @@ describe('SlashCommandPlugin', () => {
       from: 1,
       to: 4,
       query: 'he',
+      trigger: '/',
+    });
+
+    editor.unmount(host);
+  });
+
+  it('re-detects a dismissed slash command after the user keeps typing', () => {
+    const { editor, host } = mountEditor('<p>/</p>', [SlashCommandPlugin]);
+    selectRange(editor, 2, 2);
+
+    expect(editor.execute('dismissSlashCommand')).toBe(true);
+    expect(editor.query<SlashCommandState>('slashCommand')).toBeNull();
+
+    insertText(editor, 'h');
+
+    expect(editor.query<SlashCommandState>('slashCommand')).toEqual({
+      from: 1,
+      to: 3,
+      query: 'h',
       trigger: '/',
     });
 
@@ -118,6 +143,17 @@ function selectRange(
   view.dispatch(
     view.state.tr.setSelection(TextSelection.create(view.state.doc, from, to)),
   );
+}
+
+function insertText(editor: QalmaEditorController, text: string): void {
+  const view = (editor as unknown as { editorView: EditorView | undefined })
+    .editorView;
+
+  if (!view) {
+    throw new Error('Editor view is not mounted.');
+  }
+
+  view.dispatch(view.state.tr.insertText(text));
 }
 
 function option(command: string): PlaygroundSlashCommandOption {

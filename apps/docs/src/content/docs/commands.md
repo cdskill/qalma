@@ -24,15 +24,7 @@ For ordinary buttons inside `&lt;qalma-editor&gt;`, use `qalmaCommand`.
 
 ```typescript
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {
-  HistoryPlugin,
-  QalmaCommand,
-  QalmaContent,
-  QalmaEditor,
-  QalmaToolbar,
-  TextFormattingKit,
-  createQalmaEditor,
-} from '@qalma/editor';
+import { HistoryPlugin, QalmaCommand, QalmaContent, QalmaEditor, QalmaToolbar, TextFormattingKit, createQalmaEditor } from '@qalma/editor';
 
 @Component({
   selector: 'app-command-editor',
@@ -60,13 +52,13 @@ export class CommandEditor {
 
 The directive:
 
-| Behavior | Detail |
-| -------- | ------ |
-| Click | Calls `editor.execute(command, qalmaCommandValue)`. |
-| Mouse down | Prevents default so the editor selection is not lost before click. |
-| Disabled state | Binds `[disabled]` to `!editor.canExecute(...)`. |
-| Active class | Adds `.qalma-command-active` from `editor.isCommandActive(...)`. |
-| `aria-pressed` | Set only when the command has a command-state query. |
+| Behavior       | Detail                                                             |
+| -------------- | ------------------------------------------------------------------ |
+| Click          | Calls `editor.execute(command, qalmaCommandValue)`.                |
+| Mouse down     | Prevents default so the editor selection is not lost before click. |
+| Disabled state | Binds `[disabled]` to `!editor.canExecute(...)`.                   |
+| Active class   | Adds `.qalma-command-active` from `editor.isCommandActive(...)`.   |
+| `aria-pressed` | Set only when the command has a command-state query.               |
 
 ## Command values
 
@@ -76,21 +68,9 @@ static or can be computed in the template.
 ```html
 <button type="button" qalmaCommand="toggleHeading2">H2</button>
 
-<button
-  type="button"
-  qalmaCommand="setTextColor"
-  [qalmaCommandValue]="'rgb(190, 18, 60)'"
->
-  Rose
-</button>
+<button type="button" qalmaCommand="setTextColor" [qalmaCommandValue]="'rgb(190, 18, 60)'">Rose</button>
 
-<button
-  type="button"
-  qalmaCommand="setLink"
-  [qalmaCommandValue]="{ href: 'https://angular.dev', target: '_blank' }"
->
-  Angular
-</button>
+<button type="button" qalmaCommand="setLink" [qalmaCommandValue]="{ href: 'https://angular.dev', target: '_blank' }">Angular</button>
 ```
 
 For controls such as color swatches, URL forms, file uploads, and selects,
@@ -122,30 +102,31 @@ readonly canSetLink = computed(() =>
 ```
 
 `isCommandActive()` is backed by plugin-provided command-state queries. The
-formatting, heading, list, blockquote, code block, link, image, color,
+formatting, heading, list, task list, blockquote, code block, link, image, color,
 highlight, subscript, superscript, and text-align plugins expose active state
 for their relevant commands.
 
 ## Core command reference
 
-| Plugin | Commands |
-| ------ | -------- |
-| `TextFormattingKit` | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike` |
-| `SubscriptSuperscriptPlugin` | `toggleSubscript`, `toggleSuperscript` |
-| `HeadingsPlugin` | `setParagraph`, `toggleHeading1` through configured heading levels |
-| `ListsPlugin` | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem` |
-| `BlockquotePlugin` | `toggleBlockquote` |
-| `CodeBlockPlugin` | `toggleCodeBlock`, `setCodeBlockLanguage` |
-| `LinkPlugin` | `setLink`, `selectLink`, `unsetLink` |
-| `ImagePlugin` | `insertImage`, `updateImage`, `removeImage` |
-| `MentionPlugin` | `insertMention` |
-| `SlashCommandPlugin` | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock` |
-| `ColorPlugin` | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor` |
-| `HighlightPlugin` | `setHighlight`, `unsetHighlight` |
-| `TextAlignPlugin` | `setTextAlignLeft`, `setTextAlignCenter`, `setTextAlignRight`, `setTextAlignJustify` |
-| `ClearFormattingPlugin` | `clearFormatting` |
-| `HardBreakPlugin` | `insertHardBreak` |
-| `HistoryPlugin` | `undo`, `redo` |
+| Plugin                       | Commands                                                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `TextFormattingKit`          | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
+| `SubscriptSuperscriptPlugin` | `toggleSubscript`, `toggleSuperscript`                                                                           |
+| `HeadingsPlugin`             | `setParagraph`, `toggleHeading1` through configured heading levels                                               |
+| `ListsPlugin`                | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
+| `TaskListPlugin`             | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |
+| `BlockquotePlugin`           | `toggleBlockquote`                                                                                               |
+| `CodeBlockPlugin`            | `toggleCodeBlock`, `setCodeBlockLanguage`                                                                        |
+| `LinkPlugin`                 | `setLink`, `selectLink`, `unsetLink`                                                                             |
+| `ImagePlugin`                | `insertImage`, `updateImage`, `removeImage`                                                                      |
+| `MentionPlugin`              | `insertMention`                                                                                                  |
+| `SlashCommandPlugin`         | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock`                                            |
+| `ColorPlugin`                | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`                                   |
+| `HighlightPlugin`            | `setHighlight`, `unsetHighlight`                                                                                 |
+| `TextAlignPlugin`            | `setTextAlignLeft`, `setTextAlignCenter`, `setTextAlignRight`, `setTextAlignJustify`                             |
+| `ClearFormattingPlugin`      | `clearFormatting`                                                                                                |
+| `HardBreakPlugin`            | `insertHardBreak`                                                                                                |
+| `HistoryPlugin`              | `undo`, `redo`                                                                                                   |
 
 ## Duplicate names
 

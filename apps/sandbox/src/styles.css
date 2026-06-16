@@ -52,6 +52,35 @@ qalma-content .ProseMirror .qalma-placeholder::before {
   pointer-events: none;
 }
 
+qalma-content .ProseMirror ul[data-type='task-list'] {
+  padding-left: 0;
+  list-style: none;
+}
+
+qalma-content .ProseMirror li[data-type='task-item'] {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 0.5rem;
+  list-style: none;
+}
+
+qalma-content .ProseMirror li[data-type='task-item'] > label {
+  display: inline-flex;
+  align-items: flex-start;
+  padding-top: 0.125rem;
+}
+
+qalma-content .ProseMirror li[data-type='task-item'] input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #0284c7;
+}
+
+qalma-content .ProseMirror li[data-type='task-item'][data-checked='true'] {
+  color: #64748b;
+}
+
 qalma-content .ProseMirror li[style*='text-align: center'],
 qalma-content .ProseMirror li[style*='text-align: right'],
 qalma-content .ProseMirror li[style*='text-align: justify'] {

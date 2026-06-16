@@ -87,6 +87,15 @@ export const SANDBOX_SLASH_COMMAND_OPTIONS: readonly SandboxSlashCommandOption[]
       keywords: ['ol', 'ordered', 'number', 'list'],
     },
     {
+      id: 'task-list',
+      label: 'Task list',
+      description: 'Track checked and unchecked items',
+      command: 'toggleTaskList',
+      shortcut: '[]',
+      icon: 'lucideListTodo',
+      keywords: ['task', 'todo', 'checklist', 'list'],
+    },
+    {
       id: 'blockquote',
       label: 'Quote',
       description: 'Capture a quoted passage',
@@ -196,7 +205,8 @@ export class SandboxSlashCommandController {
   private isInList(): boolean {
     return (
       this.editor.isCommandActive('toggleBulletList') ||
-      this.editor.isCommandActive('toggleOrderedList')
+      this.editor.isCommandActive('toggleOrderedList') ||
+      this.editor.isCommandActive('toggleTaskList')
     );
   }
 

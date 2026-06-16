@@ -1,8 +1,5 @@
 import { Node as ProseMirrorNode, NodeSpec, NodeType } from 'prosemirror-model';
-import {
-  EditorState,
-  Plugin as ProseMirrorPlugin,
-} from 'prosemirror-state';
+import { EditorState, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 import {
   bulletList as prosemirrorBulletList,
   liftListItem as liftProsemirrorListItem,
@@ -13,12 +10,26 @@ import {
   wrapInList,
 } from 'prosemirror-schema-list';
 
-import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
+import {
+  createQalmaPlugin,
+  QalmaCommandHandler,
+  QalmaPlugin,
+} from './qalma-plugin';
 
 const bulletListNode: NodeSpec = {
   ...prosemirrorBulletList,
   content: 'listItem+',
   group: 'block',
+  parseDOM: [
+    {
+      tag: 'ul',
+      getAttrs: (node) =>
+        node instanceof HTMLElement &&
+        node.getAttribute('data-type') === 'task-list'
+          ? false
+          : null,
+    },
+  ],
 };
 
 const orderedListNode: NodeSpec = {
@@ -30,6 +41,16 @@ const orderedListNode: NodeSpec = {
 const listItemNode: NodeSpec = {
   ...prosemirrorListItem,
   content: 'paragraph block*',
+  parseDOM: [
+    {
+      tag: 'li',
+      getAttrs: (node) =>
+        node instanceof HTMLElement &&
+        node.getAttribute('data-type') === 'task-item'
+          ? false
+          : null,
+    },
+  ],
 };
 
 export const ListsPlugin = createQalmaPlugin({

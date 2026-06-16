@@ -14,23 +14,24 @@ menus, and styling remain consumer-owned Angular code.
 
 ## Authoring Essentials
 
-| Plugin                  | What it adds                          | Commands                                                                                 |
-| ----------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `TextFormattingKit`     | Bold, italic, underline, strike marks | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                          |
-| `HeadingsPlugin`        | Paragraph and heading blocks          | `setParagraph`, `toggleHeading1` through configured heading levels                       |
-| `ListsPlugin`           | Bullet and ordered lists              | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem` |
-| `BlockquotePlugin`      | Quote blocks                          | `toggleBlockquote`                                                                       |
-| `CodeBlockPlugin`       | Code blocks with language metadata    | `toggleCodeBlock`, `setCodeBlockLanguage`                                                |
-| `HistoryPlugin`         | Undo and redo stack                   | `undo`, `redo`                                                                           |
-| `ClearFormattingPlugin` | Mark and block cleanup                | `clearFormatting`                                                                        |
+| Plugin                  | What it adds                          | Commands                                                                                                         |
+| ----------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `TextFormattingKit`     | Bold, italic, underline, strike marks | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
+| `HeadingsPlugin`        | Paragraph and heading blocks          | `setParagraph`, `toggleHeading1` through configured heading levels                                               |
+| `ListsPlugin`           | Bullet and ordered lists              | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
+| `TaskListPlugin`        | Checked and unchecked task lists      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |
+| `BlockquotePlugin`      | Quote blocks                          | `toggleBlockquote`                                                                                               |
+| `CodeBlockPlugin`       | Code blocks with language metadata    | `toggleCodeBlock`, `setCodeBlockLanguage`                                                                        |
+| `HistoryPlugin`         | Undo and redo stack                   | `undo`, `redo`                                                                                                   |
+| `ClearFormattingPlugin` | Mark and block cleanup                | `clearFormatting`                                                                                                |
 
 ## Rich Content
 
-| Plugin               | What it adds                                         | Commands                                    |
-| -------------------- | ---------------------------------------------------- | ------------------------------------------- |
-| `LinkPlugin`         | Links with protocol validation                       | `setLink`, `selectLink`, `unsetLink`        |
-| `ImagePlugin`        | Inline images with alt/title metadata                | `insertImage`, `updateImage`, `removeImage` |
-| `MentionPlugin`      | Inline mention nodes and trigger state               | `insertMention`                             |
+| Plugin               | What it adds                                         | Commands                                                              |
+| -------------------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
+| `LinkPlugin`         | Links with protocol validation                       | `setLink`, `selectLink`, `unsetLink`                                  |
+| `ImagePlugin`        | Inline images with alt/title metadata                | `insertImage`, `updateImage`, `removeImage`                           |
+| `MentionPlugin`      | Inline mention nodes and trigger state               | `insertMention`                                                       |
 | `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock` |
 
 ## Styling And Layout

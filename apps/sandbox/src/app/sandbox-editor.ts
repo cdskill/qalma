@@ -29,6 +29,7 @@ import {
   QalmaEditor,
   SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
+  TaskListPlugin,
   TextAlignPlugin,
   createQalmaEditor,
   TextFormattingKit,
@@ -100,10 +101,6 @@ import { SandboxToolbar } from './sandbox-toolbar';
         (blur)="linkPopover.scheduleHideFromEvent($event)"
         (focusin)="linkPopover.showPreview($event)"
         (focusout)="linkPopover.scheduleHideFromEvent($event)"
-        (qalma-slash-command-update)="slashCommandController.refresh()"
-        (qalma-slash-command-keydown)="
-          slashCommandController.handleSlashCommandKeydown($event)
-        "
       >
         <qalma-content />
       </div>
@@ -161,7 +158,7 @@ export class SandboxEditor {
     viewChild.required<ElementRef<HTMLInputElement>>('imageUpload');
 
   protected readonly editor = createQalmaEditor({
-    content: `<h1><strong>Qalma</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><img src="${SANDBOX_EXAMPLE_IMAGE_SRC}" alt="${SANDBOX_EXAMPLE_IMAGE_ALT}" title="${SANDBOX_EXAMPLE_IMAGE_TITLE}"><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-qalma-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createQalmaEditor } from "@qalma/editor";&#10;&#10;const editor = createQalmaEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Qalma")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and qalmaCommand.</p></li></ol><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>`,
+    content: `<h1><strong>Qalma</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><img src="${SANDBOX_EXAMPLE_IMAGE_SRC}" alt="${SANDBOX_EXAMPLE_IMAGE_ALT}" title="${SANDBOX_EXAMPLE_IMAGE_TITLE}"><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-qalma-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createQalmaEditor } from "@qalma/editor";&#10;&#10;const editor = createQalmaEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Qalma")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and qalmaCommand.</p></li></ol><ul data-type="task-list"><li data-type="task-item" data-checked="true"><div data-task-item-content><p>Ship engine behavior from a plugin.</p></div></li><li data-type="task-item" data-checked="false"><div data-task-item-content><p>Style task checkboxes in the consuming app.</p></div></li></ul><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>`,
     plugins: [
       HeadingsPlugin,
       PlaceholderPlugin.configure({
@@ -180,6 +177,7 @@ export class SandboxEditor {
       SlashCommandPlugin,
       PasteRulesPlugin,
       ListsPlugin,
+      TaskListPlugin,
       BlockquotePlugin,
       CodeBlockPlugin.configure({
         languages: SANDBOX_CODE_BLOCK_LANGUAGE_VALUES,
@@ -257,6 +255,10 @@ export class SandboxEditor {
 
   @HostListener('document:keydown', ['$event'])
   protected handleDocumentKeydown(event: KeyboardEvent): void {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     if (this.editorContainsFocus()) {
       this.slashCommandController.handleEditorKeydown(event);
     }

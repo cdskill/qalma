@@ -20,6 +20,7 @@ export * from './lib/plugins/placeholder';
 export * from './lib/plugins/qalma-plugin';
 export * from './lib/plugins/slash-command';
 export * from './lib/plugins/subscript-superscript';
+export * from './lib/plugins/task-list';
 export * from './lib/plugins/text-align';
 export * from './lib/plugins/text-formatting';
 export * from './lib/plugins/trailing-paragraph';

@@ -81,7 +81,9 @@ function createDeleteSlashCommand(
       // Note: we intentionally do NOT mark this slash as dismissed here. The
       // text is removed, so the menu closes naturally. Marking it would also
       // suppress the menu after an undo restores the same `/query`.
-      dispatch(state.tr.delete(slashCommand.from, slashCommand.to).scrollIntoView());
+      dispatch(
+        state.tr.delete(slashCommand.from, slashCommand.to).scrollIntoView(),
+      );
     }
 
     return true;
@@ -116,7 +118,10 @@ function createDismissSlashCommand(
 // a stray blank line above the new block.
 function createSplitSlashCommandBlock(): QalmaCommandHandler {
   return (state, dispatch, view) => {
-    if (!state.selection.empty || state.selection.$from.parent.content.size === 0) {
+    if (
+      !state.selection.empty ||
+      state.selection.$from.parent.content.size === 0
+    ) {
       return false;
     }
 
@@ -138,6 +143,10 @@ function createSlashCommandInteractionPlugin(
 
         if (meta && Object.prototype.hasOwnProperty.call(meta, 'dismissedId')) {
           return { dismissedId: meta.dismissedId ?? null };
+        }
+
+        if (transaction.docChanged) {
+          return { dismissedId: null };
         }
 
         return previous;

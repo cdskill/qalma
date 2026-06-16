@@ -30,6 +30,10 @@ export const PLAYGROUND_DEMO_CONTENT = `
 <li><p>Select the plugins your product needs.</p></li>
 <li><p>Render the surface with Angular templates.</p></li>
 </ol>
+<ul data-type="task-list">
+<li data-type="task-item" data-checked="true"><div data-task-item-content><p>Keep engine behavior in the plugin.</p></div></li>
+<li data-type="task-item" data-checked="false"><div data-task-item-content><p>Own checkbox styling in the consuming app.</p></div></li>
+</ul>
 <h3>From TypeScript</h3>
 <pre><code class="language-typescript">import { createQalmaEditor, HeadingsPlugin, HistoryPlugin } from "@qalma/editor";&#10;&#10;const editor = createQalmaEditor({&#10;  content: "&lt;p&gt;Hello, Qalma&lt;/p&gt;",&#10;  plugins: [HeadingsPlugin, HistoryPlugin.configure({ depth: 200 })],&#10;});&#10;&#10;editor.execute("toggleHeading1");</code></pre>
 <h3>Plays well with any backend</h3>

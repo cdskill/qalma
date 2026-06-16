@@ -30,6 +30,7 @@ import {
   lucideLink,
   lucideList,
   lucideListOrdered,
+  lucideListTodo,
   lucideOutdent,
   lucidePaintBucket,
   lucidePilcrow,
@@ -77,6 +78,7 @@ import {
       lucideLink,
       lucideList,
       lucideListOrdered,
+      lucideListTodo,
       lucideOutdent,
       lucidePaintBucket,
       lucidePilcrow,
@@ -328,6 +330,15 @@ import {
           name="lucideListOrdered"
           aria-hidden="true"
         />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleTaskList"
+        title="Task list"
+        aria-label="Task list"
+      >
+        <ng-icon [class]="iconClass" name="lucideListTodo" aria-hidden="true" />
       </button>
       <button
         type="button"

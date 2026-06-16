@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  effect,
   inject,
   input,
   output,
@@ -13,6 +14,7 @@ import {
   lucideHeading3,
   lucideList,
   lucideListOrdered,
+  lucideListTodo,
   lucidePilcrow,
   lucideSquareCode,
   lucideTextQuote,
@@ -33,6 +35,7 @@ import {
       lucideHeading3,
       lucideList,
       lucideListOrdered,
+      lucideListTodo,
       lucidePilcrow,
       lucideSquareCode,
       lucideTextQuote,
@@ -55,7 +58,7 @@ import {
         >
           Basic blocks
         </div>
-        <div class="min-h-0 flex-1 overflow-y-auto">
+        <div data-slash-command-options class="min-h-0 flex-1 overflow-y-auto">
           @for (option of options(); track option.id; let index = $index) {
             <button
               type="button"
@@ -132,6 +135,15 @@ export class PlaygroundSlashCommandMenu {
 
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  constructor() {
+    effect(() => {
+      const activeIndex = this.activeIndex();
+
+      this.options();
+      queueMicrotask(() => this.scrollOptionIntoView(activeIndex));
+    });
+  }
+
   protected preserveSelection(event: MouseEvent): void {
     event.preventDefault();
   }
@@ -179,8 +191,41 @@ export class PlaygroundSlashCommandMenu {
   }
 
   private focusOption(index: number): void {
-    this.elementRef.nativeElement
-      .querySelector<HTMLButtonElement>(`[data-slash-command-index="${index}"]`)
-      ?.focus();
+    const option = this.getOptionElement(index);
+
+    option?.focus();
+    this.scrollOptionIntoView(index);
+  }
+
+  private scrollOptionIntoView(index: number): void {
+    const scroller = this.getOptionsScroller();
+    const option = this.getOptionElement(index);
+
+    if (!scroller || !option) {
+      return;
+    }
+
+    const optionTop = option.offsetTop - scroller.offsetTop;
+    const optionBottom = optionTop + option.offsetHeight;
+    const visibleTop = scroller.scrollTop;
+    const visibleBottom = visibleTop + scroller.clientHeight;
+
+    if (optionTop < visibleTop) {
+      scroller.scrollTop = optionTop;
+    } else if (optionBottom > visibleBottom) {
+      scroller.scrollTop = optionBottom - scroller.clientHeight;
+    }
+  }
+
+  private getOptionElement(index: number): HTMLButtonElement | null {
+    return this.elementRef.nativeElement.querySelector<HTMLButtonElement>(
+      `[data-slash-command-index="${index}"]`,
+    );
+  }
+
+  private getOptionsScroller(): HTMLElement | null {
+    return this.elementRef.nativeElement.querySelector<HTMLElement>(
+      '[data-slash-command-options]',
+    );
   }
 }

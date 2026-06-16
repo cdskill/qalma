@@ -48,6 +48,10 @@ Run this after any plugin or public editor capability changes.
 - Treat `apps/docs` and `apps/sandbox` as consumers; examples must import from
   `@qalma/editor`, not internal paths.
 - Document Qalma-owned contracts, not raw ProseMirror implementation details.
+- Escape HTML-like snippets in inline markdown code with entities such as
+  `&lt;` and `&gt;`; raw `<tag>` text inside inline code can be parsed as DOM and
+  render as empty `<code></code>` nodes. Use fenced `html` blocks for raw HTML
+  examples.
 - If a plugin exposes events for consumer UI, show how a consumer can listen and
   decide what to render.
 - If a page is intentionally left as a nav placeholder, state that in the final

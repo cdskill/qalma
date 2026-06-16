@@ -103,27 +103,28 @@ plugin instance with merged options, e.g.
 
 ## Available plugins
 
-| Plugin                                                                                | Commands                                                                                 |
-| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `BoldPlugin`, `ItalicPlugin`, `UnderlinePlugin`, `StrikePlugin` (`TextFormattingKit`) | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                          |
-| `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                   |
-| `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                  |
-| `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                       |
-| `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem` |
-| `CodeBlockPlugin`                                                                     | `toggleCodeBlock`, `setCodeBlockLanguage`                                                |
-| `LinkPlugin`                                                                          | `setLink`, `unsetLink`                                                                   |
-| `ImagePlugin`                                                                         | `insertImage`, `updateImage`                                                             |
-| `MentionPlugin`                                                                       | `insertMention`                                                                          |
-| `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                              |
-| `ColorPlugin`                                                                         | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`           |
-| `HighlightPlugin`                                                                     | `setHighlight`, `unsetHighlight`                                                         |
-| `TextAlignPlugin`                                                                     | alignment commands for configured node types                                             |
-| `ClearFormattingPlugin`                                                               | `clearFormatting`                                                                        |
-| `HardBreakPlugin`                                                                     | `insertHardBreak`                                                                        |
-| `HistoryPlugin`                                                                       | `undo`, `redo` (`Mod-z`, `Shift-Mod-z`, `Mod-y`)                                         |
-| `PasteRulesPlugin`                                                                    | normalizes pasted content                                                                |
-| `PlaceholderPlugin`                                                                   | shows placeholder text in an empty document                                              |
-| `TrailingParagraphPlugin`                                                             | keeps a trailing empty paragraph at the end of the document                              |
+| Plugin                                                                                | Commands                                                                                                         |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `BoldPlugin`, `ItalicPlugin`, `UnderlinePlugin`, `StrikePlugin` (`TextFormattingKit`) | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
+| `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                                           |
+| `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                                          |
+| `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                                               |
+| `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
+| `TaskListPlugin`                                                                      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |
+| `CodeBlockPlugin`                                                                     | `toggleCodeBlock`, `setCodeBlockLanguage`                                                                        |
+| `LinkPlugin`                                                                          | `setLink`, `unsetLink`                                                                                           |
+| `ImagePlugin`                                                                         | `insertImage`, `updateImage`                                                                                     |
+| `MentionPlugin`                                                                       | `insertMention`                                                                                                  |
+| `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                                                      |
+| `ColorPlugin`                                                                         | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`                                   |
+| `HighlightPlugin`                                                                     | `setHighlight`, `unsetHighlight`                                                                                 |
+| `TextAlignPlugin`                                                                     | alignment commands for configured node types                                                                     |
+| `ClearFormattingPlugin`                                                               | `clearFormatting`                                                                                                |
+| `HardBreakPlugin`                                                                     | `insertHardBreak`                                                                                                |
+| `HistoryPlugin`                                                                       | `undo`, `redo` (`Mod-z`, `Shift-Mod-z`, `Mod-y`)                                                                 |
+| `PasteRulesPlugin`                                                                    | normalizes pasted content                                                                                        |
+| `PlaceholderPlugin`                                                                   | shows placeholder text in an empty document                                                                      |
+| `TrailingParagraphPlugin`                                                             | keeps a trailing empty paragraph at the end of the document                                                      |
 
 Read each plugin's source under `src/lib/plugins` for configuration options
 (e.g. `HeadingsPlugin.configure({ levels: [1, 2, 3] })`,

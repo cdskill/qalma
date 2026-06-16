@@ -30,6 +30,8 @@ import {
   SlashCommandPlugin,
   SlashCommandState,
   SubscriptSuperscriptPlugin,
+  TaskItemState,
+  TaskListPlugin,
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   TextAlignPlugin,
   TextFormattingKit,
@@ -64,7 +66,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      43,
+      44,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
@@ -84,6 +86,7 @@ describe('App', () => {
     ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Subscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Superscript"]')).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Task list"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Image URL"]')).not.toBeNull();
     expect(
       compiled.querySelector('[aria-label="Upload image"]'),
@@ -101,6 +104,15 @@ describe('App', () => {
     expect(compiled.querySelector('.ProseMirror ol')?.textContent).toContain(
       'Pick capabilities for the current product surface.',
     );
+    expect(
+      compiled.querySelector('.ProseMirror ul[data-type="task-list"]')
+        ?.textContent,
+    ).toContain('Ship engine behavior from a plugin.');
+    expect(
+      compiled.querySelector<HTMLInputElement>(
+        '.ProseMirror li[data-type="task-item"] input[type="checkbox"]',
+      )?.checked,
+    ).toBeTrue();
     expect(
       compiled.querySelector('.ProseMirror blockquote')?.textContent,
     ).toContain(
@@ -860,6 +872,61 @@ describe('App', () => {
     expect(editor.execute('toggleBlockquote')).toBeTrue();
     expect(editor.isCommandActive('toggleBlockquote')).toBeFalse();
     expect(editor.html()).toBe('<p>Quoted text</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should expose task list commands and state through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Plan the release</p>',
+      plugins: [TaskListPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+
+    expect(TaskListPlugin.key).toBe('taskList');
+    expect(editor.execute('toggleTaskList')).toBeTrue();
+    expect(editor.isCommandActive('toggleTaskList')).toBeTrue();
+    expect(editor.query<TaskItemState>('taskItem')).toEqual({
+      checked: false,
+    });
+    expect(editor.html()).toContain('<ul data-type="task-list">');
+    expect(editor.html()).toContain(
+      '<li data-type="task-item" data-checked="false">',
+    );
+    expect(editor.html()).toContain(
+      '<div data-task-item-content=""><p>Plan the release</p></div>',
+    );
+
+    expect(editor.execute('toggleTaskItemChecked')).toBeTrue();
+    expect(editor.isCommandActive('toggleTaskItemChecked')).toBeTrue();
+    expect(editor.query<TaskItemState>('taskItem')).toEqual({
+      checked: true,
+    });
+    expect(editor.html()).toContain(
+      '<li data-type="task-item" data-checked="true">',
+    );
+
+    expect(editor.execute('setTaskItemChecked', false)).toBeTrue();
+    expect(editor.query<TaskItemState>('taskItem')).toEqual({
+      checked: false,
+    });
+    expect(editor.canExecute('setTaskItemChecked')).toBeFalse();
+
+    const checkbox = host.querySelector<HTMLInputElement>(
+      'li[data-type="task-item"] input[type="checkbox"]',
+    );
+
+    if (!checkbox) {
+      throw new Error('Expected task item checkbox to render.');
+    }
+
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(editor.query<TaskItemState>('taskItem')).toEqual({
+      checked: true,
+    });
 
     editor.unmount(host);
   });
