@@ -1,3 +1,11 @@
+## 0.0.1-alpha.8 (2026-06-16)
+
+### 🚀 Features
+
+- **editor:** add table plugin ([f08ff42](https://github.com/cdskill/qalma/commit/f08ff42))
+- **editor:** add horizontal rule plugin ([4d2101e](https://github.com/cdskill/qalma/commit/4d2101e))
+- **editor:** add markdown input rules to headings plugin ([f8d5b0e](https://github.com/cdskill/qalma/commit/f8d5b0e))
+
 ## 0.0.1-alpha.7 (2026-06-16)
 
 ### 🚀 Features
