@@ -122,6 +122,15 @@ export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly PlaygroundSlashCommandOp
       icon: 'lucideMinus',
       keywords: ['hr', 'divider', 'rule', 'separator'],
     },
+    {
+      id: 'table',
+      label: 'Table',
+      description: 'Insert a 3×3 table with a header row',
+      command: 'insertTable',
+      shortcut: '▦',
+      icon: 'lucideTable',
+      keywords: ['table', 'grid', 'rows', 'columns'],
+    },
   ];
 
 export class PlaygroundSlashCommandController {

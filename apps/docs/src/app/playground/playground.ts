@@ -29,6 +29,7 @@ import {
   QalmaEditor,
   SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
+  TablePlugin,
   TaskListPlugin,
   TextAlignPlugin,
   TextFormattingKit,
@@ -197,6 +198,7 @@ export class Playground {
       TaskListPlugin,
       BlockquotePlugin,
       HorizontalRulePlugin,
+      TablePlugin,
       CodeBlockPlugin.configure({
         languages: PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,
         defaultLanguage: PLAYGROUND_DEFAULT_CODE_BLOCK_LANGUAGE,

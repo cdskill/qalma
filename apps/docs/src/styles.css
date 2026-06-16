@@ -856,3 +856,57 @@ qalma-content .ProseMirror .hljs-type {
 qalma-content .ProseMirror .hljs-variable {
   color: var(--hl-variable);
 }
+
+/*
+ * Tables (TablePlugin / prosemirror-tables)
+ */
+qalma-content .ProseMirror .tableWrapper {
+  margin: 1.1rem 0;
+  overflow-x: auto;
+}
+qalma-content .ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  overflow: hidden;
+}
+qalma-content .ProseMirror th,
+qalma-content .ProseMirror td {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 6rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  vertical-align: top;
+}
+qalma-content .ProseMirror th {
+  background-color: var(--color-secondary);
+  font-weight: 600;
+  text-align: left;
+}
+qalma-content .ProseMirror th > *:last-child,
+qalma-content .ProseMirror td > *:last-child {
+  margin-bottom: 0;
+}
+qalma-content .ProseMirror .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-color: var(--color-accent-subtle);
+  opacity: 0.6;
+  pointer-events: none;
+}
+qalma-content .ProseMirror .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 2px;
+  background-color: var(--color-accent);
+  pointer-events: none;
+}
+qalma-content .ProseMirror.resize-cursor {
+  cursor: col-resize;
+}

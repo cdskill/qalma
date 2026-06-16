@@ -17,8 +17,12 @@ import {
   lucideAlignLeft,
   lucideAlignRight,
   lucideBaseline,
+  lucideBetweenHorizontalEnd,
+  lucideBetweenVerticalEnd,
   lucideBold,
+  lucideColumns3,
   lucideEraser,
+  lucideHeading,
   lucideHeading1,
   lucideHeading2,
   lucideHeading3,
@@ -35,11 +39,14 @@ import {
   lucidePaintBucket,
   lucidePilcrow,
   lucideRedo2,
+  lucideRows3,
   lucideSquareCode,
   lucideStrikethrough,
   lucideSubscript,
   lucideSuperscript,
+  lucideTable,
   lucideTextQuote,
+  lucideTrash2,
   lucideUnderline,
   lucideUndo2,
   lucideUnlink,
@@ -65,8 +72,12 @@ import {
       lucideAlignLeft,
       lucideAlignRight,
       lucideBaseline,
+      lucideBetweenHorizontalEnd,
+      lucideBetweenVerticalEnd,
       lucideBold,
+      lucideColumns3,
       lucideEraser,
+      lucideHeading,
       lucideHeading1,
       lucideHeading2,
       lucideHeading3,
@@ -83,11 +94,14 @@ import {
       lucidePaintBucket,
       lucidePilcrow,
       lucideRedo2,
+      lucideRows3,
       lucideSquareCode,
       lucideStrikethrough,
       lucideSubscript,
       lucideSuperscript,
+      lucideTable,
       lucideTextQuote,
+      lucideTrash2,
       lucideUnderline,
       lucideUndo2,
       lucideUnlink,
@@ -454,6 +468,91 @@ import {
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
+      <!-- Table -->
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="insertTable"
+        title="Insert table"
+        aria-label="Insert table"
+      >
+        <ng-icon [class]="iconClass" name="lucideTable" aria-hidden="true" />
+      </button>
+      @if (inTable()) {
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="addRowAfter"
+          title="Add row"
+          aria-label="Add row"
+        >
+          <ng-icon
+            [class]="iconClass"
+            name="lucideBetweenHorizontalEnd"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="addColumnAfter"
+          title="Add column"
+          aria-label="Add column"
+        >
+          <ng-icon
+            [class]="iconClass"
+            name="lucideBetweenVerticalEnd"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="deleteRow"
+          title="Delete row"
+          aria-label="Delete row"
+        >
+          <ng-icon [class]="iconClass" name="lucideRows3" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="deleteColumn"
+          title="Delete column"
+          aria-label="Delete column"
+        >
+          <ng-icon
+            [class]="iconClass"
+            name="lucideColumns3"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="toggleHeaderRow"
+          title="Toggle header row"
+          aria-label="Toggle header row"
+        >
+          <ng-icon
+            [class]="iconClass"
+            name="lucideHeading"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          type="button"
+          [class]="commandClass"
+          qalmaCommand="deleteTable"
+          title="Delete table"
+          aria-label="Delete table"
+        >
+          <ng-icon [class]="iconClass" name="lucideTrash2" aria-hidden="true" />
+        </button>
+      }
+
+      <span [class]="separatorClass" aria-hidden="true"></span>
+
       <!-- History -->
       <button
         type="button"
@@ -505,6 +604,9 @@ export class PlaygroundToolbar {
   );
   protected readonly codeBlockActive = computed(() =>
     this.editor().isCommandActive('toggleCodeBlock'),
+  );
+  protected readonly inTable = computed(
+    () => this.editor().query<boolean>('isInTable') ?? false,
   );
   protected readonly codeBlockLanguage = computed(
     () =>

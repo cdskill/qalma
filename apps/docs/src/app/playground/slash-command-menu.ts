@@ -18,6 +18,7 @@ import {
   lucideMinus,
   lucidePilcrow,
   lucideSquareCode,
+  lucideTable,
   lucideTextQuote,
 } from '@ng-icons/lucide';
 
@@ -40,6 +41,7 @@ import {
       lucideMinus,
       lucidePilcrow,
       lucideSquareCode,
+      lucideTable,
       lucideTextQuote,
     }),
   ],

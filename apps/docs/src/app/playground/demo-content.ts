@@ -10,7 +10,7 @@ import {
  * A deliberately rich starting document so the playground exercises every
  * bundled plugin: headings, alignment, the full mark set, highlight, text and
  * background color, sub/superscript, links, mentions, blockquotes, nested
- * lists, an image, and multi-language code blocks.
+ * lists, a table, an image, and multi-language code blocks.
  */
 export const PLAYGROUND_DEMO_CONTENT = `
 <h1><strong>Qalma</strong> — write beautifully in Angular</h1>
@@ -34,6 +34,16 @@ export const PLAYGROUND_DEMO_CONTENT = `
 <li data-type="task-item" data-checked="true"><div data-task-item-content><p>Keep engine behavior in the plugin.</p></div></li>
 <li data-type="task-item" data-checked="false"><div data-task-item-content><p>Own checkbox styling in the consuming app.</p></div></li>
 </ul>
+<h2>At a glance</h2>
+<p>Tables ship as a plugin too: drag a column border to resize, hop between cells with <strong>Tab</strong>, and toggle a header row.</p>
+<table>
+<tbody>
+<tr><th><p>Plugin</p></th><th><p>What it adds</p></th><th><p>What you style</p></th></tr>
+<tr><td><p>Headings</p></td><td><p><code>#</code> … <code>######</code> input rules</p></td><td><p>The type scale</p></td></tr>
+<tr><td><p>Table</p></td><td><p>Resizable rows &amp; columns</p></td><td><p>Borders &amp; header cells</p></td></tr>
+<tr><td><p>Slash menu</p></td><td><p>Insert blocks by typing <code>/</code></p></td><td><p>The menu surface</p></td></tr>
+</tbody>
+</table>
 <h3>From TypeScript</h3>
 <pre><code class="language-typescript">import { createQalmaEditor, HeadingsPlugin, HistoryPlugin } from "@qalma/editor";&#10;&#10;const editor = createQalmaEditor({&#10;  content: "&lt;p&gt;Hello, Qalma&lt;/p&gt;",&#10;  plugins: [HeadingsPlugin, HistoryPlugin.configure({ depth: 200 })],&#10;});&#10;&#10;editor.execute("toggleHeading1");</code></pre>
 <h3>Plays well with any backend</h3>
