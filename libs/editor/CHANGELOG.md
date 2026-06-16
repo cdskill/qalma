@@ -1,3 +1,9 @@
+## 0.0.1-alpha.6 (2026-06-16)
+
+### 🚀 Features
+
+- **repo:** add task list plugin ([8361f4b](https://github.com/cdskill/qalma/commit/8361f4b))
+
 ## 0.0.1-alpha.5 (2026-06-14)
 
 ### 🚀 Features
