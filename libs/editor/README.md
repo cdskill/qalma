@@ -109,6 +109,7 @@ plugin instance with merged options, e.g.
 | `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                                           |
 | `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                                          |
 | `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                                               |
+| `TablePlugin`                                                                         | `insertTable`, `addRow*`/`addColumn*`, `deleteRow`/`deleteColumn`/`deleteTable`, `mergeCells`/`splitCell`, `toggleHeader*` |
 | `HorizontalRulePlugin`                                                                | `insertHorizontalRule`                                                                                          |
 | `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
 | `TaskListPlugin`                                                                      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |
