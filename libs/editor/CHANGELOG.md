@@ -1,3 +1,13 @@
+## 0.0.1-alpha.10 (2026-06-17)
+
+### 🚀 Features
+
+- **editor:** add markdown input rule to code block ([9861d81](https://github.com/cdskill/qalma/commit/9861d81))
+
+### 🩹 Fixes
+
+- **editor:** give task list checkboxes an accessible name ([ddf5e5b](https://github.com/cdskill/qalma/commit/ddf5e5b))
+
 ## 0.0.1-alpha.9 (2026-06-17)
 
 ### 🚀 Features
