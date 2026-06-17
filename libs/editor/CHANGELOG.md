@@ -1,3 +1,9 @@
+## 0.0.1-alpha.9 (2026-06-17)
+
+### 🚀 Features
+
+- **editor:** add markdown input rules to lists and blockquote ([804a6c5](https://github.com/cdskill/qalma/commit/804a6c5))
+
 ## 0.0.1-alpha.8 (2026-06-16)
 
 ### 🚀 Features
