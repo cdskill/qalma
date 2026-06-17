@@ -1,4 +1,9 @@
 import { setBlockType } from 'prosemirror-commands';
+import {
+  InputRule,
+  inputRules,
+  textblockTypeInputRule,
+} from 'prosemirror-inputrules';
 import { Node as ProseMirrorNode, NodeSpec, NodeType } from 'prosemirror-model';
 import {
   EditorState,
@@ -17,6 +22,13 @@ export interface CodeBlockPluginOptions {
   defaultLanguage: string;
   languageClassPrefix: string;
   indentText: string;
+  /**
+   * Enable the markdown-style input rule: ```` ``` ```` followed by a space
+   * (optionally with a language, e.g. ```` ```ts ````) converts the textblock
+   * to a code block. Backspace immediately after reverts to the literal
+   * characters.
+   */
+  inputRules: boolean;
 }
 
 export const CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS: Readonly<CodeBlockPluginOptions> =
@@ -25,6 +37,7 @@ export const CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS: Readonly<CodeBlockPluginOptions>
     defaultLanguage: 'plaintext',
     languageClassPrefix: 'language-',
     indentText: '  ',
+    inputRules: true,
   });
 
 export const CodeBlockPlugin = createConfigurableQalmaPlugin(
@@ -100,6 +113,15 @@ export const CodeBlockPlugin = createConfigurableQalmaPlugin(
       }),
       prosemirrorPlugins: (schema) => [
         createCodeBlockKeyboardPlugin(schema.nodes['codeBlock'], options),
+        ...(options.inputRules
+          ? [
+              inputRules({
+                rules: [
+                  createCodeBlockInputRule(schema.nodes['codeBlock'], options),
+                ],
+              }),
+            ]
+          : []),
       ],
     });
   },
@@ -163,6 +185,18 @@ function createSetCodeBlockLanguageCommand(
 
 function isCodeBlockActive(state: EditorState, codeBlock: NodeType): boolean {
   return Boolean(getActiveCodeBlock(state, codeBlock));
+}
+
+// ```` ``` ```` plus a space converts the block to a code block; an optional
+// language (```` ```ts ````) is honored when it is in the configured list,
+// otherwise it falls back to the default language.
+function createCodeBlockInputRule(
+  codeBlock: NodeType,
+  options: Readonly<CodeBlockPluginOptions>,
+): InputRule {
+  return textblockTypeInputRule(/^```([a-zA-Z0-9-]*)\s$/, codeBlock, (match) => ({
+    language: resolveLanguageId(match[1], options) ?? options.defaultLanguage,
+  }));
 }
 
 function createCodeBlockKeyboardPlugin(
@@ -435,6 +469,10 @@ function assertCodeBlockPluginOptions(
     throw new Error(
       'CodeBlockPlugin indentText must be a non-empty string containing only spaces or tabs.',
     );
+  }
+
+  if (typeof options.inputRules !== 'boolean') {
+    throw new TypeError('CodeBlockPlugin inputRules must be a boolean.');
   }
 }
 
