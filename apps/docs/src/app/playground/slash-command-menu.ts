@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
+  lucideCode,
   lucideHeading1,
   lucideHeading2,
   lucideHeading3,
@@ -32,6 +33,7 @@ import {
   imports: [NgIcon],
   providers: [
     provideIcons({
+      lucideCode,
       lucideHeading1,
       lucideHeading2,
       lucideHeading3,
@@ -60,7 +62,7 @@ import {
         <div
           class="shrink-0 px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
         >
-          Basic blocks
+          Commands
         </div>
         <div data-slash-command-options class="min-h-0 flex-1 overflow-y-auto">
           @for (option of options(); track option.id; let index = $index) {

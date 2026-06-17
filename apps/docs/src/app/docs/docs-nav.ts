@@ -38,6 +38,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     title: 'Formatting',
     items: [
       { title: 'Text Formatting', href: '/docs/text-formatting' },
+      { title: 'Inline Code', href: '/docs/inline-code' },
       { title: 'Color & Highlight', href: '/docs/color-highlight' },
       { title: 'Subscript & Superscript', href: '/docs/subscript-superscript' },
       { title: 'Clear Formatting', href: '/docs/clear-formatting' },

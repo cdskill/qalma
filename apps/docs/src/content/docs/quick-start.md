@@ -194,25 +194,25 @@ const canUndo = this.editor.canExecute('undo');
 
 These are the command names available from the plugins used above:
 
-| Command            | Plugin            | Shortcut            |
-| ------------------ | ----------------- | ------------------- |
-| `setParagraph`     | `HeadingsPlugin`  | —                   |
-| `toggleHeading1`   | `HeadingsPlugin`  | `Cmd/Ctrl + Alt + 1`|
-| `toggleHeading2`   | `HeadingsPlugin`  | `Cmd/Ctrl + Alt + 2`|
-| `toggleHeading3`   | `HeadingsPlugin`  | `Cmd/Ctrl + Alt + 3`|
-| `toggleBold`       | `TextFormattingKit` | `Cmd/Ctrl + B`    |
-| `toggleItalic`     | `TextFormattingKit` | `Cmd/Ctrl + I`    |
-| `toggleUnderline`  | `TextFormattingKit` | `Cmd/Ctrl + U`    |
-| `toggleStrike`     | `TextFormattingKit` | —                 |
-| `toggleBulletList` | `ListsPlugin`     | —                   |
-| `toggleOrderedList`| `ListsPlugin`     | —                   |
-| `undo`             | `HistoryPlugin`   | `Cmd/Ctrl + Z`      |
-| `redo`             | `HistoryPlugin`   | `Cmd/Ctrl + Shift + Z` |
+| Command             | Plugin              | Shortcut               |
+| ------------------- | ------------------- | ---------------------- |
+| `setParagraph`      | `HeadingsPlugin`    | —                      |
+| `toggleHeading1`    | `HeadingsPlugin`    | `Cmd/Ctrl + Alt + 1`   |
+| `toggleHeading2`    | `HeadingsPlugin`    | `Cmd/Ctrl + Alt + 2`   |
+| `toggleHeading3`    | `HeadingsPlugin`    | `Cmd/Ctrl + Alt + 3`   |
+| `toggleBold`        | `TextFormattingKit` | `Cmd/Ctrl + B`         |
+| `toggleItalic`      | `TextFormattingKit` | `Cmd/Ctrl + I`         |
+| `toggleUnderline`   | `TextFormattingKit` | `Cmd/Ctrl + U`         |
+| `toggleStrike`      | `TextFormattingKit` | —                      |
+| `toggleBulletList`  | `ListsPlugin`       | —                      |
+| `toggleOrderedList` | `ListsPlugin`       | —                      |
+| `undo`              | `HistoryPlugin`     | `Cmd/Ctrl + Z`         |
+| `redo`              | `HistoryPlugin`     | `Cmd/Ctrl + Shift + Z` |
 
 ## Next steps
 
-- [Plugins](/docs/plugins) — add links, mentions, images, code blocks, color,
-  text alignment and more.
+- [Plugins](/docs/plugins) — add links, mentions, images, inline code, code
+  blocks, color, text alignment and more.
 - [Architecture](/docs/architecture) — how the controller, schema and plugins
   fit together under the hood.
 - [Live Playground](/#playground) — a fully-featured editor you can read the

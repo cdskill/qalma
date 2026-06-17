@@ -13,6 +13,7 @@ export * from './lib/plugins/history';
 export * from './lib/plugins/headings';
 export * from './lib/plugins/horizontal-rule';
 export * from './lib/plugins/image';
+export * from './lib/plugins/inline-code';
 export * from './lib/plugins/link';
 export * from './lib/plugins/lists';
 export * from './lib/plugins/mention';

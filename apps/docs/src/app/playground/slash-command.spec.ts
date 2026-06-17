@@ -1,6 +1,7 @@
 import {
   HeadingsPlugin,
   HistoryPlugin,
+  InlineCodePlugin,
   ListsPlugin,
   QalmaEditorController,
   QalmaPlugin,
@@ -70,6 +71,23 @@ describe('PlaygroundSlashCommandController.insert', () => {
 
     editor.unmount(host);
   });
+
+  it('keeps inline commands at the slash position', () => {
+    const { editor, host } = mountEditor('<p>Use /code</p>', [
+      SlashCommandPlugin,
+      InlineCodePlugin,
+    ]);
+    selectRange(editor, 10, 10);
+
+    new PlaygroundSlashCommandController(editor).insert(
+      option('toggleInlineCode', 'inline'),
+    );
+    insertText(editor, 'createQalmaEditor');
+
+    expect(editor.html()).toBe('<p>Use <code>createQalmaEditor</code></p>');
+
+    editor.unmount(host);
+  });
 });
 
 describe('SlashCommandPlugin', () => {
@@ -111,6 +129,19 @@ describe('SlashCommandPlugin', () => {
       query: 'h',
       trigger: '/',
     });
+
+    editor.unmount(host);
+  });
+
+  it('ignores slash commands inside inline code', () => {
+    const { editor, host } = mountEditor('<p><code>/he</code></p>', [
+      InlineCodePlugin,
+      SlashCommandPlugin,
+    ]);
+    selectRange(editor, 4, 4);
+
+    expect(editor.query<SlashCommandState>('slashCommand')).toBeNull();
+    expect(editor.execute('deleteSlashCommand')).toBe(false);
 
     editor.unmount(host);
   });
@@ -156,12 +187,16 @@ function insertText(editor: QalmaEditorController, text: string): void {
   view.dispatch(view.state.tr.insertText(text));
 }
 
-function option(command: string): PlaygroundSlashCommandOption {
+function option(
+  command: string,
+  placement: PlaygroundSlashCommandOption['placement'] = 'block',
+): PlaygroundSlashCommandOption {
   return {
     id: command,
     label: command,
     description: '',
     command,
+    placement,
     shortcut: '',
     icon: '',
     keywords: [],

@@ -486,6 +486,14 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   padding: 0;
 }
 
+qalma-content .ProseMirror :not(pre) > code {
+  border-radius: 0.25rem;
+  background: var(--color-muted);
+  padding: 0.125rem 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
 /* Prism syntax highlighting for fenced code blocks (AnalogJS content pipeline),
    mapped onto the same palette the playground editor uses. */
 :where(.qalma-prose, .analog-markdown-route) .token.comment,

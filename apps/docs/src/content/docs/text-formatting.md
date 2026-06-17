@@ -26,12 +26,12 @@ const editor = createQalmaEditor({
 
 ## Commands
 
-| Command | Mark | Parses | Serializes | Shortcut |
-| ------- | ---- | ------ | ---------- | -------- |
-| `toggleBold` | `strong` | `&lt;strong&gt;`, `&lt;b&gt;`, and bold `font-weight` styles | `&lt;strong&gt;` | `Mod-b` |
-| `toggleItalic` | `em` | `&lt;em&gt;`, `&lt;i&gt;`, and `font-style: italic` | `&lt;em&gt;` | `Mod-i` |
-| `toggleUnderline` | `underline` | `&lt;u&gt;` and underline `text-decoration` | `&lt;u&gt;` | `Mod-u` |
-| `toggleStrike` | `strike` | `&lt;s&gt;`, `&lt;strike&gt;`, `&lt;del&gt;`, and line-through `text-decoration` | `&lt;s&gt;` | None |
+| Command           | Mark        | Parses                                                                           | Serializes       | Shortcut |
+| ----------------- | ----------- | -------------------------------------------------------------------------------- | ---------------- | -------- |
+| `toggleBold`      | `strong`    | `&lt;strong&gt;`, `&lt;b&gt;`, and bold `font-weight` styles                     | `&lt;strong&gt;` | `Mod-b`  |
+| `toggleItalic`    | `em`        | `&lt;em&gt;`, `&lt;i&gt;`, and `font-style: italic`                              | `&lt;em&gt;`     | `Mod-i`  |
+| `toggleUnderline` | `underline` | `&lt;u&gt;` and underline `text-decoration`                                      | `&lt;u&gt;`      | `Mod-u`  |
+| `toggleStrike`    | `strike`    | `&lt;s&gt;`, `&lt;strike&gt;`, `&lt;del&gt;`, and line-through `text-decoration` | `&lt;s&gt;`      | None     |
 
 Each command has command-state support, so `qalmaCommand` adds
 `.qalma-command-active` and `aria-pressed` when the current selection has the
@@ -70,6 +70,10 @@ const editor = createQalmaEditor({
 
 The kit is only a `readonly QalmaPlugin[]`. It does not add behavior beyond
 spreading those four plugins into the editor.
+
+For semantic inline snippets, add `InlineCodePlugin` separately. It exposes
+`toggleInlineCode`, `Mod-e`, and the single-backtick input rule documented on
+the Inline Code page.
 
 ## Styling
 

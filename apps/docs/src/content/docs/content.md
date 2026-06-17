@@ -93,19 +93,20 @@ writes do not loop.
 
 Each plugin decides how its node or mark parses and serializes:
 
-| Plugin | HTML surface |
-| ------ | ------------ |
-| `TextFormattingKit` | `&lt;strong&gt;`, `&lt;em&gt;`, `&lt;u&gt;`, `&lt;s&gt;` |
-| `HeadingsPlugin` | `&lt;h1&gt;` through configured levels |
-| `ListsPlugin` | `&lt;ul&gt;`, `&lt;ol&gt;`, `&lt;li&gt;` |
-| `BlockquotePlugin` | `&lt;blockquote&gt;` |
-| `CodeBlockPlugin` | `&lt;pre&gt;&lt;code class="language-id"&gt;...&lt;/code&gt;&lt;/pre&gt;` |
-| `LinkPlugin` | `&lt;a href="..." target="..." rel="..."&gt;` |
-| `ImagePlugin` | inline `&lt;img src="..." alt="..." title="..."&gt;` |
-| `MentionPlugin` | `&lt;span data-qalma-mention ...&gt;` |
-| `ColorPlugin` | `&lt;span style="color: ...; background-color: ..."&gt;` |
-| `HighlightPlugin` | `&lt;mark&gt;` or `&lt;mark style="background-color: ..."&gt;` |
-| `TextAlignPlugin` | `style="text-align: ..."` on configured nodes, except left alignment serializes as no attribute. |
+| Plugin              | HTML surface                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| `TextFormattingKit` | `&lt;strong&gt;`, `&lt;em&gt;`, `&lt;u&gt;`, `&lt;s&gt;`                                         |
+| `InlineCodePlugin`  | `&lt;code&gt;`                                                                                   |
+| `HeadingsPlugin`    | `&lt;h1&gt;` through configured levels                                                           |
+| `ListsPlugin`       | `&lt;ul&gt;`, `&lt;ol&gt;`, `&lt;li&gt;`                                                         |
+| `BlockquotePlugin`  | `&lt;blockquote&gt;`                                                                             |
+| `CodeBlockPlugin`   | `&lt;pre&gt;&lt;code class="language-id"&gt;...&lt;/code&gt;&lt;/pre&gt;`                        |
+| `LinkPlugin`        | `&lt;a href="..." target="..." rel="..."&gt;`                                                    |
+| `ImagePlugin`       | inline `&lt;img src="..." alt="..." title="..."&gt;`                                             |
+| `MentionPlugin`     | `&lt;span data-qalma-mention ...&gt;`                                                            |
+| `ColorPlugin`       | `&lt;span style="color: ...; background-color: ..."&gt;`                                         |
+| `HighlightPlugin`   | `&lt;mark&gt;` or `&lt;mark style="background-color: ..."&gt;`                                   |
+| `TextAlignPlugin`   | `style="text-align: ..."` on configured nodes, except left alignment serializes as no attribute. |
 
 ## Read-only content
 

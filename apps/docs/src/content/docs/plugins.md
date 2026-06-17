@@ -17,6 +17,7 @@ menus, and styling remain consumer-owned Angular code.
 | Plugin                  | What it adds                          | Commands                                                                                                         |
 | ----------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `TextFormattingKit`     | Bold, italic, underline, strike marks | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
+| `InlineCodePlugin`      | Semantic inline code mark             | `toggleInlineCode`                                                                                               |
 | `HeadingsPlugin`        | Paragraph and heading blocks          | `setParagraph`, `toggleHeading1` through configured heading levels                                               |
 | `ListsPlugin`           | Bullet and ordered lists              | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |
 | `TaskListPlugin`        | Checked and unchecked task lists      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem` |

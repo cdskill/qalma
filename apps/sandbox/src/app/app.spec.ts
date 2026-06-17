@@ -15,6 +15,8 @@ import {
   IMAGE_PLUGIN_DEFAULT_OPTIONS,
   ImagePlugin,
   ImageState,
+  INLINE_CODE_PLUGIN_DEFAULT_OPTIONS,
+  InlineCodePlugin,
   LINK_PLUGIN_DEFAULT_OPTIONS,
   LinkPlugin,
   ListsPlugin,
@@ -66,7 +68,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      44,
+      45,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
@@ -86,6 +88,7 @@ describe('App', () => {
     ).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Subscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Superscript"]')).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Inline code"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Task list"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Image URL"]')).not.toBeNull();
     expect(
@@ -154,6 +157,9 @@ describe('App', () => {
     expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
       'highlight',
     );
+    expect(
+      compiled.querySelector('.ProseMirror p code:not([class])')?.textContent,
+    ).toBe('inline code');
     expect(compiled.querySelector('.ProseMirror sub')?.textContent).toBe('2');
     expect(compiled.querySelector('.ProseMirror sup')?.textContent).toBe('2');
     expect(
@@ -277,6 +283,105 @@ describe('App', () => {
     expect(editor.execute('clearFormatting')).toBeFalse();
 
     editor.unmount(host);
+  });
+
+  it('should expose inline code through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Use createQalmaEditor to start.</p>',
+      plugins: [InlineCodePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 5, 22);
+
+    expect(InlineCodePlugin.key).toBe('inlineCode');
+    expect(editor.canExecute('toggleInlineCode')).toBeTrue();
+    expect(editor.execute('toggleInlineCode')).toBeTrue();
+    expect(editor.isCommandActive('toggleInlineCode')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>Use <code>createQalmaEditor</code> to start.</p>',
+    );
+    expect(editor.execute('toggleInlineCode')).toBeTrue();
+    expect(editor.isCommandActive('toggleInlineCode')).toBeFalse();
+    expect(editor.html()).toBe('<p>Use createQalmaEditor to start.</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized inline code through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Use <code>createQalmaEditor</code> to start.</p>',
+      plugins: [InlineCodePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 5, 22);
+
+    expect(editor.html()).toBe(
+      '<p>Use <code>createQalmaEditor</code> to start.</p>',
+    );
+    expect(editor.isCommandActive('toggleInlineCode')).toBeTrue();
+
+    editor.unmount(host);
+  });
+
+  it('should apply inline code with the Mod-e shortcut', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Use createQalmaEditor to start.</p>',
+      plugins: [InlineCodePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 5, 22);
+
+    const event = dispatchModKey(editor, 'e');
+
+    expect(event.defaultPrevented).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>Use <code>createQalmaEditor</code> to start.</p>',
+    );
+
+    editor.unmount(host);
+  });
+
+  it('should convert matching backticks to inline code', () => {
+    const editor = createQalmaEditor({
+      content: '<p>`createQalmaEditor</p>',
+      plugins: [InlineCodePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 19, 19);
+
+    expect(typeText(editor, '`')).toBeTrue();
+    expect(editor.html()).toBe('<p><code>createQalmaEditor</code></p>');
+
+    editor.unmount(host);
+  });
+
+  it('should expose configurable inline code defaults and validation', () => {
+    const configured = InlineCodePlugin.configure({
+      inputRules: false,
+    });
+
+    expect(INLINE_CODE_PLUGIN_DEFAULT_OPTIONS).toEqual({
+      inputRules: true,
+    });
+    expect(InlineCodePlugin.options).toEqual(
+      INLINE_CODE_PLUGIN_DEFAULT_OPTIONS,
+    );
+    expect(configured.options).toEqual({
+      inputRules: false,
+    });
+    expect(() =>
+      InlineCodePlugin.configure({
+        inputRules: 'yes' as never,
+      }),
+    ).toThrowError('InlineCodePlugin inputRules must be a boolean.');
   });
 
   it('should expose text and background color through the public plugin', () => {
@@ -1297,6 +1402,24 @@ describe('App', () => {
     editor.unmount(host);
   });
 
+  it('should keep slash commands disabled inside inline code', () => {
+    const editor = createQalmaEditor({
+      content: '<p><code>/he</code></p>',
+      plugins: [InlineCodePlugin, SlashCommandPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 4, 4);
+
+    expect(editor.query<SlashCommandState>('slashCommand')).toBeNull();
+    expect(editor.canExecute('deleteSlashCommand')).toBeFalse();
+    expect(editor.execute('deleteSlashCommand')).toBeFalse();
+    expect(editor.html()).toBe('<p><code>/he</code></p>');
+
+    editor.unmount(host);
+  });
+
   it('should expose configurable slash command defaults and validation', () => {
     const configured = SlashCommandPlugin.configure({
       trigger: '+',
@@ -1360,6 +1483,28 @@ describe('App', () => {
     expect(editor.html()).toBe(
       '<pre><code class="language-plaintext">@gr</code></pre>',
     );
+
+    editor.unmount(host);
+  });
+
+  it('should keep mentions disabled inside inline code', () => {
+    const editor = createQalmaEditor({
+      content: '<p><code>@gr</code></p>',
+      plugins: [InlineCodePlugin, MentionPlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 4, 4);
+
+    expect(editor.query<MentionState>('mention')).toBeNull();
+    expect(
+      editor.canExecute('insertMention', {
+        id: 'grace-hopper',
+        label: 'Grace Hopper',
+      }),
+    ).toBeFalse();
+    expect(editor.html()).toBe('<p><code>@gr</code></p>');
 
     editor.unmount(host);
   });
@@ -1536,6 +1681,57 @@ function getEditorSelectionFrom(editor: QalmaEditorController): number {
   }
 
   return view.state.selection.from;
+}
+
+function typeText(editor: QalmaEditorController, text: string): boolean {
+  const view = getEditorView(editor);
+  const { from, to } = view.state.selection;
+  let handled = false;
+
+  view.someProp('handleTextInput', (handler) => {
+    handled = handler(view, from, to, text);
+
+    return handled;
+  });
+
+  if (!handled) {
+    view.dispatch(view.state.tr.insertText(text, from, to));
+  }
+
+  return handled;
+}
+
+function dispatchModKey(
+  editor: QalmaEditorController,
+  key: string,
+): KeyboardEvent {
+  const view = getEditorView(editor);
+  const event = new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    key,
+    ctrlKey: !isMacPlatform(),
+    metaKey: isMacPlatform(),
+  });
+
+  view.dom.dispatchEvent(event);
+
+  return event;
+}
+
+function getEditorView(editor: QalmaEditorController): EditorView {
+  const view = (editor as unknown as { editorView: EditorView | undefined })
+    .editorView;
+
+  if (!view) {
+    throw new Error('Editor view is not mounted.');
+  }
+
+  return view;
+}
+
+function isMacPlatform(): boolean {
+  return /Mac|iP(hone|[oa]d)/.test(navigator.platform);
 }
 
 function pastePlainText(editor: QalmaEditorController, text: string): void {

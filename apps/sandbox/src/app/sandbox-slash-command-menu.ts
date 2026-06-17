@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
+  lucideCode,
   lucideHeading1,
   lucideHeading2,
   lucideHeading3,
@@ -30,6 +31,7 @@ import {
   imports: [NgIcon],
   providers: [
     provideIcons({
+      lucideCode,
       lucideHeading1,
       lucideHeading2,
       lucideHeading3,
@@ -56,7 +58,7 @@ import {
         <div
           class="shrink-0 px-3 pb-1.5 pt-3 text-xs font-semibold text-slate-500"
         >
-          Basic blocks
+          Commands
         </div>
         <div
           data-slash-command-options

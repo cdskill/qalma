@@ -102,15 +102,16 @@ readonly canSetLink = computed(() =>
 ```
 
 `isCommandActive()` is backed by plugin-provided command-state queries. The
-formatting, heading, list, task list, blockquote, code block, link, image, color,
-highlight, subscript, superscript, and text-align plugins expose active state
-for their relevant commands.
+formatting, inline code, heading, list, task list, blockquote, code block, link,
+image, color, highlight, subscript, superscript, and text-align plugins expose
+active state for their relevant commands.
 
 ## Core command reference
 
 | Plugin                       | Commands                                                                                                         |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `TextFormattingKit`          | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
+| `InlineCodePlugin`           | `toggleInlineCode`                                                                                               |
 | `SubscriptSuperscriptPlugin` | `toggleSubscript`, `toggleSuperscript`                                                                           |
 | `HeadingsPlugin`             | `setParagraph`, `toggleHeading1` through configured heading levels                                               |
 | `ListsPlugin`                | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                         |

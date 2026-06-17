@@ -17,6 +17,7 @@ import {
   lucideAlignLeft,
   lucideAlignRight,
   lucideBold,
+  lucideCode,
   lucideEraser,
   lucideHeading1,
   lucideHeading2,
@@ -62,6 +63,7 @@ import {
       lucideAlignLeft,
       lucideAlignRight,
       lucideBold,
+      lucideCode,
       lucideEraser,
       lucideHeading1,
       lucideHeading2,
@@ -227,6 +229,15 @@ import {
         aria-label="Strikethrough"
       >
         <ng-icon name="lucideStrikethrough" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleInlineCode"
+        title="Inline code"
+        aria-label="Inline code"
+      >
+        <ng-icon name="lucideCode" aria-hidden="true" />
       </button>
       <button
         type="button"

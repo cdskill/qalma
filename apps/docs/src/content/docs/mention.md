@@ -19,12 +19,12 @@ const editor = createQalmaEditor({
 
 ## Public API
 
-| Contract | Description |
-| -------- | ----------- |
-| `query&lt;MentionState&gt;('mention')` | Returns `{ from, to, query, trigger }` while a mention query is active. |
-| `insertMention` | Replaces the active mention query or current selection with a mention node. |
-| `qalma-mention-update` | DOM event emitted from the editor view when mention state may have changed. |
-| `qalma-mention-keydown` | Cancelable DOM event for mention menu keys. |
+| Contract                               | Description                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| `query&lt;MentionState&gt;('mention')` | Returns `{ from, to, query, trigger }` while a mention query is active.     |
+| `insertMention`                        | Replaces the active mention query or current selection with a mention node. |
+| `qalma-mention-update`                 | DOM event emitted from the editor view when mention state may have changed. |
+| `qalma-mention-keydown`                | Cancelable DOM event for mention menu keys.                                 |
 
 Mention keydown events cover `ArrowDown`, `ArrowUp`, `Escape`, `Enter`, `Tab`,
 space, and `Spacebar`.
@@ -44,16 +44,16 @@ const editor = createQalmaEditor({
 });
 ```
 
-| Option | Default | Validation |
-| ------ | ------- | ---------- |
-| `trigger` | `'@'` | Single non-whitespace character. |
-| `minQueryLength` | `0` | Non-negative integer. |
-| `maxQueryLength` | `64` | Integer greater than or equal to `minQueryLength`. |
-| `appendSpaceOnInsert` | `true` | Boolean. |
+| Option                | Default | Validation                                         |
+| --------------------- | ------- | -------------------------------------------------- |
+| `trigger`             | `'@'`   | Single non-whitespace character.                   |
+| `minQueryLength`      | `0`     | Non-negative integer.                              |
+| `maxQueryLength`      | `64`    | Integer greater than or equal to `minQueryLength`. |
+| `appendSpaceOnInsert` | `true`  | Boolean.                                           |
 
 Mentions are detected only when the selection is collapsed, the cursor is not
-inside a code textblock, the trigger starts the parent text or follows
-whitespace, and the query contains no whitespace.
+inside a code block or inline code mark, the trigger starts the parent text or
+follows whitespace, and the query contains no whitespace.
 
 ## Insert a mention
 
@@ -70,6 +70,7 @@ editor.execute('insertMention', {
 The mention serializes as a non-editable span:
 
 ```html
+<!-- prettier-ignore -->
 <span
   data-qalma-mention
   data-mention-id="ada-lovelace"

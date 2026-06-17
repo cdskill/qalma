@@ -11,6 +11,7 @@ export interface PlaygroundSlashCommandOption {
   description: string;
   command: string;
   value?: QalmaCommandValue;
+  placement?: 'block' | 'inline';
   shortcut: string;
   icon: string;
   keywords: readonly string[];
@@ -105,6 +106,16 @@ export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly PlaygroundSlashCommandOp
       keywords: ['blockquote', 'quote'],
     },
     {
+      id: 'inline-code',
+      label: 'Inline code',
+      description: 'Format typed text as code',
+      command: 'toggleInlineCode',
+      placement: 'inline',
+      shortcut: '`code`',
+      icon: 'lucideCode',
+      keywords: ['inline', 'code', 'mark'],
+    },
+    {
       id: 'code-block',
       label: 'Code block',
       description: 'Insert a syntax-highlighted block',
@@ -194,20 +205,22 @@ export class PlaygroundSlashCommandController {
       return;
     }
 
-    // Notion/Plate-style: the block renders on its own new line instead of
-    // transforming the line the trigger was typed on. Empty blocks transform in
-    // place (no split) to avoid leaving a stray blank line.
-    if (this.isInList()) {
-      // Keep the current item; split off a fresh one and lift it out of the list.
-      this.editor.execute('splitListItem');
+    if (option.placement !== 'inline') {
+      // Notion/Plate-style: the block renders on its own new line instead of
+      // transforming the line the trigger was typed on. Empty blocks transform
+      // in place (no split) to avoid leaving a stray blank line.
+      if (this.isInList()) {
+        // Keep the current item; split off a fresh one and lift it out of the list.
+        this.editor.execute('splitListItem');
 
-      for (let guard = 0; guard < 20 && this.isInList(); guard += 1) {
-        if (!this.editor.execute('liftListItem')) {
-          break;
+        for (let guard = 0; guard < 20 && this.isInList(); guard += 1) {
+          if (!this.editor.execute('liftListItem')) {
+            break;
+          }
         }
+      } else {
+        this.editor.execute('splitSlashCommandBlock');
       }
-    } else {
-      this.editor.execute('splitSlashCommandBlock');
     }
 
     this.editor.execute(option.command, option.value);

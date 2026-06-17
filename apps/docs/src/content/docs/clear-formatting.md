@@ -24,8 +24,8 @@ const editor = createQalmaEditor({
 
 ## Command behavior
 
-| Command | Description |
-| ------- | ----------- |
+| Command           | Description                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
 | `clearFormatting` | Removes inline marks and resets clearable selected text blocks to paragraphs. |
 
 The command returns `false` when there are no stored marks, no inline marks to
@@ -65,10 +65,11 @@ application needs one.
 
 `clearFormatting` works well with these mark-producing plugins:
 
-| Plugin | Cleared marks |
-| ------ | ------------- |
-| `TextFormattingKit` | `strong`, `em`, `underline`, `strike` |
-| `SubscriptSuperscriptPlugin` | `subscript`, `superscript` |
-| `ColorPlugin` | `textStyle` |
-| `HighlightPlugin` | `highlight` |
-| `LinkPlugin` | `link` |
+| Plugin                       | Cleared marks                         |
+| ---------------------------- | ------------------------------------- |
+| `TextFormattingKit`          | `strong`, `em`, `underline`, `strike` |
+| `InlineCodePlugin`           | `code`                                |
+| `SubscriptSuperscriptPlugin` | `subscript`, `superscript`            |
+| `ColorPlugin`                | `textStyle`                           |
+| `HighlightPlugin`            | `highlight`                           |
+| `LinkPlugin`                 | `link`                                |

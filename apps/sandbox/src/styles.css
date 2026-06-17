@@ -100,6 +100,16 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   padding-right: 1rem;
 }
 
+qalma-content .ProseMirror :not(pre) > code {
+  border-radius: 0.25rem;
+  background: rgb(226 232 240);
+  padding: 0.125rem 0.3rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  font-size: 0.875em;
+}
+
 qalma-content .ProseMirror .sandbox-code-block {
   margin-bottom: 0.75rem;
   overflow: hidden;

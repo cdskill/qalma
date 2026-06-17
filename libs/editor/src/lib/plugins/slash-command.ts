@@ -1,5 +1,4 @@
 import { splitBlock } from 'prosemirror-commands';
-import { NodeType } from 'prosemirror-model';
 import {
   EditorState,
   Plugin as ProseMirrorPlugin,
@@ -12,6 +11,7 @@ import {
   QalmaCommandHandler,
   QalmaPlugin,
 } from './qalma-plugin';
+import { isInCodeContext } from '../prosemirror/code';
 
 export interface SlashCommandState {
   from: number;
@@ -219,7 +219,7 @@ function findSlashCommandState(
 
   const $cursor = state.selection.$from;
 
-  if (isCodeTextblock($cursor.parent.type)) {
+  if (isInCodeContext(state)) {
     return null;
   }
 
@@ -277,10 +277,6 @@ function isSlashCommandNavigationKey(key: string): boolean {
 
 function hasSlashCommandBoundary(text: string, triggerIndex: number): boolean {
   return triggerIndex === 0 || /\s/.test(text.charAt(triggerIndex - 1));
-}
-
-function isCodeTextblock(type: NodeType): boolean {
-  return Boolean(type.spec.code);
 }
 
 function assertSlashCommandPluginOptions(

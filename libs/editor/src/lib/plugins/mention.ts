@@ -1,8 +1,5 @@
 import { NodeSpec, NodeType } from 'prosemirror-model';
-import {
-  Plugin as ProseMirrorPlugin,
-  TextSelection,
-} from 'prosemirror-state';
+import { Plugin as ProseMirrorPlugin, TextSelection } from 'prosemirror-state';
 
 import {
   createConfigurableQalmaPlugin,
@@ -10,6 +7,7 @@ import {
   QalmaCommandHandler,
   QalmaPlugin,
 } from './qalma-plugin';
+import { isInCodeContext } from '../prosemirror/code';
 
 export interface MentionCommandValue {
   id: string;
@@ -130,7 +128,10 @@ function createInsertMentionCommand(
       trigger: attrs?.trigger ?? options.trigger,
     };
 
-    if (!attrs || !selectionAllowsMention(state, mention, range.from, range.to)) {
+    if (
+      !attrs ||
+      !selectionAllowsMention(state, mention, range.from, range.to)
+    ) {
       return false;
     }
 
@@ -153,7 +154,9 @@ function createInsertMentionCommand(
 
       dispatch(
         transaction
-          .setSelection(TextSelection.create(transaction.doc, selectionPosition))
+          .setSelection(
+            TextSelection.create(transaction.doc, selectionPosition),
+          )
           .scrollIntoView(),
       );
     }
@@ -228,7 +231,7 @@ function getMentionState(
 
   const $cursor = state.selection.$from;
 
-  if (isCodeTextblock($cursor.parent.type)) {
+  if (isInCodeContext(state)) {
     return null;
   }
 
@@ -315,14 +318,10 @@ function selectionAllowsMention(
   const $to = state.doc.resolve(to);
 
   return (
-    !isCodeTextblock($from.parent.type) &&
+    !isInCodeContext(state) &&
     $from.sameParent($to) &&
     $from.parent.canReplaceWith($from.index(), $to.index(), mention)
   );
-}
-
-function isCodeTextblock(type: NodeType): boolean {
-  return Boolean(type.spec.code);
 }
 
 function normalizeMentionText(value: unknown): string | null {
@@ -354,10 +353,7 @@ function assertMentionPluginOptions(
     );
   }
 
-  if (
-    !Number.isInteger(options.minQueryLength) ||
-    options.minQueryLength < 0
-  ) {
+  if (!Number.isInteger(options.minQueryLength) || options.minQueryLength < 0) {
     throw new RangeError(
       'MentionPlugin minQueryLength must be a non-negative integer.',
     );
@@ -373,8 +369,6 @@ function assertMentionPluginOptions(
   }
 
   if (typeof options.appendSpaceOnInsert !== 'boolean') {
-    throw new TypeError(
-      'MentionPlugin appendSpaceOnInsert must be a boolean.',
-    );
+    throw new TypeError('MentionPlugin appendSpaceOnInsert must be a boolean.');
   }
 }

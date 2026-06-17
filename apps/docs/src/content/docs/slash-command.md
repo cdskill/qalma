@@ -19,14 +19,14 @@ const editor = createQalmaEditor({
 
 ## Public API
 
-| Contract                                   | Description                                                                    |
-| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| Contract                                         | Description                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------ |
 | `query&lt;SlashCommandState&gt;('slashCommand')` | Returns `{ from, to, query, trigger }` while a slash command is active.        |
-| `deleteSlashCommand`                       | Deletes the active `/query` range before you execute the selected command.     |
-| `dismissSlashCommand`                      | Closes the active slash command without changing document content.             |
-| `splitSlashCommandBlock`                   | Splits a non-empty block before applying a picked command on its own line.     |
-| `qalma-slash-command-update`               | DOM event emitted from the editor view when the slash state may have changed.  |
-| `qalma-slash-command-keydown`              | Cancelable DOM event for `ArrowUp`, `ArrowDown`, `Enter`, `Tab`, and `Escape`. |
+| `deleteSlashCommand`                             | Deletes the active `/query` range before you execute the selected command.     |
+| `dismissSlashCommand`                            | Closes the active slash command without changing document content.             |
+| `splitSlashCommandBlock`                         | Splits a non-empty block before applying a picked command on its own line.     |
+| `qalma-slash-command-update`                     | DOM event emitted from the editor view when the slash state may have changed.  |
+| `qalma-slash-command-keydown`                    | Cancelable DOM event for `ArrowUp`, `ArrowDown`, `Enter`, `Tab`, and `Escape`. |
 
 ## Consumer Menu Pattern
 
@@ -37,7 +37,7 @@ Keep the menu in your app or docs playground. A typical selection flow is:
 3. Render an Angular overlay near the current DOM selection.
 4. On pick, run `editor.execute('deleteSlashCommand')`.
 5. Optionally run `editor.execute('splitSlashCommandBlock')` for non-empty
-   paragraphs.
+   paragraphs when the selected command creates a block.
 6. Run the selected command, such as `editor.execute('toggleHeading1')`.
 
 ```typescript
@@ -45,6 +45,17 @@ function pickHeading1() {
   if (editor.execute('deleteSlashCommand')) {
     editor.execute('splitSlashCommandBlock');
     editor.execute('toggleHeading1');
+  }
+}
+```
+
+Inline commands should stay at the slash position instead of splitting the
+block:
+
+```typescript
+function pickInlineCode() {
+  if (editor.execute('deleteSlashCommand')) {
+    editor.execute('toggleInlineCode');
   }
 }
 ```
@@ -67,11 +78,12 @@ SlashCommandPlugin.configure({
 | `minQueryLength` | `0`     | Minimum query length before state is exposed.         |
 | `maxQueryLength` | `64`    | Maximum query length before the state is ignored.     |
 
-Slash commands are ignored inside code textblocks and when the selection is not
-collapsed.
+Slash commands are ignored inside code blocks, inline code marks, and when the
+selection is not collapsed.
 
 ## Playground
 
 The live playground uses this plugin to offer text, headings, lists, quotes,
-and code blocks from a Notion-style menu. Its menu is ordinary Angular code
-composed on top of `SlashCommandPlugin`, not library-rendered UI.
+inline code, code blocks, dividers, and tables from a Notion-style menu. Its
+menu is ordinary Angular code composed on top of `SlashCommandPlugin`, not
+library-rendered UI.
