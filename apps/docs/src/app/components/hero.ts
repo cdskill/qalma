@@ -60,7 +60,12 @@ import { PosthogService } from '../services/posthog.service';
       </p>
 
       <div class="mt-7 flex justify-center">
-        <a appBtn size="lg" href="#playground" (click)="trackGetStarted()">
+        <a
+          appBtn
+          size="lg"
+          routerLink="/docs/introduction"
+          (click)="trackGetStarted()"
+        >
           Get started
           <ng-icon name="lucideArrowRight" aria-hidden="true" />
         </a>
