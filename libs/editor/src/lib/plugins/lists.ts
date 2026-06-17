@@ -1,4 +1,10 @@
-import { Node as ProseMirrorNode, NodeSpec, NodeType } from 'prosemirror-model';
+import { InputRule, inputRules, wrappingInputRule } from 'prosemirror-inputrules';
+import {
+  Node as ProseMirrorNode,
+  NodeSpec,
+  NodeType,
+  Schema,
+} from 'prosemirror-model';
 import { EditorState, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 import {
   bulletList as prosemirrorBulletList,
@@ -11,10 +17,25 @@ import {
 } from 'prosemirror-schema-list';
 
 import {
+  createConfigurableQalmaPlugin,
   createQalmaPlugin,
   QalmaCommandHandler,
   QalmaPlugin,
 } from './qalma-plugin';
+
+export interface ListsPluginOptions {
+  /**
+   * Enable markdown-style input rules: `-`, `+`, or `*` followed by a space
+   * starts a bullet list, and `1.` followed by a space starts an ordered
+   * list. Backspace immediately after reverts to the literal characters.
+   */
+  inputRules: boolean;
+}
+
+export const LISTS_PLUGIN_DEFAULT_OPTIONS: Readonly<ListsPluginOptions> =
+  Object.freeze({
+    inputRules: true,
+  });
 
 const bulletListNode: NodeSpec = {
   ...prosemirrorBulletList,
@@ -53,65 +74,100 @@ const listItemNode: NodeSpec = {
   ],
 };
 
-export const ListsPlugin = createQalmaPlugin({
-  key: 'lists',
-  nodes: {
-    bulletList: bulletListNode,
-    orderedList: orderedListNode,
-    listItem: listItemNode,
+export const ListsPlugin = createConfigurableQalmaPlugin(
+  LISTS_PLUGIN_DEFAULT_OPTIONS,
+  (options) => {
+    assertListsPluginOptions(options);
+
+    return createQalmaPlugin({
+      key: 'lists',
+      nodes: {
+        bulletList: bulletListNode,
+        orderedList: orderedListNode,
+        listItem: listItemNode,
+      },
+      commands: (schema) => ({
+        toggleBulletList: createToggleListCommand(
+          schema.nodes['bulletList'],
+          schema.nodes['orderedList'],
+          schema.nodes['listItem'],
+        ),
+        toggleOrderedList: createToggleListCommand(
+          schema.nodes['orderedList'],
+          schema.nodes['bulletList'],
+          schema.nodes['listItem'],
+        ),
+        splitListItem: splitListItemKeepMarks(schema.nodes['listItem']),
+        liftListItem: liftProsemirrorListItem(schema.nodes['listItem']),
+        sinkListItem: sinkProsemirrorListItem(schema.nodes['listItem']),
+      }),
+      commandStates: (schema) => ({
+        toggleBulletList: (state) =>
+          isClosestListActive(state, [
+            schema.nodes['bulletList'],
+            schema.nodes['orderedList'],
+          ]),
+        toggleOrderedList: (state) =>
+          isClosestListActive(state, [
+            schema.nodes['orderedList'],
+            schema.nodes['bulletList'],
+          ]),
+      }),
+      shortcuts: (schema) => ({
+        'Mod-Shift-8': createToggleListCommand(
+          schema.nodes['bulletList'],
+          schema.nodes['orderedList'],
+          schema.nodes['listItem'],
+        ),
+        'Mod-Shift-7': createToggleListCommand(
+          schema.nodes['orderedList'],
+          schema.nodes['bulletList'],
+          schema.nodes['listItem'],
+        ),
+        Enter: splitListItemKeepMarks(schema.nodes['listItem']),
+        Tab: createListTabCommand(
+          [schema.nodes['bulletList'], schema.nodes['orderedList']],
+          sinkProsemirrorListItem(schema.nodes['listItem']),
+        ),
+        'Shift-Tab': createListTabCommand(
+          [schema.nodes['bulletList'], schema.nodes['orderedList']],
+          liftProsemirrorListItem(schema.nodes['listItem']),
+        ),
+      }),
+      prosemirrorPlugins: (schema) => [
+        createLeaveEditorPlugin(),
+        ...(options.inputRules
+          ? [inputRules({ rules: createListInputRules(schema) })]
+          : []),
+      ],
+    });
   },
-  commands: (schema) => ({
-    toggleBulletList: createToggleListCommand(
-      schema.nodes['bulletList'],
-      schema.nodes['orderedList'],
-      schema.nodes['listItem'],
-    ),
-    toggleOrderedList: createToggleListCommand(
-      schema.nodes['orderedList'],
-      schema.nodes['bulletList'],
-      schema.nodes['listItem'],
-    ),
-    splitListItem: splitListItemKeepMarks(schema.nodes['listItem']),
-    liftListItem: liftProsemirrorListItem(schema.nodes['listItem']),
-    sinkListItem: sinkProsemirrorListItem(schema.nodes['listItem']),
-  }),
-  commandStates: (schema) => ({
-    toggleBulletList: (state) =>
-      isClosestListActive(state, [
-        schema.nodes['bulletList'],
-        schema.nodes['orderedList'],
-      ]),
-    toggleOrderedList: (state) =>
-      isClosestListActive(state, [
-        schema.nodes['orderedList'],
-        schema.nodes['bulletList'],
-      ]),
-  }),
-  shortcuts: (schema) => ({
-    'Mod-Shift-8': createToggleListCommand(
-      schema.nodes['bulletList'],
-      schema.nodes['orderedList'],
-      schema.nodes['listItem'],
-    ),
-    'Mod-Shift-7': createToggleListCommand(
-      schema.nodes['orderedList'],
-      schema.nodes['bulletList'],
-      schema.nodes['listItem'],
-    ),
-    Enter: splitListItemKeepMarks(schema.nodes['listItem']),
-    Tab: createListTabCommand(
-      [schema.nodes['bulletList'], schema.nodes['orderedList']],
-      sinkProsemirrorListItem(schema.nodes['listItem']),
-    ),
-    'Shift-Tab': createListTabCommand(
-      [schema.nodes['bulletList'], schema.nodes['orderedList']],
-      liftProsemirrorListItem(schema.nodes['listItem']),
-    ),
-  }),
-  prosemirrorPlugins: () => [createLeaveEditorPlugin()],
-});
+);
 
 export const ListsKit: readonly QalmaPlugin[] = [ListsPlugin];
+
+// `-`, `+`, `*` start a bullet list; `1.` starts an ordered list and joins a
+// preceding list only when the typed number continues its sequence.
+function createListInputRules(schema: Schema): InputRule[] {
+  return [
+    wrappingInputRule(/^\s*([-+*])\s$/, schema.nodes['bulletList']),
+    wrappingInputRule(
+      /^(\d+)\.\s$/,
+      schema.nodes['orderedList'],
+      (match) => ({ order: Number(match[1]) }),
+      (match, node) =>
+        node.childCount + (node.attrs['order'] as number) === Number(match[1]),
+    ),
+  ];
+}
+
+function assertListsPluginOptions(
+  options: Readonly<ListsPluginOptions>,
+): void {
+  if (typeof options.inputRules !== 'boolean') {
+    throw new TypeError('ListsPlugin inputRules must be a boolean.');
+  }
+}
 
 function createToggleListCommand(
   list: NodeType,
