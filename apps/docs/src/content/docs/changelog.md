@@ -1,58 +1,102 @@
 ---
 title: Changelog
-description: Release notes for the current alpha line, summarized from libs/editor/CHANGELOG.md.
+description: Release notes for @qalma/editor, generated from libs/editor/CHANGELOG.md.
 ---
 
 # Changelog
 
-The canonical package changelog lives in `libs/editor/CHANGELOG.md`. This page
-summarizes the current alpha line for docs readers.
+This page mirrors the canonical package changelog at
+`libs/editor/CHANGELOG.md`. It is regenerated from that file on every release —
+do not edit it by hand.
 
-## 0.0.1-alpha.5 - 2026-06-14
+## 0.0.1-alpha.9 (2026-06-17)
 
-Branding update for the docs site:
+### 🚀 Features
 
-- Added the Qalma brand mark.
+- **editor:** add markdown input rules to lists and blockquote ([804a6c5](https://github.com/cdskill/qalma/commit/804a6c5))
 
-## 0.0.1-alpha.4 - 2026-06-14
+## 0.0.1-alpha.8 (2026-06-16)
 
-Version bump only. No editor code changes.
+### 🚀 Features
 
-## 0.0.1-alpha.3 - 2026-06-14
+- **editor:** add table plugin ([f08ff42](https://github.com/cdskill/qalma/commit/f08ff42))
+- **editor:** add horizontal rule plugin ([4d2101e](https://github.com/cdskill/qalma/commit/4d2101e))
+- **editor:** add markdown input rules to headings plugin ([f8d5b0e](https://github.com/cdskill/qalma/commit/f8d5b0e))
 
-Feature and docs infrastructure updates:
+## 0.0.1-alpha.7 (2026-06-16)
 
-- Added `SlashCommandPlugin`.
-- Added cookieless PostHog analytics in the docs app.
-- Added search/SEO deployment support for Google Search Console, robots.txt,
-  and IndexNow.
+### 🚀 Features
 
-## 0.0.1-alpha.2 - 2026-06-13
+- **editor:** link plugin no longer invoke window but instead expose onClick handler ([a55bef9](https://github.com/cdskill/qalma/commit/a55bef9))
 
-Docs and infrastructure setup:
+## 0.0.1-alpha.6 (2026-06-16)
 
-- Added S3 and CloudFront infrastructure.
-- Added the deploy workflow.
-- Enabled zoneless change detection.
-- Added the Analog docs app in SSG mode.
+### 🚀 Features
 
-## 0.0.1-alpha.1 - 2026-06-12
+- **repo:** add task list plugin ([8361f4b](https://github.com/cdskill/qalma/commit/8361f4b))
 
-Initial alpha editor surface:
+## 0.0.1-alpha.5 (2026-06-14)
 
-- Added the headless ProseMirror foundation.
-- Renamed public APIs, selectors, CSS hooks, mention attributes, and command
-  directives to Qalma names.
-- Added first-party plugins for links, headings, lists, blockquotes, code
-  blocks, clear formatting, hard breaks, text alignment, color, highlight,
-  placeholder, trailing paragraph, subscript/superscript, paste rules,
-  mentions, images, and slash commands.
-- Added the image node as an inline selectable node.
-- Moved placeholder rendering into `PlaceholderPlugin`.
-- Deferred content mounting until browser render.
+### 🚀 Features
 
-## Current status
+- **docs:** add qalma brand mark ([dcba972](https://github.com/cdskill/qalma/commit/dcba972))
 
-The package is still alpha (`0.0.x`). Public APIs may change between alpha
-releases. Prefer reading the dedicated docs pages and the current TypeScript
-exports from `@qalma/editor` when integrating a feature.
+## 0.0.1-alpha.4 (2026-06-14)
+
+This was a version bump only for editor to align it with other projects, there were no code changes.
+
+## 0.0.1-alpha.3 (2026-06-14)
+
+### 🚀 Features
+
+- **editor:** add slash command plugin ([1bdbbac](https://github.com/cdskill/qalma/commit/1bdbbac))
+- **docs:** cookieless PostHog analytics (SSR-safe) ([a028094](https://github.com/cdskill/qalma/commit/a028094))
+- **seo:** GSC verification, robots.txt, IndexNow on deploy ([f0b2686](https://github.com/cdskill/qalma/commit/f0b2686))
+
+## 0.0.1-alpha.2 (2026-06-13)
+
+### 🚀 Features
+
+- **docs:** add S3+CloudFront infra (Terraform) and CI deploy workflow ([6728e57](https://github.com/cdskill/qalma/commit/6728e57))
+- **docs:** enable zoneless change detection + register Angular CLI MCP ([3290508](https://github.com/cdskill/qalma/commit/3290508))
+- **docs:** add Analog docs app in SSG mode + sync-doc skill ([1a3e579](https://github.com/cdskill/qalma/commit/1a3e579))
+
+## 0.0.1-alpha.1 (2026-06-12)
+
+### 🚀 Features
+
+- ⚠️  **editor:** rename public api to qalma ([17e7ff3](https://github.com/cdskill/qalma/commit/17e7ff3))
+- **editor:** add image plugin ([2963fa3](https://github.com/cdskill/qalma/commit/2963fa3))
+- **editor:** add headless mention plugin ([7ab9ea2](https://github.com/cdskill/qalma/commit/7ab9ea2))
+- **plugins:** add paste rules plugin ([71a0c51](https://github.com/cdskill/qalma/commit/71a0c51))
+- **editor:** add subscript superscript plugin ([23316d4](https://github.com/cdskill/qalma/commit/23316d4))
+- **editor:** add trailing paragraph plugin ([0fb7a66](https://github.com/cdskill/qalma/commit/0fb7a66))
+- **editor:** add placeholder plugin ([71897d7](https://github.com/cdskill/qalma/commit/71897d7))
+- **editor:** add highlight plugin ([27f6720](https://github.com/cdskill/qalma/commit/27f6720))
+- **editor:** add color plugin ([ba5e568](https://github.com/cdskill/qalma/commit/ba5e568))
+- **editor:** add text alignment plugin ([d2ad48b](https://github.com/cdskill/qalma/commit/d2ad48b))
+- **editor:** add hard break plugin ([d18edbe](https://github.com/cdskill/qalma/commit/d18edbe))
+- **editor:** add clear formatting plugin ([fa6cf1a](https://github.com/cdskill/qalma/commit/fa6cf1a))
+- **editor:** add code block plugin ([3c7efb4](https://github.com/cdskill/qalma/commit/3c7efb4))
+- **editor:** add blockquote plugin ([32d1d9e](https://github.com/cdskill/qalma/commit/32d1d9e))
+- **editor:** add headings and lists plugins ([1e25877](https://github.com/cdskill/qalma/commit/1e25877))
+- **editor:** add headless link plugin ([7cad9b3](https://github.com/cdskill/qalma/commit/7cad9b3))
+- **editor:** add headless plugin-based ProseMirror foundation ([b4aa486](https://github.com/cdskill/qalma/commit/b4aa486))
+
+### 🩹 Fixes
+
+- **editor:** expose commandStates for unset color commands ([4a3225b](https://github.com/cdskill/qalma/commit/4a3225b))
+- ⚠️  **editor:** move placeholder rendering into PlaceholderPlugin ([dbf254b](https://github.com/cdskill/qalma/commit/dbf254b))
+- ⚠️  **editor:** make image node inline and validate insertion via schema ([767dd90](https://github.com/cdskill/qalma/commit/767dd90))
+- **editor:** defer content mount until browser render ([f168213](https://github.com/cdskill/qalma/commit/f168213))
+
+### ⚠️  Breaking Changes
+
+- **editor:** move placeholder rendering into PlaceholderPlugin  ([dbf254b](https://github.com/cdskill/qalma/commit/dbf254b))
+  remove QalmaEditorOptions.placeholder,
+  QalmaEditorController.placeholder, and setPlaceholder().
+- **editor:** make image node inline and validate insertion via schema  ([767dd90](https://github.com/cdskill/qalma/commit/767dd90))
+  the image node is now inline; documents serialized
+  with a top-level <img> will be re-wrapped in a paragraph on parse.
+- **editor:** rename public api to qalma  ([17e7ff3](https://github.com/cdskill/qalma/commit/17e7ff3))
+  public editor APIs, selectors, CSS hooks, mention attributes, and command directives now use Qalma names.
