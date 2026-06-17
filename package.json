@@ -13,8 +13,8 @@
     "serve:docs": "nx serve docs",
     "build:docs": "nx build docs",
     "preview:docs": "nx serve-static docs",
-    "release": "nx release --skip-publish",
-    "prerelease": "nx release prerelease --skip-publish",
+    "release": "nx release --skip-publish && node tools/sync-changelog-doc.mjs",
+    "prerelease": "nx release prerelease --skip-publish && node tools/sync-changelog-doc.mjs",
     "prerelease:dry-run": "nx release prerelease --skip-publish --dry-run"
   },
   "private": true,
