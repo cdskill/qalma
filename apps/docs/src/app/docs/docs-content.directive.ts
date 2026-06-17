@@ -26,6 +26,7 @@ export class DocsContent {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private observer?: MutationObserver;
   private enhancing = false;
+  private mermaidId = 0;
 
   constructor() {
     afterNextRender(() => {
@@ -48,10 +49,85 @@ export class DocsContent {
   private enhance(): void {
     this.enhancing = true;
     try {
+      // Tag mermaid blocks first so the copy/terminal passes skip them; the
+      // actual (async) render happens after, below.
+      this.markMermaidBlocks();
       this.buildPackageManagerCards();
       this.addCopyButtons();
     } finally {
       this.enhancing = false;
+    }
+
+    void this.renderMermaid();
+  }
+
+  /**
+   * Marks ```mermaid``` code blocks as enhanced so the copy-button and
+   * package-manager passes leave them alone, and flags them for rendering.
+   */
+  private markMermaidBlocks(): void {
+    const blocks = this.host.nativeElement.querySelectorAll<HTMLElement>(
+      'pre:not([data-enhanced]) > code.language-mermaid',
+    );
+
+    blocks.forEach((code) => {
+      const pre = code.closest('pre');
+      if (pre) {
+        pre.setAttribute('data-enhanced', '');
+        pre.classList.add('docs-mermaid-pending');
+      }
+    });
+  }
+
+  /**
+   * Renders flagged mermaid blocks into inline SVG. Mermaid is loaded lazily so
+   * it only ships to pages that actually use a diagram, and runs browser-only
+   * via `afterNextRender`, so SSR/prerender emit the raw definition as a
+   * graceful fallback.
+   */
+  private async renderMermaid(): Promise<void> {
+    const pending = Array.from(
+      this.host.nativeElement.querySelectorAll<HTMLPreElement>(
+        'pre.docs-mermaid-pending',
+      ),
+    );
+
+    if (pending.length === 0) {
+      return;
+    }
+
+    // Clear the pending flag on all blocks up front: replacing a <pre> with the
+    // rendered SVG triggers the MutationObserver, which re-enters this method —
+    // dropping the flag now keeps it from racing on the not-yet-rendered ones.
+    pending.forEach((pre) => pre.classList.remove('docs-mermaid-pending'));
+
+    const { default: mermaid } = await import('mermaid');
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      fontFamily: 'inherit',
+      theme: document.documentElement.classList.contains('dark')
+        ? 'dark'
+        : 'neutral',
+    });
+
+    for (const pre of pending) {
+      const definition = pre.textContent ?? '';
+
+      try {
+        const { svg } = await mermaid.render(
+          `docs-mermaid-${(this.mermaidId += 1)}`,
+          definition,
+        );
+        const figure = document.createElement('figure');
+        figure.className = 'docs-mermaid';
+        figure.setAttribute('data-enhanced', '');
+        figure.innerHTML = svg;
+        pre.replaceWith(figure);
+      } catch {
+        // Invalid diagram: keep the original code block visible.
+        pre.removeAttribute('data-enhanced');
+      }
     }
   }
 

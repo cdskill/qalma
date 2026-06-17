@@ -31,35 +31,34 @@ easily restyle. Qalma takes a different approach:
 ## Why not just use ProseMirror directly?
 
 You can — ProseMirror _is_ the engine Qalma runs on. But ProseMirror is a
-low-level toolkit, not a ready-made editor. Drop it into an Angular app and you
-end up rebuilding the same integration layer that Qalma already gives you:
+low-level toolkit, not a ready-made editor. In an Angular app, Qalma is the
+integration layer in the middle that you would otherwise build by hand:
 
-- **Angular lifecycle and rendering.** ProseMirror's `EditorView` is imperative
-  and mounts straight to the DOM. You have to create it after render, keep it
-  out of server-side rendering, tear it down on destroy, and make it cooperate
-  with zoneless change detection. Qalma's controller does all of this and is
-  SSR- and zoneless-safe out of the box.
-- **State as signals.** ProseMirror hands you an `EditorState` and a `dispatch`
-  function. Answering "is bold active?", "what's the current HTML?" or "what
-  link is under the cursor?" means listening to every transaction and
-  re-deriving state yourself. Qalma exposes all of it as signals — `html`,
-  `isCommandActive`, `query` — that your components bind to directly.
-- **Schema and plugin wiring.** A working editor needs a schema assembled from
-  node and mark specs, plus keymaps, input rules, history, and a dozen plugins
-  ordered correctly. Qalma plugins each own their schema, commands, shortcuts,
-  and input rules, and are composed for you with duplicate detection.
-- **A command contract.** `execute`, `canExecute`, `isCommandActive`, and the
-  `qalmaCommand` directive give you one consistent way to drive the editor from
-  buttons and menus, instead of hand-rolling a command registry in every app.
-- **Common features, already built.** Links with click handling, mentions,
-  slash commands, tables, code blocks with indentation, markdown shortcuts, and
-  paste cleanup are each real work to build well on raw ProseMirror. In Qalma
-  they are opt-in plugins.
+```mermaid
+flowchart TD
+    app["Your Angular app · toolbar, menus, styling — you write"]
+    qalma["Qalma · Angular mount, signals, plugins, commands"]
+    pm["ProseMirror · document model, schema, transactions — the engine"]
+    app --> qalma --> pm
+    classDef accent fill:#8c5a2b,stroke:#8c5a2b,color:#ffffff;
+    class qalma accent;
+```
+
+That middle layer is real work. Here is what you write yourself with raw
+ProseMirror versus what Qalma already provides:
+
+| What you deal with | Raw ProseMirror | Qalma |
+| ------------------ | --------------- | ----- |
+| Angular mount | Wire `EditorView` by hand; keep it SSR- and zoneless-safe | Built into the controller |
+| Reading state | Listen to every transaction and re-derive | Signals: `html`, `isCommandActive`, `query` |
+| Schema & plugins | Assemble the schema, keymaps, input rules, history | Composable plugins, ordered for you |
+| Driving the editor | Roll your own command registry | `execute` / `canExecute` / `qalmaCommand` |
+| Common features | Build links, tables, slash menu, markdown rules | Opt-in plugins |
 
 In short: with raw ProseMirror you write the editor _and_ the Angular plumbing
-every time. With Qalma you write only your UI. And because ProseMirror stays the
-engine underneath, you keep its document model, schema validation, and
-correctness — you just don't assemble them by hand.
+every time; with Qalma you write only your UI. ProseMirror stays the engine
+underneath, so you keep its document model and correctness without assembling
+them by hand.
 
 ## How the pieces fit together
 
