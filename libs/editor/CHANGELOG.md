@@ -1,3 +1,9 @@
+## 0.0.1-alpha.11 (2026-06-17)
+
+### 🚀 Features
+
+- **editor:** add inline code plugin ([594ea74](https://github.com/cdskill/qalma/commit/594ea74))
+
 ## 0.0.1-alpha.10 (2026-06-17)
 
 ### 🚀 Features
