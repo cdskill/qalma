@@ -51,6 +51,7 @@ menus, and styling remain consumer-owned Angular code.
 | `HardBreakPlugin`         | Inline hard breaks                                       | `insertHardBreak` |
 | `PasteRulesPlugin`        | Paste cleanup and autolink behavior                      | None              |
 | `PlaceholderPlugin`       | Placeholder decorations for empty documents              | None              |
+| `SelectionPlugin`         | Selection read model and update event for contextual UI  | None              |
 | `TrailingParagraphPlugin` | Ensures a final editable paragraph after terminal blocks | None              |
 
 ## Configurable Plugins

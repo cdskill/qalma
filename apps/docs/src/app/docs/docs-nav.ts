@@ -30,6 +30,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { title: 'Editor & Controller', href: '/docs/editor-controller' },
       { title: 'Plugins', href: '/docs/plugins' },
       { title: 'Commands', href: '/docs/commands' },
+      { title: 'Selection', href: '/docs/selection' },
       { title: 'Content & Serialization', href: '/docs/content' },
       { title: 'Toolbar', href: '/docs/toolbar' },
     ],

@@ -147,3 +147,8 @@ protected isTextColorActive(color: string): boolean {
 When you use a component system such as Spartan/helm or another shadcn-style
 set of primitives, keep it in the application layer. Qalma's library primitives
 stay unstyled so the same editor can fit any design system.
+
+For selection-based toolbars, add `SelectionPlugin`, listen for
+`qalma-selection-update`, and render your app overlay from
+`query<SelectionState>('selection')`. The docs playground contextual toolbar is
+one consumer-owned example of that pattern.

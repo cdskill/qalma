@@ -23,9 +23,9 @@ The current editor already includes:
 | Formatting         | Text formatting, inline code, color, highlight, subscript/superscript, clear formatting             |
 | Structure          | Headings, lists, blockquotes, hard breaks, trailing paragraphs                                      |
 | Media and links    | Links, inline images                                                                                |
-| Productivity       | Mentions, slash commands, paste rules, code blocks, history                                         |
+| Productivity       | Selection state, mentions, slash commands, paste rules, code blocks, history                        |
 | Layout             | Text alignment                                                                                      |
-| Docs examples      | Live playground, consumer-owned toolbar, link popover, mention menu, slash menu, image upload       |
+| Docs examples      | Live playground, consumer-owned toolbar, contextual toolbar, link popover, mention menu, slash menu |
 
 ## Near-term product priorities
 
