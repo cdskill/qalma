@@ -20,6 +20,7 @@ export * from './lib/plugins/mention';
 export * from './lib/plugins/paste-rules';
 export * from './lib/plugins/placeholder';
 export * from './lib/plugins/qalma-plugin';
+export * from './lib/plugins/selection';
 export * from './lib/plugins/slash-command';
 export * from './lib/plugins/subscript-superscript';
 export * from './lib/plugins/table';
