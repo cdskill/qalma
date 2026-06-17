@@ -878,6 +878,11 @@ qalma-content .ProseMirror td {
   padding: 0.45rem 0.6rem;
   border: 1px solid var(--color-border);
   vertical-align: top;
+  /* Clip the absolutely-positioned column-resize-handle widget to the cell so
+     it can never overflow the table wrapper and trigger a horizontal scrollbar
+     (which would grow the table height on hover). `overflow` is honored on
+     cells but not reliably on the table element itself. */
+  overflow: hidden;
 }
 qalma-content .ProseMirror th {
   background-color: var(--color-secondary);
