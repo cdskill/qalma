@@ -45,6 +45,25 @@ const editor = createQalmaEditor({
 </qalma-editor>
 ```
 
+## Input rules
+
+At the start of a textblock, `-`, `+`, or `*` followed by a space starts a
+bullet list, and `1.` followed by a space starts an ordered list (continuing the
+number sequence when it follows an existing list). The conversion is one-way:
+pressing `Backspace` immediately after reverts to the literal characters.
+
+Disable the shortcuts while keeping the commands and toolbar buttons:
+
+```typescript
+const editor = createQalmaEditor({
+  plugins: [ListsPlugin.configure({ inputRules: false })],
+});
+```
+
+| Validation | Error condition |
+| ---------- | --------------- |
+| `inputRules` must be a boolean | Non-boolean value. |
+
 ## Active state
 
 `toggleBulletList` is active when the closest list around the selection is a

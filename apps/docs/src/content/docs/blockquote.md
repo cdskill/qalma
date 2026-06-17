@@ -43,6 +43,24 @@ const editor = createQalmaEditor({
 The command uses ProseMirror's wrapping and lifting behavior. It returns
 `false` when the current selection cannot be wrapped or lifted.
 
+## Input rules
+
+At the start of a textblock, typing `>` followed by a space wraps it in a
+blockquote. The conversion is one-way: pressing `Backspace` immediately after
+reverts to the literal characters.
+
+Disable the shortcut while keeping the command and toolbar button:
+
+```typescript
+const editor = createQalmaEditor({
+  plugins: [BlockquotePlugin.configure({ inputRules: false })],
+});
+```
+
+| Validation | Error condition |
+| ---------- | --------------- |
+| `inputRules` must be a boolean | Non-boolean value. |
+
 ## Active state
 
 `toggleBlockquote` is active when the selection is inside a blockquote at any
