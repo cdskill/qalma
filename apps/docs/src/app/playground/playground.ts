@@ -28,6 +28,7 @@ import {
   PlaceholderPlugin,
   QalmaContent,
   QalmaEditor,
+  SelectionPlugin,
   SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
   TablePlugin,
@@ -44,6 +45,9 @@ import {
 } from './code-block';
 import { PlaygroundCodeHighlightPlugin } from './code-highlight-plugin';
 import { PLAYGROUND_DEMO_CONTENT } from './demo-content';
+import {
+  PlaygroundContextualToolbar,
+} from './contextual-toolbar';
 import {
   PLAYGROUND_EXAMPLE_IMAGE_ALT,
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
@@ -63,6 +67,7 @@ import {
   PlaygroundSlashCommandOption,
 } from './slash-command';
 import { PlaygroundSlashCommandMenu } from './slash-command-menu';
+import { PlaygroundSelectionToolbarDirective } from './selection-toolbar-directive';
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
 
@@ -72,7 +77,9 @@ import { PosthogService } from '../services/posthog.service';
     QalmaContent,
     QalmaEditor,
     PlaygroundLinkPopover,
+    PlaygroundContextualToolbar,
     PlaygroundMentionMenu,
+    PlaygroundSelectionToolbarDirective,
     PlaygroundSlashCommandMenu,
     PlaygroundToolbar,
   ],
@@ -100,11 +107,14 @@ import { PosthogService } from '../services/posthog.service';
 
       <qalma-content
         #mentionSurface
+        #selectionToolbar="appPlaygroundSelectionToolbar"
         class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
+        [appPlaygroundSelectionToolbar]="editor"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="
           linkPopover.showPreview($event);
+          selectionToolbar.refresh();
           mentionController.refresh();
           slashCommandController.refresh()
         "
@@ -112,6 +122,13 @@ import { PosthogService } from '../services/posthog.service';
         (focusin)="linkPopover.showPreview($event)"
         (focusout)="linkPopover.scheduleHideFromEvent($event)"
         (click)="mentionController.refresh()"
+      />
+
+      <app-playground-contextual-toolbar
+        [editor]="editor"
+        [placement]="selectionToolbar.placement()"
+        (dismiss)="selectionToolbar.hide()"
+        (requestLink)="showContextualLinkEditor($event, selectionToolbar)"
       />
     </qalma-editor>
 
@@ -186,6 +203,7 @@ export class Playground {
       TextAlignPlugin,
       ...TextFormattingKit,
       InlineCodePlugin,
+      SelectionPlugin,
       SubscriptSuperscriptPlugin,
       HighlightPlugin,
       ColorPlugin,
@@ -344,6 +362,14 @@ export class Playground {
   protected onLinkSave(popover: LinkPopover): void {
     this.linkPopover.save(popover);
     this.posthogService.posthog.capture('playground_link_saved');
+  }
+
+  protected showContextualLinkEditor(
+    event: MouseEvent,
+    selectionToolbar: PlaygroundSelectionToolbarDirective,
+  ): void {
+    selectionToolbar.hide();
+    this.linkPopover.showToolbarEditor(event);
   }
 
   protected onMentionPick(option: PlaygroundMentionOption): void {
