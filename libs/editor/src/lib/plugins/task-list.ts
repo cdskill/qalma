@@ -62,6 +62,7 @@ const taskItemNode: NodeSpec = {
           {
             type: 'checkbox',
             'data-task-item-checkbox': '',
+            'aria-label': 'Toggle task',
             checked: checked ? '' : null,
           },
         ],

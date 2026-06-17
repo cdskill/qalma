@@ -16,6 +16,7 @@ product UI accessibility to the components you build around the controller.
 | `button[qalmaCommand]` | Preserves editor selection on mouse down, disables itself through `canExecute()`, and sets `aria-pressed` only for commands with active state. |
 | `&lt;qalma-content&gt;` | Mounts the ProseMirror view after browser render. The editor view receives `aria-label="Rich text editor"`. |
 | `ListsPlugin` | Handles `Escape` and `Shift+Escape` to move focus to adjacent focusable elements outside the editor, or blur when none exist. |
+| `TaskListPlugin` | Renders each task checkbox with `aria-label="Toggle task"` so it has an accessible name without a visible label. |
 
 Use native buttons for toolbar controls whenever possible. `QalmaCommand`
 targets `button[qalmaCommand]` specifically.
