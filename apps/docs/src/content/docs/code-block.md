@@ -83,9 +83,21 @@ setLanguage(event: Event): void {
 | `defaultLanguage` | `'plaintext'` | Same identifier format and included in `languages`. |
 | `languageClassPrefix` | `'language-'` | Non-empty string without whitespace. |
 | `indentText` | Two spaces | Non-empty string containing only spaces or tabs. |
+| `inputRules` | `true` | Boolean. |
 
 The command language value is trimmed and lowercased before it is checked
 against `languages`.
+
+## Input rules
+
+At the start of a textblock, three backticks followed by a space convert it to a
+code block. An optional language can follow the backticks — `` ```ts `` — and is
+applied when it is in `languages`, otherwise the block falls back to
+`defaultLanguage`. The conversion is one-way: pressing `Backspace` immediately
+after reverts to the literal characters.
+
+Disable the shortcut while keeping the command, language select, and toolbar
+button by setting `inputRules: false`.
 
 ## Keyboard behavior
 
