@@ -13,6 +13,7 @@ import {
   ClearFormattingPlugin,
   CodeBlockPlugin,
   ColorPlugin,
+  DragHandlePlugin,
   HardBreakPlugin,
   HeadingsPlugin,
   HighlightPlugin,
@@ -45,9 +46,9 @@ import {
 } from './code-block';
 import { PlaygroundCodeHighlightPlugin } from './code-highlight-plugin';
 import { PLAYGROUND_DEMO_CONTENT } from './demo-content';
-import {
-  PlaygroundContextualToolbar,
-} from './contextual-toolbar';
+import { PlaygroundContextualToolbar } from './contextual-toolbar';
+import { PlaygroundDragHandle } from './drag-handle';
+import { PlaygroundDragHandleDirective } from './drag-handle-directive';
 import {
   PLAYGROUND_EXAMPLE_IMAGE_ALT,
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
@@ -78,6 +79,8 @@ import { PosthogService } from '../services/posthog.service';
     QalmaEditor,
     PlaygroundLinkPopover,
     PlaygroundContextualToolbar,
+    PlaygroundDragHandle,
+    PlaygroundDragHandleDirective,
     PlaygroundMentionMenu,
     PlaygroundSelectionToolbarDirective,
     PlaygroundSlashCommandMenu,
@@ -107,8 +110,10 @@ import { PosthogService } from '../services/posthog.service';
 
       <qalma-content
         #mentionSurface
+        #dragHandle="appPlaygroundDragHandle"
         #selectionToolbar="appPlaygroundSelectionToolbar"
-        class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
+        class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:mx-auto [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:max-w-[61.5rem] [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
+        [appPlaygroundDragHandle]="editor"
         [appPlaygroundSelectionToolbar]="editor"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
@@ -129,6 +134,15 @@ import { PosthogService } from '../services/posthog.service';
         [placement]="selectionToolbar.placement()"
         (dismiss)="selectionToolbar.hide()"
         (requestLink)="showContextualLinkEditor($event, selectionToolbar)"
+      />
+
+      <app-playground-drag-handle
+        [editor]="editor"
+        [handle]="dragHandle.handle()"
+        [dropIndicator]="dragHandle.dropIndicator()"
+        [draggedBlockHighlight]="dragHandle.draggedBlockHighlight()"
+        (dragStart)="dragHandle.startDrag($event.event, $event.handle)"
+        (dismiss)="dragHandle.hide()"
       />
     </qalma-editor>
 
@@ -203,6 +217,7 @@ export class Playground {
       TextAlignPlugin,
       ...TextFormattingKit,
       InlineCodePlugin,
+      DragHandlePlugin,
       SelectionPlugin,
       SubscriptSuperscriptPlugin,
       HighlightPlugin,

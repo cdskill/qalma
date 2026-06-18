@@ -16,7 +16,7 @@ import { Playground } from '../playground/playground';
 
       <section
         id="playground"
-        class="mx-auto max-w-5xl px-4 pb-24 sm:px-6"
+        class="mx-auto max-w-6xl px-4 pb-24 sm:px-6"
         aria-label="Live editor playground"
       >
         @defer (on viewport) {

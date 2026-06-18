@@ -119,6 +119,7 @@ plugin instance with merged options, e.g.
 | `ImagePlugin`                                                                         | `insertImage`, `updateImage`                                                                                               |
 | `MentionPlugin`                                                                       | `insertMention`                                                                                                            |
 | `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                                                                |
+| `DragHandlePlugin`                                                                    | `selectBlock`, `deleteBlock`, `duplicateBlock`, `moveBlockTo`, `moveBlockUp`, `moveBlockDown`                              |
 | `SelectionPlugin`                                                                     | None (`query('selection')`, `qalma-selection-update`)                                                                       |
 | `ColorPlugin`                                                                         | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`                                             |
 | `HighlightPlugin`                                                                     | `setHighlight`, `unsetHighlight`                                                                                           |

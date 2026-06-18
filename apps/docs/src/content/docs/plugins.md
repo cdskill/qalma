@@ -34,6 +34,7 @@ menus, and styling remain consumer-owned Angular code.
 | `ImagePlugin`        | Inline images with alt/title metadata                | `insertImage`, `updateImage`, `removeImage`                           |
 | `MentionPlugin`      | Inline mention nodes and trigger state               | `insertMention`                                                       |
 | `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock` |
+| `DragHandlePlugin`   | Block metadata and action commands for custom handles | `selectBlock`, `deleteBlock`, `duplicateBlock`, `moveBlockTo`, `moveBlockUp`, `moveBlockDown` |
 
 ## Styling And Layout
 
