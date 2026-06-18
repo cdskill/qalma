@@ -9,6 +9,12 @@ This page mirrors the canonical package changelog at
 `libs/editor/CHANGELOG.md`. It is regenerated from that file on every release —
 do not edit it by hand.
 
+## 0.0.1-alpha.13 (2026-06-18)
+
+### 🚀 Features
+
+- **editor:** add drag handle plugin ([182a43c](https://github.com/cdskill/qalma/commit/182a43c))
+
 ## 0.0.1-alpha.12 (2026-06-17)
 
 ### 🚀 Features
