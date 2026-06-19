@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
   workflow_dispatch:
@@ -21,16 +22,25 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout pull request
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          path: pull-request
+
+      - name: Checkout trusted guard
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-base
 
       - uses: actions/setup-node@v6
         with:
           node-version: '24.x'
 
       - name: Require human approval for protected test changes
-        run: node tools/guard-protected-test-changes.mjs
+        working-directory: pull-request
+        run: node ../trusted-base/tools/guard-protected-test-changes.mjs
 
   validation:
     name: Lint, typecheck, unit, and browser tests

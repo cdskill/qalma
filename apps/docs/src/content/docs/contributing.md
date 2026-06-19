@@ -90,3 +90,7 @@ pnpm nx build sandbox
 
 For user-visible editor behavior, verify the sandbox or docs playground in a
 real browser.
+
+For the full testing map, including first-party plugin specs, Playwright
+coverage, and protected test-change review, see
+[Testing Strategy](/docs/testing-strategy).
