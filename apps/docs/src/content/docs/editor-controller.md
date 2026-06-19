@@ -150,6 +150,26 @@ loadDocument(html: string): void {
 }
 ```
 
+The controller also reads and writes the document as JSON and Markdown:
+
+| Method | Description |
+| ------ | ----------- |
+| `getJSON()` | Serializes to ProseMirror's native, **lossless** JSON (`QalmaDocument`). |
+| `setJSON(doc)` | Replaces the document from a `QalmaDocument`. Works before and after mount. |
+| `getMarkdown()` | Serializes to Markdown (CommonMark + GFM); output-only. |
+
+```typescript
+import { QalmaDocument } from '@qalma/editor';
+
+const doc: QalmaDocument = this.editor.getJSON(); // persist losslessly
+this.editor.setJSON(doc); // restore later
+
+const markdown = this.editor.getMarkdown(); // export to Markdown
+```
+
+See [Content & Serialization](/docs/content) for the format comparison and how
+Markdown falls back to inline HTML for marks it cannot express.
+
 `setEditable(false)` makes command execution and `canExecute()` return false,
 and updates the ProseMirror `editable` prop.
 

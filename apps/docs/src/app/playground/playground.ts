@@ -4,8 +4,10 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  computed,
   effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import {
@@ -39,6 +41,7 @@ import {
   TrailingParagraphPlugin,
   createQalmaEditor,
 } from '@qalma/editor';
+import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
 import {
   PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,
@@ -72,9 +75,12 @@ import { PlaygroundSelectionToolbarDirective } from './selection-toolbar-directi
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
 
+type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ...BrnToggleGroupImports,
     QalmaContent,
     QalmaEditor,
     PlaygroundLinkPopover,
@@ -185,12 +191,32 @@ import { PosthogService } from '../services/posthog.service';
       <summary
         class="flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
-        Serialized HTML
-        <span class="font-mono text-xs">{{ editor.html().length }} chars</span>
+        Serialized output
+        <span class="font-mono text-xs">{{ serializedOutput().length }} chars</span>
       </summary>
+      <div class="border-t border-border px-4 pt-3">
+        <brn-toggle-group
+          type="single"
+          [nullable]="false"
+          [value]="outputFormat()"
+          (valueChange)="onOutputFormatChange($event)"
+          aria-label="Serialization format"
+          class="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-1"
+        >
+          @for (format of outputFormats; track format.value) {
+            <button
+              brnToggleGroupItem
+              [value]="format.value"
+              class="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm"
+            >
+              {{ format.label }}
+            </button>
+          }
+        </brn-toggle-group>
+      </div>
       <pre
-        class="m-0 max-h-72 overflow-y-auto whitespace-pre-wrap break-words border-t border-border px-4 py-3 font-mono text-xs leading-5 text-muted-foreground [overflow-wrap:anywhere]"
-      ><code>{{ editor.html() }}</code></pre>
+        class="m-0 max-h-72 overflow-y-auto whitespace-pre-wrap break-words px-4 py-3 font-mono text-xs leading-5 text-muted-foreground [overflow-wrap:anywhere]"
+      ><code>{{ serializedOutput() }}</code></pre>
     </details>
   `,
 })
@@ -249,6 +275,30 @@ export class Playground {
     ],
   });
 
+  protected readonly outputFormats: readonly {
+    value: PlaygroundOutputFormat;
+    label: string;
+  }[] = [
+    { value: 'html', label: 'HTML' },
+    { value: 'json', label: 'JSON' },
+    { value: 'markdown', label: 'Markdown' },
+  ];
+  protected readonly outputFormat = signal<PlaygroundOutputFormat>('html');
+  // Reads `editor.html()` so it recomputes on every edit, then renders the
+  // currently selected format. JSON/Markdown are pulled fresh on each change.
+  protected readonly serializedOutput = computed(() => {
+    const html = this.editor.html();
+
+    switch (this.outputFormat()) {
+      case 'json':
+        return JSON.stringify(this.editor.getJSON(), null, 2);
+      case 'markdown':
+        return this.editor.getMarkdown();
+      default:
+        return html;
+    }
+  });
+
   protected readonly linkPopover = new LinkPopoverController(this.editor);
   protected readonly mentionController = new PlaygroundMentionController(
     this.editor,
@@ -301,6 +351,13 @@ export class Playground {
         this.revokeImagePreviewUrls();
       });
     });
+  }
+
+  protected onOutputFormatChange(value: unknown): void {
+    // `nullable=false` keeps a selection, so `value` is always a single format.
+    if (value === 'html' || value === 'json' || value === 'markdown') {
+      this.outputFormat.set(value);
+    }
   }
 
   protected insertImageFromUrl(): void {
