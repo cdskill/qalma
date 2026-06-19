@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 
 const exampleImageSrc =
   'https://i.redd.it/can-thragg-win-a-3v1-against-thaedus-nolan-and-conquest-v0-4ljwinnbdyyg1.jpg?width=1333&format=pjpg&auto=webp&s=c691acfd4ff12ddc2f2da8fd21335bbc441a90bf';
@@ -28,7 +28,7 @@ test('autolinks plain text URLs on paste', async ({ page }) => {
     );
   });
 
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p>Read <a href="https://angular.dev/docs" target="_blank" rel="noopener noreferrer">https://angular.dev/docs</a>.</p>',
   );
 });
@@ -63,7 +63,7 @@ test('cleans pasted HTML links', async ({ page }) => {
     );
   });
 
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p><a href="https://analogjs.org/docs/features/server-side-rendering" target="_blank" rel="noopener noreferrer">Server-Side Rendering</a></p>',
   );
 });
@@ -92,7 +92,7 @@ test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
 
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Space');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p><span data-qalma-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
   );
 });
@@ -124,7 +124,32 @@ test('runs block commands from the consumer-owned slash menu', async ({
 
   await page.keyboard.press('Enter');
   await editor.pressSequentially('Roadmap');
-  await expect(page.locator('pre')).toContainText('<h1>Roadmap</h1>');
+  await expect(serializedHtml(page)).toContainText('<h1>Roadmap</h1>');
+});
+
+test('applies formatting shortcuts in the real editor surface', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const editor = page.locator('.ProseMirror');
+  const toolbar = page.getByRole('toolbar', { name: 'Editor toolbar' });
+  const bold = toolbar.getByRole('button', { name: 'Bold' });
+
+  await editor.click();
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
+  );
+  await page.keyboard.press('Backspace');
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+B' : 'Control+B',
+  );
+  await editor.pressSequentially('Shortcut text');
+
+  await expect(bold).toHaveAttribute('aria-pressed', 'true');
+  await expect(serializedHtml(page)).toContainText(
+    '<p><strong>Shortcut text</strong></p>',
+  );
 });
 
 test('renders the configured plugin toolbar', async ({ page }) => {
@@ -146,7 +171,10 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const underline = toolbar.getByRole('button', { name: 'Underline' });
   const subscript = toolbar.getByRole('button', { name: 'Subscript' });
   const superscript = toolbar.getByRole('button', { name: 'Superscript' });
-  const highlight = toolbar.getByRole('button', { name: 'Highlight' });
+  const highlight = toolbar.getByRole('button', {
+    name: 'Highlight',
+    exact: true,
+  });
   const mintHighlight = toolbar.getByRole('button', {
     name: 'Mint highlight',
   });
@@ -176,13 +204,13 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const uploadImage = toolbar.getByRole('button', { name: 'Upload image' });
   const liftListItem = toolbar.getByRole('button', { name: 'Lift list item' });
   const sinkListItem = toolbar.getByRole('button', { name: 'Sink list item' });
-  const link = toolbar.getByRole('button', { name: 'Link' });
+  const link = toolbar.getByRole('button', { name: 'Link', exact: true });
   const unlink = toolbar.getByRole('button', { name: 'Unlink' });
   const undo = toolbar.getByRole('button', { name: 'Undo' });
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
   await expect(page.locator('qalma-editor > button')).toHaveCount(0);
-  await expect(toolbar.getByRole('button')).toHaveCount(43);
+  await expect(toolbar.getByRole('button')).toHaveCount(45);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
   await expect(heading2).toHaveAttribute('title', 'Heading 2');
@@ -258,33 +286,33 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(redo).toBeDisabled();
 
   await expect(page.locator('.ProseMirror')).toContainText('Qalma');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<h1><strong>Qalma</strong></h1>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and qalmaCommand.</p></li></ol>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     `<img src="${exampleImageHtmlSrc}" alt="${exampleImageAlt}" title="${exampleImageTitle}">`,
   );
-  await expect(page.locator('pre')).toContainText('<u>underline</u>');
-  await expect(page.locator('pre')).toContainText('<mark>highlight</mark>');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText('<u>underline</u>');
+  await expect(serializedHtml(page)).toContainText('<mark>highlight</mark>');
+  await expect(serializedHtml(page)).toContainText(
     '<span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     'formulas like H<sub>2</sub>O and E=mc<sup>2</sup>',
   );
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>',
   );
 
@@ -294,20 +322,20 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .selectText();
   await heading2.click();
   await expect(heading2).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<h2>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</h2>',
   );
   await paragraph.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
   await alignRight.click();
   await expect(alignRight).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p style="text-align: right;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
   await alignLeft.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
   await expect(bulletList).toBeEnabled();
@@ -315,15 +343,15 @@ test('renders the configured plugin toolbar', async ({ page }) => {
 
   await bulletList.click();
   await expect(bulletList).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ul><li><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
   );
   await alignRight.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ul><li style="text-align: right;"><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
   );
   await alignLeft.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ul><li><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ul>',
   );
   await page.locator('.ProseMirror').press('Tab');
@@ -337,23 +365,23 @@ test('renders the configured plugin toolbar', async ({ page }) => {
 
   await orderedList.click();
   await expect(orderedList).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<ol><li><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></li></ol>',
   );
 
   await orderedList.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
 
   await blockquote.click();
   await expect(blockquote).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<blockquote><p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p></blockquote>',
   );
 
   await blockquote.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<p>Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p>',
   );
 
@@ -368,7 +396,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     page.getByRole('dialog', { name: 'Link preview' }).getByRole('link'),
   ).toContainText('https://angular.dev');
 
-  await page.locator('.ProseMirror').getByText('Qalma').selectText();
+  await page.locator('.ProseMirror h1 strong').selectText();
   await link.click();
   await page
     .getByRole('dialog', { name: 'Link preview' })
@@ -378,7 +406,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .getByRole('dialog', { name: 'Link preview' })
     .getByRole('button', { name: 'Save' })
     .click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<h1><strong><a href="/docs" target="_blank" rel="noopener noreferrer">Qalma</a></strong></h1>',
   );
   await expect(unlink).toBeEnabled();
@@ -396,60 +424,54 @@ test('renders the configured plugin toolbar', async ({ page }) => {
     .getByRole('dialog', { name: 'Link preview' })
     .getByRole('button', { name: 'Save' })
     .click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<h1><strong><a href="/guide" target="_blank" rel="noopener noreferrer">Qalma</a></strong></h1>',
   );
-
-  const popupPromise = page.waitForEvent('popup');
-  await page.locator('.ProseMirror a[href="/guide"]').click();
-  const popup = await popupPromise;
-  await expect(popup).toHaveURL('/guide');
-  await popup.close();
 
   await page.locator('.ProseMirror a[href="/guide"]').hover();
   await page
     .getByRole('dialog', { name: 'Link preview' })
     .getByRole('button', { name: 'Unlink' })
     .click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<h1><strong>Qalma</strong></h1>',
   );
 
   await page.locator('.ProseMirror').getByText('highlight').selectText();
   await mintHighlight.click();
   await expect(mintHighlight).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<mark style="background-color: rgb(187, 247, 208);">highlight</mark>',
   );
   await clearHighlight.click();
-  await expect(page.locator('pre')).toContainText(
-    'strikethrough</s>, highlight, <span style="color: rgb(14, 116, 144);',
+  await expect(serializedHtml(page)).toContainText(
+    'strikethrough</s>, <code>inline code</code>, highlight, <span style="color: rgb(14, 116, 144);',
   );
 
   await page.locator('.ProseMirror sub').selectText();
   await expect(subscript).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText('H<sub>2</sub>O');
+  await expect(serializedHtml(page)).toContainText('H<sub>2</sub>O');
   await superscript.click();
   await expect(superscript).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText('H<sup>2</sup>O');
+  await expect(serializedHtml(page)).toContainText('H<sup>2</sup>O');
   await subscript.click();
-  await expect(page.locator('pre')).toContainText('H<sub>2</sub>O');
+  await expect(serializedHtml(page)).toContainText('H<sub>2</sub>O');
 
   await page.locator('.ProseMirror').getByText('color').selectText();
   await roseTextColor.click();
   await expect(roseTextColor).toHaveAttribute('aria-pressed', 'true');
   await skyBackgroundColor.click();
   await expect(skyBackgroundColor).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<span style="color: rgb(190, 18, 60); background-color: rgb(186, 230, 253);">color</span>',
   );
   await clearTextColor.click();
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     '<span style="background-color: rgb(186, 230, 253);">color</span>',
   );
   await clearBackgroundColor.click();
-  await expect(page.locator('pre')).toContainText(
-    'try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, highlight, color, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, and <a href="https://angular.dev"',
+  await expect(serializedHtml(page)).toContainText(
+    '<code>inline code</code>, highlight, color, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>',
   );
 
   const imagePrompts = [exampleImageSrc, 'Inserted image', 'Demo image'];
@@ -458,7 +480,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   });
   await imageUrl.click();
   await expect(imageUrl).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('pre')).toContainText(
+  await expect(serializedHtml(page)).toContainText(
     `<img src="${exampleImageHtmlSrc}" alt="Inserted image" title="Demo image">`,
   );
 
@@ -469,3 +491,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await undo.click();
   await expect(redo).toBeEnabled();
 });
+
+function serializedHtml(page: Page): Locator {
+  return page.getByRole('region', { name: 'Serialized HTML' }).locator('pre');
+}

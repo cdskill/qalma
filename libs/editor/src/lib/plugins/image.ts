@@ -170,9 +170,15 @@ function createUpdateImageCommand(
     }
 
     if (dispatch) {
+      const transaction = state.tr.setNodeMarkup(
+        selectedImage.from,
+        image,
+        attrs,
+      );
+
       dispatch(
-        state.tr
-          .setNodeMarkup(selectedImage.from, image, attrs)
+        transaction
+          .setSelection(NodeSelection.create(transaction.doc, selectedImage.from))
           .scrollIntoView(),
       );
     }

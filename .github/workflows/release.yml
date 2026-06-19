@@ -43,13 +43,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Validate
         run: |
           pnpm nx run-many -t lint
           pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
+          pnpm exec tsc -p libs/editor/tsconfig.spec.json --noEmit
           pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
+          pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
           pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
+          pnpm nx test editor -- --run
+          pnpm nx test sandbox -- --run
           pnpm nx build sandbox
+          pnpm nx e2e sandbox-e2e -- --project=chromium
 
       - name: Resolve release version
         id: release

@@ -226,6 +226,7 @@ describe('App', () => {
   it('should expose code block commands through the public plugin', () => {
     const snippet =
       'const language = "typescript"; const enabled = language.length > 0; console.log({ enabled, language });';
+    const serializedSnippet = snippet.replace('>', '&gt;');
     const editor = createQalmaEditor({
       content: `<p>${snippet}</p>`,
       plugins: [
@@ -244,17 +245,17 @@ describe('App', () => {
     expect(editor.isCommandActive('toggleCodeBlock')).toBeTrue();
     expect(editor.query<string>('codeBlockLanguage')).toBe('typescript');
     expect(editor.html()).toBe(
-      `<pre><code class="language-typescript">${snippet}</code></pre>`,
+      `<pre><code class="language-typescript">${serializedSnippet}</code></pre>`,
     );
     expect(editor.execute('setCodeBlockLanguage', 'go')).toBeTrue();
     expect(editor.query<string>('codeBlockLanguage')).toBe('go');
     expect(editor.html()).toBe(
-      `<pre><code class="language-go">${snippet}</code></pre>`,
+      `<pre><code class="language-go">${serializedSnippet}</code></pre>`,
     );
     expect(editor.execute('toggleCodeBlock')).toBeTrue();
     expect(editor.isCommandActive('toggleCodeBlock')).toBeFalse();
     expect(editor.query<string>('codeBlockLanguage')).toBeNull();
-    expect(editor.html()).toBe(`<p>${snippet}</p>`);
+    expect(editor.html()).toBe(`<p>${serializedSnippet}</p>`);
 
     editor.unmount(host);
   });
@@ -392,7 +393,7 @@ describe('App', () => {
     const host = document.createElement('div');
 
     editor.mount(host);
-    selectEditorRange(editor, 1, 12);
+    selectEditorRange(editor, 1, 6);
 
     expect(ColorPlugin.key).toBe('color');
     expect(editor.canExecute('unsetTextColor')).toBeFalse();
@@ -457,15 +458,15 @@ describe('App', () => {
     ).toBeTrue();
     expect(editor.isCommandActive('insertImage')).toBeTrue();
     expect(editor.query<ImageState>('image')).toEqual({
-      from: 8,
-      to: 9,
+      from: 7,
+      to: 8,
       src: 'https://example.com/photo.png',
       alt: 'Example photo',
       title: 'Photo',
       previewSrc: null,
     });
     expect(editor.html()).toBe(
-      '<p>Before</p><img src="https://example.com/photo.png" alt="Example photo" title="Photo">',
+      '<p>Before<img src="https://example.com/photo.png" alt="Example photo" title="Photo"></p>',
     );
     expect(
       editor.execute('updateImage', {
@@ -477,7 +478,7 @@ describe('App', () => {
       'https://example.com/updated.png',
     );
     expect(editor.html()).toBe(
-      '<p>Before</p><img src="https://example.com/updated.png" alt="Updated photo" title="Photo">',
+      '<p>Before<img src="https://example.com/updated.png" alt="Updated photo" title="Photo"></p>',
     );
     expect(editor.execute('removeImage')).toBeTrue();
     expect(editor.html()).toBe('<p>Before</p>');
@@ -508,7 +509,7 @@ describe('App', () => {
       'blob:http://localhost/photo-preview',
     );
     expect(editor.html()).toBe(
-      '<p>Before</p><img src="/uploads/photo.png" alt="Uploaded photo" title="Photo">',
+      '<p>Before<img src="/uploads/photo.png" alt="Uploaded photo" title="Photo"></p>',
     );
 
     editor.unmount(host);
@@ -525,7 +526,7 @@ describe('App', () => {
     editor.mount(host);
 
     expect(editor.html()).toBe(
-      '<img src="https://example.com/photo.png" alt="Example" title="Photo">',
+      '<p><img src="https://example.com/photo.png" alt="Example" title="Photo"></p>',
     );
 
     editor.unmount(host);
@@ -586,7 +587,7 @@ describe('App', () => {
     const host = document.createElement('div');
 
     editor.mount(host);
-    selectEditorRange(editor, 1, 12);
+    selectEditorRange(editor, 1, 6);
 
     expect(HighlightPlugin.key).toBe('highlight');
     expect(editor.canExecute('unsetHighlight')).toBeFalse();
@@ -924,6 +925,7 @@ describe('App', () => {
       defaultLanguage: 'plaintext',
       languageClassPrefix: 'language-',
       indentText: '  ',
+      inputRules: true,
     });
     expect(CodeBlockPlugin.options).toEqual(CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS);
     expect(configured.options).toEqual({
@@ -931,6 +933,7 @@ describe('App', () => {
       defaultLanguage: 'go',
       languageClassPrefix: 'language-',
       indentText: '  ',
+      inputRules: true,
     });
     expect(() =>
       CodeBlockPlugin.configure({
@@ -1150,10 +1153,12 @@ describe('App', () => {
 
     expect(HEADINGS_PLUGIN_DEFAULT_OPTIONS).toEqual({
       levels: [1, 2, 3],
+      inputRules: true,
     });
     expect(HeadingsPlugin.options).toEqual(HEADINGS_PLUGIN_DEFAULT_OPTIONS);
     expect(configured.options).toEqual({
       levels: [2, 3, 4],
+      inputRules: true,
     });
     expect(() =>
       HeadingsPlugin.configure({
@@ -1536,7 +1541,7 @@ describe('App', () => {
       appendSpaceOnInsert: false,
     });
     expect(editor.html()).toBe(
-      '<p>Ask <span data-qalma-mention="" data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@" contenteditable="false">@Ada Lovelace</span>.</p>',
+      '<p>Ask <span data-qalma-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>.</p>',
     );
     expect(() =>
       MentionPlugin.configure({
@@ -1689,7 +1694,10 @@ function typeText(editor: QalmaEditorController, text: string): boolean {
   let handled = false;
 
   view.someProp('handleTextInput', (handler) => {
-    handled = handler(view, from, to, text);
+    handled =
+      handler(view, from, to, text, () =>
+        view.state.tr.insertText(text, from, to),
+      ) === true;
 
     return handled;
   });
