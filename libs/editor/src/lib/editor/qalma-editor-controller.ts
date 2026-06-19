@@ -1,5 +1,5 @@
 import { Signal, WritableSignal, signal } from '@angular/core';
-import { Schema } from 'prosemirror-model';
+import { Node as ProseMirrorNode, Schema } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
@@ -10,7 +10,13 @@ import {
   QalmaQuery,
   QalmaStateQuery,
 } from '../plugins/qalma-plugin';
-import { serializeHtmlDocument } from '../prosemirror/html';
+import { parseHtmlDocument, serializeHtmlDocument } from '../prosemirror/html';
+import {
+  QalmaDocument,
+  parseJsonDocument,
+  serializeJsonDocument,
+} from '../prosemirror/json';
+import { serializeMarkdownDocument } from '../prosemirror/markdown';
 import {
   createCommandRegistry,
   createCommandStateRegistry,
@@ -40,6 +46,8 @@ export class QalmaEditorController {
   private editorState?: EditorState;
   private editorView?: EditorView;
   private host?: HTMLElement;
+  /** Faithful document set via `setJSON` before the view is mounted. */
+  private pendingDoc?: ProseMirrorNode;
 
   constructor(options: QalmaEditorOptions = {}) {
     this.plugins = [...(options.plugins ?? [])];
@@ -64,10 +72,12 @@ export class QalmaEditorController {
     host.replaceChildren();
 
     this.editorState = createQalmaState({
+      doc: this.pendingDoc,
       html: this.html(),
       plugins: this.plugins,
       schema: this.schema,
     });
+    this.pendingDoc = undefined;
     this.host = host;
     this.editorView = new EditorView(host, {
       state: this.editorState,
@@ -157,6 +167,8 @@ export class QalmaEditorController {
       return;
     }
 
+    this.pendingDoc = undefined;
+
     if (!this.editorView) {
       this.htmlState.set(html);
 
@@ -171,6 +183,44 @@ export class QalmaEditorController {
     this.editorView.updateState(this.editorState);
     this.syncHtmlFromEditorState();
     this.bumpViewVersion();
+  }
+
+  /**
+   * Serializes the current document to ProseMirror's native JSON — the
+   * lossless format to persist and later restore with `setJSON`.
+   */
+  getJSON(): QalmaDocument {
+    return serializeJsonDocument(this.currentDoc());
+  }
+
+  /** Replaces the document content from a JSON document produced by `getJSON`. */
+  setJSON(json: QalmaDocument): void {
+    const doc = parseJsonDocument(json, this.schema);
+
+    if (!this.editorView) {
+      this.pendingDoc = doc;
+      this.htmlState.set(serializeHtmlDocument(doc, this.schema));
+
+      return;
+    }
+
+    this.editorState = createQalmaState({
+      doc,
+      plugins: this.plugins,
+      schema: this.schema,
+    });
+    this.editorView.updateState(this.editorState);
+    this.syncHtmlFromEditorState();
+    this.bumpViewVersion();
+  }
+
+  /**
+   * Serializes the current document to Markdown (CommonMark + GFM). Marks with
+   * no Markdown equivalent (underline, color, highlight, sub/superscript,
+   * mentions) fall back to inline HTML so no content is lost.
+   */
+  getMarkdown(): string {
+    return serializeMarkdownDocument(this.currentDoc());
   }
 
   setEditable(editable: boolean): void {
@@ -197,6 +247,14 @@ export class QalmaEditorController {
     }
 
     this.bumpViewVersion();
+  }
+
+  private currentDoc(): ProseMirrorNode {
+    return (
+      this.editorState?.doc ??
+      this.pendingDoc ??
+      parseHtmlDocument(this.html(), this.schema)
+    );
   }
 
   private syncHtmlFromEditorState(): void {

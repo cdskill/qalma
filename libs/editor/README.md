@@ -69,13 +69,37 @@ Builds a `QalmaEditorController`, the headless API your components bind to:
 | `canExecute(command, value?)` | Whether a command would currently succeed.                             |
 | `isCommandActive(command)`    | Whether a toggleable command is active for the current selection.      |
 | `query<T>(name)`              | Reads plugin-provided state, e.g. the link or image under the cursor.  |
-| `setHtml(html)`               | Replaces the document content.                                         |
+| `setHtml(html)`               | Replaces the document content from an HTML string.                     |
+| `getJSON()`                   | Serializes the document to ProseMirror's native, lossless JSON.        |
+| `setJSON(doc)`                | Replaces the document content from a `QalmaDocument` JSON object.       |
+| `getMarkdown()`               | Serializes the document to Markdown (CommonMark + GFM).                |
 | `setEditable(editable)`       | Toggles editability at runtime.                                        |
 | `focus()`                     | Focuses the editor view.                                               |
 
 `options.content` accepts an initial HTML string, and `options.plugins`
 accepts the list of `QalmaPlugin`s that define the schema, commands, and
 behavior available to the editor.
+
+### Serializing content
+
+The controller can read and write the document in three formats:
+
+- **HTML** — `html()` (a live signal) and `setHtml()`. Best for rendering and
+  interop with existing HTML content.
+- **JSON** — `getJSON()` and `setJSON()`. ProseMirror's native document model;
+  **lossless** and the recommended format to persist and restore content.
+- **Markdown** — `getMarkdown()`. CommonMark plus GFM (tables, task lists,
+  strikethrough). Marks Markdown cannot express (underline, text color,
+  highlight, sub/superscript, mentions) fall back to inline HTML so no content
+  is dropped. Markdown is output-only — typing Markdown syntax is handled by the
+  per-plugin input rules.
+
+```ts
+const doc = editor.getJSON(); // persist this
+editor.setJSON(doc); // restore it later, losslessly
+
+const markdown = editor.getMarkdown(); // export to Markdown
+```
 
 ### Components and directives
 
