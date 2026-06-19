@@ -104,6 +104,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { title: 'Bundle Size', href: '/docs/bundle-size' },
       { title: 'Changelog', href: '/docs/changelog' },
       { title: 'Roadmap', href: '/docs/roadmap' },
+      { title: 'Testing Strategy', href: '/docs/testing-strategy' },
       { title: 'Contributing', href: '/docs/contributing' },
     ],
   },
