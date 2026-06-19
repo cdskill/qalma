@@ -3,6 +3,7 @@ export * from './lib/editor/content';
 export * from './lib/editor/editor';
 export * from './lib/editor/qalma-editor-controller';
 export * from './lib/editor/toolbar';
+export type { QalmaDocument } from './lib/prosemirror/json';
 export * from './lib/plugins/blockquote';
 export * from './lib/plugins/clear-formatting';
 export * from './lib/plugins/code-block';
