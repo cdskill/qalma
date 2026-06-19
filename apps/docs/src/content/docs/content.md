@@ -5,8 +5,9 @@ description: How Qalma parses initial HTML, keeps editor.html() in sync, and ser
 
 # Content & Serialization
 
-Qalma accepts and emits HTML strings. Internally, that HTML is parsed into a
-ProseMirror document using the schema produced by your selected plugins.
+Qalma parses initial HTML into a ProseMirror document using the schema produced
+by your selected plugins, and can serialize that document back out in three
+formats.
 
 ```typescript
 const editor = createQalmaEditor({
@@ -14,6 +15,18 @@ const editor = createQalmaEditor({
   plugins: [HeadingsPlugin, ...TextFormattingKit],
 });
 ```
+
+## Output formats
+
+| Format | Read | Write | Lossless | Best for |
+| ------ | ---- | ----- | -------- | -------- |
+| HTML | `html()` signal | `setHtml()` | Yes | Rendering, interop with existing HTML |
+| JSON | `getJSON()` | `setJSON()` | **Yes** | Persisting and restoring documents |
+| Markdown | `getMarkdown()` | — (input rules) | No | Exporting to Markdown, plain-text storage |
+
+JSON is ProseMirror's native document model and the recommended format to
+persist content. Markdown is output-only: typing Markdown syntax is handled by
+each plugin's [input rules](/docs/plugins), not by a Markdown parser.
 
 ## Initial content
 
@@ -88,6 +101,64 @@ constructor() {
 For form-specific synchronization, use the pattern in
 [Forms Integration](/docs/forms-integration) so external writes and editor
 writes do not loop.
+
+## JSON
+
+`getJSON()` returns the document as ProseMirror's native JSON — the lossless
+format to persist. `setJSON()` restores it. Both work before and after the
+content surface mounts.
+
+```typescript
+import { QalmaDocument } from '@qalma/editor';
+
+saveDraft(): void {
+  const doc: QalmaDocument = this.editor.getJSON();
+  localStorage.setItem('qalma-draft', JSON.stringify(doc));
+}
+
+restoreDraft(): void {
+  const raw = localStorage.getItem('qalma-draft');
+
+  if (raw) {
+    this.editor.setJSON(JSON.parse(raw) as QalmaDocument);
+  }
+}
+```
+
+Unlike HTML, JSON preserves every node attribute and mark exactly, so a
+`getJSON()` → `setJSON()` round-trip reproduces the document without loss.
+Prefer it over HTML when you control both the save and load sides.
+
+## Markdown
+
+`getMarkdown()` serializes the document to Markdown
+([CommonMark](https://commonmark.org/) plus GitHub-Flavored extensions: tables,
+task lists, and strikethrough).
+
+```typescript
+exportMarkdown(): string {
+  return this.editor.getMarkdown();
+}
+```
+
+Marks and nodes that Markdown cannot express fall back to inline HTML — which
+CommonMark permits — so the output stays complete instead of silently dropping
+content:
+
+| Content | Markdown output |
+| ------- | --------------- |
+| Bold, italic, strikethrough | `**b**`, `*i*`, `~~s~~` |
+| Inline code, code block | `` `code` ``, fenced ` ``` ` with language |
+| Links, images | `[text](href)`, `![alt](src)` |
+| Headings, blockquote, lists, task lists, tables | `#`, `>`, `-`/`1.`, `- [x]`, GFM pipe table |
+| Underline | `&lt;u&gt;...&lt;/u&gt;` |
+| Subscript / superscript | `&lt;sub&gt;...&lt;/sub&gt;` / `&lt;sup&gt;...&lt;/sup&gt;` |
+| Text color / highlight | `&lt;span style&gt;` / `&lt;mark&gt;` |
+| Mention | the mention label as plain text |
+
+Markdown is **output-only**. To restore content, persist
+[JSON](#json) instead; to let users *type* Markdown shortcuts, rely on each
+plugin's input rules.
 
 ## Plugin-owned serialization
 
