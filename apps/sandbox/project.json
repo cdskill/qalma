@@ -62,6 +62,13 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     },
+    "test": {
+      "executor": "@analogjs/vitest-angular:test",
+      "outputs": ["{workspaceRoot}/coverage/apps/sandbox"],
+      "options": {
+        "config": "vite.config.ts"
+      }
+    },
     "serve-static": {
       "continuous": true,
       "executor": "@nx/web:file-server",

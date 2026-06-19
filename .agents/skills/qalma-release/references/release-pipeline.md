@@ -103,7 +103,8 @@ alpha cuts bump `0.0.1-alpha.N` automatically.
      CLI).
   4. `pnpm install --frozen-lockfile`.
   5. Validate: `nx run-many -t lint`, `tsc --noEmit` for editor/sandbox/
-     sandbox-e2e, `nx build sandbox`.
+     sandbox/sandbox-e2e test configs, `nx test editor`, `nx test sandbox`,
+     `nx build sandbox`, and the Chromium `sandbox-e2e` Playwright run.
   6. Resolve version from `GITHUB_REF_NAME` (strip leading `v`); check
      `npm view @qalma/editor version` to set `first_release` for the very
      first publish.

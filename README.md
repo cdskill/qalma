@@ -107,10 +107,17 @@ pnpm install
 pnpm nx serve sandbox      # run the sandbox consumer app
 pnpm nx serve docs         # run the documentation site
 pnpm nx run-many -t lint   # lint everything
+pnpm nx test editor        # Vitest contract tests for @qalma/editor
+pnpm nx test sandbox       # Vitest consumer tests for the sandbox app
+pnpm nx e2e sandbox-e2e    # Playwright browser coverage for the sandbox
 pnpm nx build sandbox      # production bundle
 ```
 
 Run `pnpm nx graph` to explore the project graph.
+
+PRs that modify tests, E2E specs, snapshots, test configs, CI workflows, or
+the test-change guard need the `approved-test-change` label. The label is meant
+to force human review before a regression is accepted by weakening the tests.
 
 ## Contributing
 

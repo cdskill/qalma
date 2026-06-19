@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  protected-test-changes:
+    name: Guard protected test changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+
+      - name: Require human approval for protected test changes
+        run: node tools/guard-protected-test-changes.mjs
+
+  validation:
+    name: Lint, typecheck, unit, and browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+          run_install: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Lint
+        run: pnpm nx run-many -t lint
+
+      - name: Typecheck
+        run: |
+          pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
+          pnpm exec tsc -p libs/editor/tsconfig.spec.json --noEmit
+          pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
+          pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
+          pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
+
+      - name: Vitest
+        run: |
+          pnpm nx test editor -- --run
+          pnpm nx test sandbox -- --run
+
+      - name: Build sandbox
+        run: pnpm nx build sandbox
+
+      - name: Playwright sandbox
+        run: pnpm nx e2e sandbox-e2e -- --project=chromium
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-artifacts
+          path: |
+            dist/.playwright/apps/sandbox-e2e/playwright-report
+            dist/.playwright/apps/sandbox-e2e/test-output
+          if-no-files-found: ignore

@@ -78,12 +78,21 @@ shared behavior change:
 
 ```bash
 pnpm nx run-many -t lint
+pnpm nx test editor
+pnpm nx test sandbox
 pnpm nx build sandbox
 pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
+pnpm exec tsc -p libs/editor/tsconfig.spec.json --noEmit
 pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
+pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
 pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
 ```
 
 For user-visible editor behavior, also verify the sandbox interaction in a real
 browser. If Playwright browsers are unavailable, report that limitation and use
 the available browser tooling.
+
+Test, E2E, snapshot, test config, workflow, CODEOWNERS, and guard-script changes
+must pass `pnpm guard:protected-test-changes` in CI. Pull requests that touch
+those protected files require the `approved-test-change` label after human
+review.

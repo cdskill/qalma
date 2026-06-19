@@ -17,6 +17,9 @@ const shouldStartWebServer = !process.env['BASE_URL'];
  */
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src' }),
+  forbidOnly: Boolean(process.env['CI']),
+  retries: process.env['CI'] ? 2 : 0,
+  workers: process.env['CI'] ? 1 : undefined,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL,

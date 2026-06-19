@@ -16,6 +16,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/vitest:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/editor"],
+      "options": {
+        "configFile": "libs/editor/vite.config.ts"
+      }
     }
   }
 }

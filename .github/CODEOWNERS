@@ -1,0 +1,18 @@
+# Human review is required before changing the tests or the machinery that
+# decides whether tests are allowed to change.
+
+.github/CODEOWNERS @cdskill
+.github/workflows/** @cdskill
+tools/guard-protected-test-changes.mjs @cdskill
+
+**/*.spec.ts @cdskill
+**/*.test.ts @cdskill
+**/__snapshots__/** @cdskill
+**/*.snap @cdskill
+**/golden/** @cdskill
+
+apps/*-e2e/** @cdskill
+**/playwright.config.* @cdskill
+**/vite.config.* @cdskill
+**/vitest.config.* @cdskill
+**/tsconfig.spec.json @cdskill

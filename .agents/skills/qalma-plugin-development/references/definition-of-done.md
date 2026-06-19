@@ -44,9 +44,13 @@ Use the applicable items. Do not add meaningless tests merely to tick a box.
 
 ```bash
 pnpm nx run-many -t lint
+pnpm nx test editor
+pnpm nx test sandbox
 pnpm nx build sandbox
 pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
+pnpm exec tsc -p libs/editor/tsconfig.spec.json --noEmit
 pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
+pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
 pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
 ```
 
