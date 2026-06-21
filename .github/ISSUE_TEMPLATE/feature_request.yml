@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest a plugin, command, or API improvement for @qalma/editor.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! API and DX feedback is especially welcome while
+        Qalma is in beta. Please search existing issues first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or the pain point, not just the solution.
+      placeholder: I need to ... but today the API only lets me ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would the API / plugin / command look like? Sketch it out.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried, or how other editors handle this.
+    validations:
+      required: false

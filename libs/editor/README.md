@@ -15,8 +15,10 @@ of unstyled Angular primitives (`<qalma-editor>`, `<qalma-content>`,
 menus, popovers — stays in your app. You choose the plugins, you own the
 markup.
 
-> **Status:** alpha (`0.0.x`). The public API may still change between
-> releases.
+**[Documentation & live demo → qalma.dev](https://qalma.dev)**
+
+> **Status:** beta (`0.1.x`). The public API is stabilizing but may still
+> change before `1.0`.
 
 ## Installation
 
@@ -164,10 +166,12 @@ Read each plugin's source under `src/lib/plugins` for configuration options
 
 ## Learn more
 
-`apps/sandbox` is a full working example: a toolbar, link popover, mention
-menu, image upload, and code block highlighting, all built from the public
-`@qalma/editor` API.
+- **Documentation & live demo:** [qalma.dev](https://qalma.dev)
+- **Guides & plugin reference:** [qalma.dev/docs](https://qalma.dev/docs)
+- **Source & issues:** [github.com/cdskill/qalma](https://github.com/cdskill/qalma)
 
-```sh
-npx nx serve sandbox
-```
+The repository also ships a full example app (`apps/sandbox`) — a toolbar, link
+popover, mention menu, image upload, and code block highlighting — built
+entirely from the public `@qalma/editor` API. See
+[CONTRIBUTING.md](https://github.com/cdskill/qalma/blob/main/CONTRIBUTING.md) to
+run it locally.

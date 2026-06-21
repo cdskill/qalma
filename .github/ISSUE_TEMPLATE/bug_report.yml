@@ -1,0 +1,49 @@
+name: Bug report
+description: Report something that isn't working as expected in @qalma/editor.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug! Qalma is in beta, so clear repros are gold.
+        Please search existing issues first to avoid duplicates.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+      placeholder: Toggling bold on a collapsed selection throws ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps, or a link to a StackBlitz / repo that reproduces it.
+      placeholder: |
+        1. Create an editor with `[...TextFormattingKit]`
+        2. ...
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: editor-version
+    attributes:
+      label: "@qalma/editor version"
+      placeholder: 0.1.0-beta.0
+    validations:
+      required: true
+  - type: input
+    id: angular-version
+    attributes:
+      label: Angular version
+      placeholder: "21.2.x"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Environment & extra context
+      description: Browser, OS, the plugins you configured, console errors, etc.
+    validations:
+      required: false
