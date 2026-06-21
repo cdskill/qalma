@@ -9,6 +9,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideFileText,
   lucideLayoutDashboard,
+  lucideMail,
   lucideMessageSquare,
 } from '@ng-icons/lucide';
 import { BrnTabsImports } from '@spartan-ng/brain/tabs';
@@ -17,6 +18,7 @@ import { CodePanel } from '../examples/code-panel';
 import { CommentBox } from '../examples/comment-box';
 import { DocsHeader } from '../components/docs-header';
 import { EXAMPLES, ExampleId } from '../examples/examples-registry';
+import { MailBox } from '../examples/mail-box';
 import { MarkdownNotes } from '../examples/markdown-notes';
 import { NotionDoc } from '../examples/notion-doc';
 
@@ -46,6 +48,7 @@ export const routeMeta: RouteMeta = {
     DocsHeader,
     CodePanel,
     CommentBox,
+    MailBox,
     MarkdownNotes,
     NotionDoc,
   ],
@@ -53,6 +56,7 @@ export const routeMeta: RouteMeta = {
     provideIcons({
       lucideFileText,
       lucideLayoutDashboard,
+      lucideMail,
       lucideMessageSquare,
     }),
   ],
@@ -128,37 +132,38 @@ export const routeMeta: RouteMeta = {
             </p>
           </div>
 
-          <div class="grid items-start gap-5 xl:grid-cols-2">
-            <div class="min-w-0">
-              @defer (on viewport) {
-                @switch (activeId()) {
-                  @case ('comment-box') {
-                    <app-comment-box />
-                  }
-                  @case ('notion-doc') {
-                    <app-notion-doc />
-                  }
-                  @case ('markdown-notes') {
-                    <app-markdown-notes />
-                  }
+          <div class="min-w-0">
+            @defer (on viewport) {
+              @switch (activeId()) {
+                @case ('comment-box') {
+                  <app-comment-box />
                 }
-              } @placeholder {
-                <div
-                  class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
-                ></div>
-              } @loading (minimum 300ms) {
-                <div
-                  class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
-                ></div>
+                @case ('mail-box') {
+                  <app-mail-box />
+                }
+                @case ('notion-doc') {
+                  <app-notion-doc />
+                }
+                @case ('markdown-notes') {
+                  <app-markdown-notes />
+                }
               }
-            </div>
-
-            <app-code-panel
-              class="min-w-0 xl:sticky xl:top-20"
-              [code]="activeExample().recipe"
-              [exampleId]="activeId()"
-            />
+            } @placeholder {
+              <div
+                class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
+              ></div>
+            } @loading (minimum 300ms) {
+              <div
+                class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
+              ></div>
+            }
           </div>
+
+          <app-code-panel
+            class="mt-5 block"
+            [code]="activeExample().recipe"
+            [exampleId]="activeId()"
+          />
         </section>
       </div>
     </main>

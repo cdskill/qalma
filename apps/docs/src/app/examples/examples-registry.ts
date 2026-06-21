@@ -3,7 +3,11 @@
  * demo via `@switch` (one editor mounted at a time) and feeds `recipe` to the
  * code panel. Add an entry here + a `@case` in the page to grow the showcase.
  */
-export type ExampleId = 'comment-box' | 'notion-doc' | 'markdown-notes';
+export type ExampleId =
+  | 'comment-box'
+  | 'mail-box'
+  | 'notion-doc'
+  | 'markdown-notes';
 
 export interface ExampleMeta {
   readonly id: ExampleId;
@@ -52,6 +56,37 @@ const editor = createQalmaEditor({
 //   </qalma-toolbar>
 //   <qalma-content />
 // </qalma-editor>`;
+
+const MAIL_BOX_RECIPE = `import {
+  createQalmaEditor,
+  TextFormattingKit,
+  LinkPlugin,
+  ListsPlugin,
+  TextAlignPlugin,
+  HorizontalRulePlugin,
+  HardBreakPlugin,
+  PasteRulesPlugin,
+  PlaceholderPlugin,
+  HistoryPlugin,
+} from '@qalma/editor';
+
+// An email composer: the formatting an email actually needs.
+const editor = createQalmaEditor({
+  plugins: [
+    ...TextFormattingKit,          // bold, italic, underline, strike
+    LinkPlugin,
+    ListsPlugin,
+    TextAlignPlugin,               // left / center / right
+    HorizontalRulePlugin,          // signature divider
+    HardBreakPlugin,
+    PasteRulesPlugin,
+    PlaceholderPlugin.configure({ placeholder: 'Write your message…' }),
+    HistoryPlugin,
+  ],
+});
+
+// On send, hand the HTML payload to your mail API:
+const html = editor.html();`;
 
 const NOTION_DOC_RECIPE = `import {
   createQalmaEditor,
@@ -148,6 +183,13 @@ export const EXAMPLES: readonly ExampleMeta[] = [
     tagline: 'Compact toolbar, @mentions',
     icon: 'lucideMessageSquare',
     recipe: COMMENT_BOX_RECIPE,
+  },
+  {
+    id: 'mail-box',
+    title: 'Email composer',
+    tagline: 'Formatting, alignment, links',
+    icon: 'lucideMail',
+    recipe: MAIL_BOX_RECIPE,
   },
   {
     id: 'notion-doc',
