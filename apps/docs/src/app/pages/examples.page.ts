@@ -23,6 +23,7 @@ import { MailBox } from '../examples/mail-box';
 import { MarkdownNotes } from '../examples/markdown-notes';
 import { NotionDoc } from '../examples/notion-doc';
 import { ProductReview } from '../examples/product-review';
+import { QalmaEditorLoading } from '../components/qalma-editor-loading';
 
 export const routeMeta: RouteMeta = {
   title: 'Examples',
@@ -54,6 +55,7 @@ export const routeMeta: RouteMeta = {
     MarkdownNotes,
     NotionDoc,
     ProductReview,
+    QalmaEditorLoading,
   ],
   providers: [
     provideIcons({
@@ -140,7 +142,7 @@ export const routeMeta: RouteMeta = {
           </div>
 
           <div class="min-w-0">
-            @defer (on viewport) {
+            @defer (on viewport; prefetch on idle) {
               @switch (currentId) {
                 @case ('comment-box') {
                   <app-comment-box />
@@ -159,13 +161,19 @@ export const routeMeta: RouteMeta = {
                 }
               }
             } @placeholder {
-              <div
-                class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
-              ></div>
+              <app-qalma-editor-loading
+                height="28.75rem"
+                eyebrow="Example loading"
+              >
+                Qalma is getting dressed for this surface...
+              </app-qalma-editor-loading>
             } @loading (minimum 300ms) {
-              <div
-                class="h-[460px] animate-pulse rounded-xl border border-border bg-card"
-              ></div>
+              <app-qalma-editor-loading
+                height="28.75rem"
+                eyebrow="Example loading"
+              >
+                Qalma is getting dressed for this surface...
+              </app-qalma-editor-loading>
             }
           </div>
 

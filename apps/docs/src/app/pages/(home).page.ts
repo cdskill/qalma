@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { DocsHeader } from '../components/docs-header';
 import { Hero } from '../components/hero';
+import { QalmaEditorLoading } from '../components/qalma-editor-loading';
 import { Playground } from '../playground/playground';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-home',
-  imports: [DocsHeader, Hero, Playground],
+  imports: [DocsHeader, Hero, Playground, QalmaEditorLoading],
   template: `
     <app-docs-header />
 
@@ -19,21 +20,23 @@ import { Playground } from '../playground/playground';
         class="mx-auto max-w-6xl px-4 pb-24 sm:px-6"
         aria-label="Live editor playground"
       >
-        @defer (on viewport) {
+        @defer (on viewport; prefetch on idle) {
           <app-playground />
         } @placeholder {
-          <div
-            class="h-[520px] animate-pulse rounded-xl border border-border bg-card"
-          ></div>
+          <app-qalma-editor-loading eyebrow="Playground loading">
+            Your favorite editor is sharpening its qalam...
+          </app-qalma-editor-loading>
         } @loading (minimum 300ms) {
-          <div
-            class="h-[520px] animate-pulse rounded-xl border border-border bg-card"
-          ></div>
+          <app-qalma-editor-loading eyebrow="Playground loading">
+            Your favorite editor is sharpening its qalam...
+          </app-qalma-editor-loading>
         }
       </section>
     </main>
 
-    <footer class="border-t border-border/60 py-8 text-center text-sm text-muted-foreground">
+    <footer
+      class="border-t border-border/60 py-8 text-center text-sm text-muted-foreground"
+    >
       <p>Qalma — the qalam for Angular. Built on ProseMirror.</p>
     </footer>
   `,
