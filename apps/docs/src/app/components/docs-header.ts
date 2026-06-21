@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  HostListener,
   inject,
   signal,
 } from '@angular/core';
@@ -16,6 +18,19 @@ import {
 import { HlmButton } from '../ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { PosthogService } from '../services/posthog.service';
+import { DOCS_NAV } from '../docs/docs-nav';
+
+interface HeaderNavItem {
+  readonly title: string;
+  readonly href: string;
+}
+
+const HEADER_NAV: readonly HeaderNavItem[] = [
+  { title: 'Home', href: '/' },
+  { title: 'Docs', href: '/docs/introduction' },
+  { title: 'Examples', href: '/examples' },
+  { title: 'Playground', href: '/#playground' },
+];
 
 /**
  * Minimal top bar in the shadcn / plate spirit: short height, no dividing
@@ -34,13 +49,41 @@ import { PosthogService } from '../services/posthog.service';
     }),
   ],
   template: `
-    <header class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
-      @let isMobileNavOpen = mobileNavOpen();
+    @let isMobileNavOpen = mobileNavOpen();
 
+    <header
+      [class]="
+        isMobileNavOpen
+          ? 'sticky top-0 z-50 w-full bg-card/95 backdrop-blur-md transition-colors'
+          : 'sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md transition-colors'
+      "
+    >
       <div
-        class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
+        class="relative mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6 md:gap-6"
       >
-        <a href="/" class="flex items-center gap-2" aria-label="Qalma home">
+        <button
+          type="button"
+          class="-ml-2 flex h-10 items-center gap-2 rounded-md px-2 text-base font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:hidden"
+          aria-controls="mobile-navigation"
+          [attr.aria-label]="isMobileNavOpen ? 'Close menu' : 'Open menu'"
+          [attr.aria-expanded]="isMobileNavOpen"
+          (click)="toggleMobileNav()"
+        >
+          <span
+            class="relative grid size-5 shrink-0 place-items-center"
+            aria-hidden="true"
+          >
+            <ng-icon name="lucideMenu" [class]="menuIconClass()" />
+            <ng-icon name="lucideX" [class]="closeIconClass()" />
+          </span>
+          <span>Menu</span>
+        </button>
+
+        <a
+          href="/"
+          class="hidden items-center gap-2 sm:flex"
+          aria-label="Qalma home"
+        >
           <img
             src="/qalma-mark-light.svg"
             class="size-5 dark:hidden"
@@ -86,7 +129,7 @@ import { PosthogService } from '../services/posthog.service';
         <div class="ml-auto flex items-center gap-1.5">
           <button
             type="button"
-            class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary sm:inline-flex"
+            class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary lg:inline-flex"
           >
             <ng-icon name="lucideSearch" class="text-sm" aria-hidden="true" />
             <span>Search docs…</span>
@@ -133,61 +176,167 @@ import { PosthogService } from '../services/posthog.service';
           </a>
 
           <app-theme-toggle />
-
-          <button
-            appBtn
-            variant="ghost"
-            size="icon"
-            type="button"
-            class="md:hidden"
-            [attr.aria-label]="isMobileNavOpen ? 'Close menu' : 'Open menu'"
-            [attr.aria-expanded]="isMobileNavOpen"
-            (click)="toggleMobileNav()"
-          >
-            <ng-icon
-              [name]="isMobileNavOpen ? 'lucideX' : 'lucideMenu'"
-              aria-hidden="true"
-            />
-          </button>
         </div>
-
-        @if (isMobileNavOpen) {
-          <nav
-            class="absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-card px-4 py-3 shadow-lg sm:px-6 md:hidden"
-          >
-            <a
-              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              href="/#playground"
-              (click)="mobileNavOpen.set(false)"
-            >
-              Playground
-            </a>
-            <a
-              routerLink="/examples"
-              routerLinkActive="bg-accent-subtle !text-accent"
-              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              (click)="mobileNavOpen.set(false)"
-            >
-              Examples
-            </a>
-            <a
-              routerLink="/docs/introduction"
-              routerLinkActive="bg-accent-subtle !text-accent"
-              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              (click)="mobileNavOpen.set(false)"
-            >
-              Docs
-            </a>
-          </nav>
-        }
       </div>
+
+      @if (isMobileNavOpen) {
+        <nav
+          id="mobile-navigation"
+          class="absolute inset-x-0 top-full z-40 h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain bg-card px-5 pb-12 pt-6 shadow-[0_20px_80px_rgba(0,0,0,0.12)] md:hidden"
+          aria-label="Mobile navigation"
+          animate.enter="mobile-nav-enter"
+          animate.leave="mobile-nav-leave"
+        >
+          <div class="mx-auto max-w-6xl space-y-9">
+            <section aria-labelledby="mobile-main-menu-title">
+              <h2
+                id="mobile-main-menu-title"
+                class="text-sm font-medium text-muted-foreground"
+              >
+                Menu
+              </h2>
+              <ul class="mt-4 space-y-3">
+                @for (item of headerNav; track item.href) {
+                  <li>
+                    @if (isRouterRoute(item.href)) {
+                      <a
+                        [routerLink]="item.href"
+                        routerLinkActive="!text-accent"
+                        [routerLinkActiveOptions]="{
+                          exact: item.href === '/'
+                        }"
+                        class="block rounded-sm py-0.5 text-2xl font-semibold leading-8 text-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card"
+                        (click)="
+                          onMobileNavItemClick(item.title, item.href, 'Menu')
+                        "
+                      >
+                        {{ item.title }}
+                      </a>
+                    } @else {
+                      <a
+                        [href]="item.href"
+                        class="block rounded-sm py-0.5 text-2xl font-semibold leading-8 text-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card"
+                        (click)="
+                          onMobileNavItemClick(item.title, item.href, 'Menu')
+                        "
+                      >
+                        {{ item.title }}
+                      </a>
+                    }
+                  </li>
+                }
+              </ul>
+            </section>
+
+            @for (group of docsGroups; track group.title) {
+              <section [attr.aria-labelledby]="'mobile-docs-' + $index">
+                <h2
+                  [id]="'mobile-docs-' + $index"
+                  class="text-sm font-medium text-muted-foreground"
+                >
+                  {{ group.title }}
+                </h2>
+                <ul class="mt-4 space-y-3">
+                  @for (item of group.items; track item.href) {
+                    <li>
+                      @if (isRouterRoute(item.href)) {
+                        <a
+                          [routerLink]="item.href"
+                          routerLinkActive="!text-accent"
+                          [routerLinkActiveOptions]="{ exact: true }"
+                          class="block rounded-sm py-0.5 text-2xl font-semibold leading-8 text-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card"
+                          (click)="
+                            onMobileNavItemClick(
+                              item.title,
+                              item.href,
+                              group.title
+                            )
+                          "
+                        >
+                          {{ item.title }}
+                        </a>
+                      } @else {
+                        <a
+                          [href]="item.href"
+                          class="block rounded-sm py-0.5 text-2xl font-semibold leading-8 text-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card"
+                          (click)="
+                            onMobileNavItemClick(
+                              item.title,
+                              item.href,
+                              group.title
+                            )
+                          "
+                        >
+                          {{ item.title }}
+                        </a>
+                      }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </div>
+        </nav>
+      }
     </header>
+  `,
+  styles: `
+    .mobile-nav-enter {
+      animation: mobile-nav-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mobile-nav-leave {
+      animation: mobile-nav-out 140ms ease-in forwards;
+    }
+
+    @keyframes mobile-nav-in {
+      from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes mobile-nav-out {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-0.375rem);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mobile-nav-enter,
+      .mobile-nav-leave {
+        animation: none;
+      }
+    }
   `,
 })
 export class DocsHeader {
   private readonly posthogService = inject(PosthogService);
 
   protected readonly mobileNavOpen = signal(false);
+  protected readonly headerNav = HEADER_NAV;
+  protected readonly docsGroups = DOCS_NAV;
+  protected readonly menuIconClass = computed(() =>
+    this.mobileNavOpen()
+      ? 'absolute inset-0 text-xl opacity-0 rotate-90 scale-75 transition-all duration-200 ease-out'
+      : 'absolute inset-0 text-xl opacity-100 rotate-0 scale-100 transition-all duration-200 ease-out',
+  );
+  protected readonly closeIconClass = computed(() =>
+    this.mobileNavOpen()
+      ? 'absolute inset-0 text-xl opacity-100 rotate-0 scale-100 transition-all duration-200 ease-out'
+      : 'absolute inset-0 text-xl opacity-0 -rotate-90 scale-75 transition-all duration-200 ease-out',
+  );
 
   protected toggleMobileNav(): void {
     const opening = !this.mobileNavOpen();
@@ -197,11 +346,37 @@ export class DocsHeader {
     }
   }
 
+  protected closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
+
+  protected onMobileNavItemClick(
+    title: string,
+    href: string,
+    group: string,
+  ): void {
+    this.closeMobileNav();
+    this.posthogService.posthog.capture('mobile_nav_clicked', {
+      title,
+      href,
+      group,
+    });
+  }
+
+  @HostListener('document:keydown.escape')
+  protected closeMobileNavOnEscape(): void {
+    this.closeMobileNav();
+  }
+
   protected trackNpmClick(): void {
     this.posthogService.posthog.capture('npm_link_clicked');
   }
 
   protected trackGithubClick(): void {
     this.posthogService.posthog.capture('github_link_clicked');
+  }
+
+  protected isRouterRoute(href: string): boolean {
+    return href.startsWith('/') && !href.includes('#');
   }
 }

@@ -4,23 +4,18 @@ import {
   Component,
   ElementRef,
   inject,
-  signal,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMenu, lucideX } from '@ng-icons/lucide';
 
 import { DocsContent } from '../docs/docs-content.directive';
 import { DocsHeader } from '../components/docs-header';
 import { DocsSidebar } from '../docs/docs-sidebar';
 import { DocsToc } from '../docs/docs-toc';
 import { DocsTocItem, DocsTocService } from '../docs/docs-toc.service';
-import { HlmButton } from '../ui/button';
 
 /**
- * Shared layout for every `/docs/*` route: header, left-nav (sidebar on
- * desktop, slide-over sheet on mobile), content outlet and a right-hand
- * "On This Page" column.
+ * Shared layout for every `/docs/*` route: header, desktop left-nav, content
+ * outlet and a right-hand "On This Page" column.
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,10 +26,7 @@ import { HlmButton } from '../ui/button';
     DocsToc,
     DocsContent,
     RouterOutlet,
-    NgIcon,
-    HlmButton,
   ],
-  providers: [provideIcons({ lucideMenu, lucideX })],
   template: `
     <app-docs-header />
 
@@ -48,18 +40,6 @@ import { HlmButton } from '../ui/button';
       </aside>
 
       <main class="min-w-0 flex-1 py-10">
-        <button
-          appBtn
-          variant="outline"
-          size="sm"
-          type="button"
-          class="mb-6 md:hidden"
-          (click)="mobileNavOpen.set(true)"
-        >
-          <ng-icon name="lucideMenu" aria-hidden="true" />
-          Menu
-        </button>
-
         <div appDocsContent class="mx-auto max-w-3xl">
           <router-outlet />
         </div>
@@ -71,45 +51,12 @@ import { HlmButton } from '../ui/button';
         <app-docs-toc />
       </aside>
     </div>
-
-    @if (mobileNavOpen()) {
-      <button
-        type="button"
-        class="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
-        aria-label="Close navigation"
-        (click)="mobileNavOpen.set(false)"
-      ></button>
-
-      <div
-        class="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-border bg-card p-6 shadow-xl md:hidden"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Documentation navigation"
-        (keydown.escape)="mobileNavOpen.set(false)"
-      >
-        <button
-          appBtn
-          variant="ghost"
-          size="icon"
-          type="button"
-          class="mb-4 shrink-0 self-start"
-          aria-label="Close navigation"
-          (click)="mobileNavOpen.set(false)"
-        >
-          <ng-icon name="lucideX" aria-hidden="true" />
-        </button>
-
-        <app-docs-sidebar class="min-h-0 flex-1" (linkClick)="mobileNavOpen.set(false)" />
-      </div>
-    }
   `,
 })
 export default class DocsLayout implements AfterViewChecked {
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly tocService = inject(DocsTocService);
   private headingsKey = '';
-
-  protected readonly mobileNavOpen = signal(false);
 
   ngAfterViewChecked(): void {
     const headings = this.host.nativeElement.querySelectorAll(
