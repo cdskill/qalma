@@ -4,9 +4,9 @@
 
 - `@qalma/editor` — scoped, public npm package, built from `libs/editor` with
   `@nx/angular:package` (ng-packagr, partial Angular compilation).
-- `libs/editor/package.json` carries `publishConfig: { access: "public", tag:
-  "latest" }`, `repository`, `bugs`, `homepage`, `keywords`, and the
-  `@angular/core` peer range. This file is the manifest that ships to npm.
+- `libs/editor/package.json` carries the package metadata: public npm access,
+  the `latest` publish tag, `repository`, `bugs`, `homepage`, `keywords`, and
+  the `@angular/core` peer range. This file is the manifest that ships to npm.
 - `libs/editor/ng-package.json` configures the ng-packagr build:
   `dest: "../../dist/libs/editor"`, `allowedNonPeerDependencies` for the
   `prosemirror-*` packages + `tslib`, entry `src/index.ts`.
@@ -72,8 +72,13 @@ target used by CI:
 ## Local Release Scripts (`package.json`)
 
 ```jsonc
-"release": "nx release --skip-publish",
-"release:dry-run": "nx release --skip-publish --dry-run"
+"release": "nx release --skip-publish && node tools/sync-changelog-doc.mjs",
+"prerelease": "nx release prerelease --skip-publish && node tools/sync-changelog-doc.mjs",
+"prerelease:dry-run": "nx release prerelease --skip-publish --dry-run",
+"release:beta:init": "nx release preminor --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
+"release:beta:init:dry-run": "nx release preminor --preid beta --skip-publish --dry-run",
+"release:beta": "nx release prerelease --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
+"release:beta:dry-run": "nx release prerelease --preid beta --skip-publish --dry-run"
 ```
 
 `nx release <specifier> --skip-publish` defaults (confirmed via
@@ -85,10 +90,34 @@ target used by CI:
   release commit (no GitHub release locally — `createRelease` is unset).
 - Publish step is skipped (auto-answers "no" to the publish prompt).
 
-This intentionally leaves the actual `npm publish` and the GitHub release to CI.
+The beta scripts are the public prerelease path:
 
-`prerelease` / `release:dry-run` use the `prerelease` specifier so repeated
-alpha cuts bump `0.0.1-alpha.N` automatically.
+- `release:beta:init` starts the beta line with `preminor --preid beta`
+  (for example, from the alpha line to `0.1.0-beta.0`).
+- `release:beta` advances the beta line with `prerelease --preid beta`
+  (for example, `0.1.0-beta.1`).
+- The matching `*:dry-run` scripts preview those bumps without writing.
+
+The generic `release` script remains available for the default Nx release flow,
+but explicit stable or one-off versions should call Nx directly so the version
+argument is passed before the changelog-sync command:
+
+```sh
+pnpm nx release <version> --skip-publish
+node tools/sync-changelog-doc.mjs
+```
+
+Use `pnpm nx release <version> --skip-publish --dry-run` for an explicit dry
+run.
+
+After the Nx release command creates the release commit and tag,
+`tools/sync-changelog-doc.mjs` regenerates
+`apps/docs/src/content/docs/changelog.md` from `libs/editor/CHANGELOG.md` and
+creates a follow-up `docs(changelog): sync docs changelog from release` commit
+when the docs page changes. This intentionally keeps the release tag pointing at
+the release commit while still pushing docs changelog drift in the same branch.
+
+The actual `npm publish` and GitHub release are left to CI.
 
 ## GitHub Actions Workflow (`.github/workflows/release.yml`)
 
@@ -97,8 +126,8 @@ alpha cuts bump `0.0.1-alpha.N` automatically.
   `id-token: write` (required for npm OIDC Trusted Publishing).
 - Steps:
   1. Checkout with full history (`fetch-depth: 0`).
-  2. Setup pnpm 10.23.0, Node 24.x with `registry-url:
-     https://registry.npmjs.org`.
+  2. Setup pnpm 10.23.0 and Node 24.x with the npm registry configured for
+     publishing.
   3. `npm install --global npm@latest` (Trusted Publishing needs a recent npm
      CLI).
   4. `pnpm install --frozen-lockfile`.
@@ -108,24 +137,35 @@ alpha cuts bump `0.0.1-alpha.N` automatically.
   6. Resolve version from `GITHUB_REF_NAME` (strip leading `v`); check
      `npm view @qalma/editor version` to set `first_release` for the very
      first publish.
-  7. `pnpm nx release version <version> [--first-release] --git-commit=false
-     --git-tag=false --stage-changes=false` — re-applies the version to
-     `libs/editor/package.json` and `dist/libs/editor/package.json` inside the
-     CI checkout (independent of whatever was committed locally).
+  7. Re-apply the tag version inside CI:
+
+     ```sh
+     pnpm nx release version <version> [--first-release] \
+       --git-commit=false \
+       --git-tag=false \
+       --stage-changes=false
+     ```
+
+     This rewrites `libs/editor/package.json` and
+     `dist/libs/editor/package.json` inside the CI checkout, independent of
+     whatever was committed locally.
+
   8. `npm publish dist/libs/editor --access public --tag latest --provenance`.
-     The package is alpha-only, so `latest` tracks the newest alpha (it is what
-     npmjs features and what a plain `npm install` resolves). Publishing under
-     `latest` keeps this inside the single OIDC-authenticated publish call — a
-     separate `npm dist-tag add` step would not be authenticated by the
-     trusted-publishing token and would need a long-lived npm token secret.
+     The package is pre-1.0 with no stable release yet, so `latest` tracks the
+     newest beta (it is what npmjs features and what a plain `npm install`
+     resolves). Publishing under `latest` keeps this inside the single
+     OIDC-authenticated publish call — a separate `npm dist-tag add` step would
+     not be authenticated by the trusted-publishing token and would need a
+     long-lived npm token secret. Once `1.0.0` is published, keep stable on
+     `latest` and move later prereleases to a separate `next`/`beta` dist-tag.
   9. Create the GitHub release with the `gh` CLI (pre-installed on the runner,
      authenticated via `GITHUB_TOKEN`): an `awk` step extracts the current
      version's section from the committed `libs/editor/CHANGELOG.md` into
-     `release-notes.md`, then `gh release create v<version> --title v<version>
-     --notes-file release-notes.md` runs — adding `--prerelease` when the
-     version contains a `-` (i.e. an `alpha`/`rc` preid). The committed
-     changelog is the source of truth; nx's `createRelease` is not used (it has
-     no CLI flag and would fire during the local release too).
+     `release-notes.md`, then `gh release create` creates `v<version>` from
+     those notes, adding `--prerelease` when the version contains a `-` (i.e. a
+     `beta`/`rc` preid). The committed changelog is the source of truth; nx's
+     `createRelease` is not used (it has no CLI flag and would fire during the
+     local release too).
 
 ## npm Trusted Publisher (OIDC)
 
@@ -157,10 +197,10 @@ once a CI-driven release via Trusted Publishing has succeeded.
 
 ## Troubleshooting
 
-- `npm error 403 ... Two-factor authentication or granular access token with
-  bypass 2fa enabled is required to publish packages.` — the npm account
-  requires 2FA for publishing. For a manual publish, pass `--otp=<TOTP>`. CI
-  publishes avoid this entirely via Trusted Publishing.
+- `npm error 403` about two-factor authentication or a granular access token
+  with 2FA bypass — the npm account requires 2FA for publishing. For a manual
+  publish, pass `--otp=<TOTP>`. CI publishes avoid this entirely via Trusted
+  Publishing.
 - If the workflow's "Resolve release version" step reports the tag version
   already exists on npm (and `first_release` is incorrectly `true`), the tag
   was likely pushed for a version already published — delete the tag and
