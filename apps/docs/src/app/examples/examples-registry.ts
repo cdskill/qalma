@@ -6,6 +6,7 @@
 export type ExampleId =
   | 'comment-box'
   | 'mail-box'
+  | 'product-review'
   | 'notion-doc'
   | 'markdown-notes';
 
@@ -87,6 +88,55 @@ const editor = createQalmaEditor({
 
 // On send, hand the HTML payload to your mail API:
 const html = editor.html();`;
+
+const PRODUCT_REVIEW_RECIPE = `import { computed, signal } from '@angular/core';
+import { form } from '@angular/forms/signals';
+import {
+  createQalmaEditor,
+  TextFormattingKit,
+  LinkPlugin,
+  ListsPlugin,
+  PlaceholderPlugin,
+  HardBreakPlugin,
+  PasteRulesPlugin,
+  HistoryPlugin,
+} from '@qalma/editor';
+
+type ReviewRating = '0' | '1' | '2' | '3' | '4' | '5';
+
+// The editor is just one field — the rating and headline stay in
+// an Angular Signal Form that your product UI owns.
+const reviewModel = signal({
+  rating: '0' as ReviewRating,
+  headline: '',
+});
+const reviewForm = form(reviewModel);
+
+const editor = createQalmaEditor({
+  plugins: [
+    ...TextFormattingKit,
+    LinkPlugin,
+    ListsPlugin,
+    PlaceholderPlugin.configure({ placeholder: 'Share your experience…' }),
+    HardBreakPlugin,
+    PasteRulesPlugin,
+    HistoryPlugin,
+  ],
+});
+
+const canSubmit = computed(
+  () => reviewForm.rating().value() !== '0' && editor.html() !== '<p></p>',
+);
+
+function submit() {
+  const { rating, headline } = reviewModel();
+
+  return {
+    rating: Number(rating),
+    headline: headline.trim() || 'My review',
+    body: editor.html(),
+  };
+}`;
 
 const NOTION_DOC_RECIPE = `import {
   createQalmaEditor,
@@ -190,6 +240,13 @@ export const EXAMPLES: readonly ExampleMeta[] = [
     tagline: 'Formatting, alignment, links',
     icon: 'lucideMail',
     recipe: MAIL_BOX_RECIPE,
+  },
+  {
+    id: 'product-review',
+    title: 'Product review',
+    tagline: 'Editor inside a form',
+    icon: 'lucideStar',
+    recipe: PRODUCT_REVIEW_RECIPE,
   },
   {
     id: 'notion-doc',

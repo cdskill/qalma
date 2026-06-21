@@ -81,6 +81,9 @@ const SEED = `<p>Hi team,</p>
     }),
   ],
   template: `
+    @let messageSent = sent();
+    @let linkIsActive = linkActive();
+
     <div
       class="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
     >
@@ -88,7 +91,7 @@ const SEED = `<p>Hi team,</p>
         class="flex items-center justify-between border-b border-border bg-secondary/40 px-4 py-2.5 text-sm"
       >
         <span class="font-medium">New message</span>
-        @if (sent()) {
+        @if (messageSent) {
           <span class="text-xs font-medium text-accent">Sent ✓</span>
         }
       </div>
@@ -187,8 +190,8 @@ const SEED = `<p>Hi team,</p>
           <button
             type="button"
             [class]="btnClass"
-            [class.qalma-command-active]="linkActive()"
-            [attr.aria-pressed]="linkActive()"
+            [class.qalma-command-active]="linkIsActive"
+            [attr.aria-pressed]="linkIsActive"
             (mousedown)="$event.preventDefault()"
             (click)="linkPopover.showToolbarEditor($event)"
             aria-label="Link"

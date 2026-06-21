@@ -35,6 +35,8 @@ import { PosthogService } from '../services/posthog.service';
   ],
   template: `
     <header class="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
+      @let isMobileNavOpen = mobileNavOpen();
+
       <div
         class="relative mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6"
       >
@@ -138,18 +140,18 @@ import { PosthogService } from '../services/posthog.service';
             size="icon"
             type="button"
             class="md:hidden"
-            [attr.aria-label]="mobileNavOpen() ? 'Close menu' : 'Open menu'"
-            [attr.aria-expanded]="mobileNavOpen()"
+            [attr.aria-label]="isMobileNavOpen ? 'Close menu' : 'Open menu'"
+            [attr.aria-expanded]="isMobileNavOpen"
             (click)="toggleMobileNav()"
           >
             <ng-icon
-              [name]="mobileNavOpen() ? 'lucideX' : 'lucideMenu'"
+              [name]="isMobileNavOpen ? 'lucideX' : 'lucideMenu'"
               aria-hidden="true"
             />
           </button>
         </div>
 
-        @if (mobileNavOpen()) {
+        @if (isMobileNavOpen) {
           <nav
             class="absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-card px-4 py-3 shadow-lg sm:px-6 md:hidden"
           >

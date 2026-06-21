@@ -116,6 +116,10 @@ const SEED_COMMENTS: readonly {
     }),
   ],
   template: `
+    @let postedComments = comments();
+    @let linkIsActive = linkActive();
+    @let editorIsEmpty = empty();
+
     <div
       class="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
     >
@@ -138,12 +142,12 @@ const SEED_COMMENTS: readonly {
         </svg>
         <span class="font-medium">Discussion</span>
         <span class="text-xs text-muted-foreground"
-          >{{ comments().length }} comments</span
+          >{{ postedComments.length }} comments</span
         >
       </div>
 
       <ul class="m-0 list-none p-0">
-        @for (comment of comments(); track comment.id) {
+        @for (comment of postedComments; track comment.id) {
           <li class="flex gap-3 border-b border-border px-4 py-3.5">
             <span
               class="mt-0.5 flex size-8 shrink-0 select-none items-center justify-center rounded-full bg-accent-subtle text-xs font-semibold text-accent"
@@ -210,8 +214,8 @@ const SEED_COMMENTS: readonly {
             <button
               type="button"
               [class]="btnClass"
-              [class.qalma-command-active]="linkActive()"
-              [attr.aria-pressed]="linkActive()"
+              [class.qalma-command-active]="linkIsActive"
+              [attr.aria-pressed]="linkIsActive"
               (mousedown)="$event.preventDefault()"
               (click)="linkPopover.showToolbarEditor($event)"
               aria-label="Link"
@@ -241,7 +245,7 @@ const SEED_COMMENTS: readonly {
             <button
               type="button"
               class="inline-flex h-8 items-center rounded-md bg-accent px-3.5 text-xs font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              [disabled]="empty()"
+              [disabled]="editorIsEmpty"
               (click)="submit()"
             >
               Comment

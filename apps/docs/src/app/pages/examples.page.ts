@@ -11,16 +11,18 @@ import {
   lucideLayoutDashboard,
   lucideMail,
   lucideMessageSquare,
+  lucideStar,
 } from '@ng-icons/lucide';
 import { BrnTabsImports } from '@spartan-ng/brain/tabs';
 
 import { CodePanel } from '../examples/code-panel';
 import { CommentBox } from '../examples/comment-box';
 import { DocsHeader } from '../components/docs-header';
-import { EXAMPLES, ExampleId } from '../examples/examples-registry';
+import { EXAMPLES, type ExampleId } from '../examples/examples-registry';
 import { MailBox } from '../examples/mail-box';
 import { MarkdownNotes } from '../examples/markdown-notes';
 import { NotionDoc } from '../examples/notion-doc';
+import { ProductReview } from '../examples/product-review';
 
 export const routeMeta: RouteMeta = {
   title: 'Examples',
@@ -28,7 +30,7 @@ export const routeMeta: RouteMeta = {
     {
       name: 'description',
       content:
-        'See Qalma in real-world shapes — a comment box, a block document, a Markdown notes editor. One engine, every surface, each with the recipe that built it.',
+        'See Qalma in real-world shapes — a comment box, email composer, product review form, block document, and Markdown notes editor. One engine, every surface.',
     },
   ],
 };
@@ -51,6 +53,7 @@ export const routeMeta: RouteMeta = {
     MailBox,
     MarkdownNotes,
     NotionDoc,
+    ProductReview,
   ],
   providers: [
     provideIcons({
@@ -58,6 +61,7 @@ export const routeMeta: RouteMeta = {
       lucideLayoutDashboard,
       lucideMail,
       lucideMessageSquare,
+      lucideStar,
     }),
   ],
   template: `
@@ -83,9 +87,12 @@ export const routeMeta: RouteMeta = {
         </p>
       </section>
 
+      @let currentId = activeId();
+      @let currentExample = activeExample();
+
       <div
         brnTabs
-        [brnTabs]="activeId()"
+        [brnTabs]="currentId"
         (brnTabsChange)="select($event)"
         class="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10"
       >
@@ -100,13 +107,13 @@ export const routeMeta: RouteMeta = {
               type="button"
               class="group flex shrink-0 items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors lg:w-full"
               [class]="
-                activeId() === example.id ? activeTabClass : idleTabClass
+                currentId === example.id ? activeTabClass : idleTabClass
               "
             >
               <ng-icon
                 [name]="example.icon"
                 class="shrink-0 text-base"
-                [class.text-accent]="activeId() === example.id"
+                [class.text-accent]="currentId === example.id"
                 aria-hidden="true"
               />
               <span class="min-w-0">
@@ -125,21 +132,24 @@ export const routeMeta: RouteMeta = {
         <section class="min-w-0">
           <div class="mb-3">
             <h2 class="font-serif text-xl font-medium tracking-tight">
-              {{ activeExample().title }}
+              {{ currentExample.title }}
             </h2>
             <p class="text-sm text-muted-foreground">
-              {{ activeExample().tagline }}
+              {{ currentExample.tagline }}
             </p>
           </div>
 
           <div class="min-w-0">
             @defer (on viewport) {
-              @switch (activeId()) {
+              @switch (currentId) {
                 @case ('comment-box') {
                   <app-comment-box />
                 }
                 @case ('mail-box') {
                   <app-mail-box />
+                }
+                @case ('product-review') {
+                  <app-product-review />
                 }
                 @case ('notion-doc') {
                   <app-notion-doc />
@@ -161,8 +171,8 @@ export const routeMeta: RouteMeta = {
 
           <app-code-panel
             class="mt-5 block"
-            [code]="activeExample().recipe"
-            [exampleId]="activeId()"
+            [code]="currentExample.recipe"
+            [exampleId]="currentId"
           />
         </section>
       </div>
@@ -190,8 +200,12 @@ export default class ExamplesComponent {
     'border-transparent text-muted-foreground hover:border-border hover:bg-secondary hover:text-foreground';
 
   protected select(id: string | undefined): void {
-    if (id) {
-      this.activeId.set(id as ExampleId);
+    if (isExampleId(id)) {
+      this.activeId.set(id);
     }
   }
+}
+
+function isExampleId(id: string | undefined): id is ExampleId {
+  return EXAMPLES.some((example) => example.id === id);
 }

@@ -68,6 +68,8 @@ const SEED = `<h2>Product brief</h2>
     PlaygroundSlashCommandMenu,
   ],
   template: `
+    @let slashMenuOpen = slashCommandController.open();
+
     <div
       class="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
     >
@@ -101,7 +103,7 @@ const SEED = `<h2>Product brief</h2>
       </qalma-editor>
     </div>
 
-    @if (slashCommandController.open()) {
+    @if (slashMenuOpen) {
       <app-playground-slash-command-menu
         [placement]="slashCommandController.placement()"
         [options]="slashCommandController.options()"

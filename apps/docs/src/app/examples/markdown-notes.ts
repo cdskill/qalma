@@ -39,6 +39,8 @@ const SEED = `<h2>Release notes</h2>
   selector: 'app-markdown-notes',
   imports: [QalmaContent, QalmaEditor],
   template: `
+    @let exportedMarkdown = markdown();
+
     <div
       class="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
     >
@@ -67,7 +69,7 @@ const SEED = `<h2>Release notes</h2>
         </div>
         <pre
           class="m-0 max-h-44 overflow-auto px-4 py-2.5 font-mono text-xs leading-relaxed text-muted-foreground"
-        ><code>{{ markdown() }}</code></pre>
+        ><code>{{ exportedMarkdown }}</code></pre>
       </div>
     </div>
   `,

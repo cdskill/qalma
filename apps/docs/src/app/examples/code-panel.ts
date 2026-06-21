@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   afterRenderEffect,
   effect,
@@ -42,6 +43,10 @@ const CLAMP_PX = 340;
   ],
   host: { class: 'block' },
   template: `
+    @let isCopied = copied();
+    @let isExpanded = expanded();
+    @let canCollapse = collapsible();
+
     <figure class="m-0 flex h-full flex-col overflow-hidden rounded-xl border border-border bg-muted">
       <figcaption
         class="flex items-center justify-between border-b border-border px-4 py-2"
@@ -54,23 +59,23 @@ const CLAMP_PX = 340;
         <button
           type="button"
           class="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-          [attr.aria-label]="copied() ? 'Copied' : 'Copy code'"
+          [attr.aria-label]="isCopied ? 'Copied' : 'Copy code'"
           (click)="copy()"
         >
           <ng-icon
-            [name]="copied() ? 'lucideCheck' : 'lucideCopy'"
+            [name]="isCopied ? 'lucideCheck' : 'lucideCopy'"
             class="text-sm"
-            [class.text-accent]="copied()"
+            [class.text-accent]="isCopied"
             aria-hidden="true"
           />
-          {{ copied() ? 'Copied' : 'Copy' }}
+          {{ isCopied ? 'Copied' : 'Copy' }}
         </button>
       </figcaption>
 
       <div class="relative min-h-0 flex-1">
         <div
           class="overflow-hidden transition-[max-height] duration-300 ease-out"
-          [style.maxHeight.px]="expanded() ? null : CLAMP_PX"
+          [style.maxHeight.px]="isExpanded ? null : CLAMP_PX"
         >
           <pre
             #codeEl
@@ -78,7 +83,7 @@ const CLAMP_PX = 340;
           ><code>{{ code() }}</code></pre>
         </div>
 
-        @if (collapsible() && !expanded()) {
+        @if (canCollapse && !isExpanded) {
           <div
             class="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end justify-center bg-gradient-to-t from-muted via-muted/85 to-transparent"
           >
@@ -94,7 +99,7 @@ const CLAMP_PX = 340;
         }
       </div>
 
-      @if (collapsible() && expanded()) {
+      @if (canCollapse && isExpanded) {
         <button
           type="button"
           class="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -109,6 +114,7 @@ const CLAMP_PX = 340;
 })
 export class CodePanel {
   private readonly posthogService = inject(PosthogService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly code = input.required<string>();
   readonly language = input('TypeScript');
@@ -137,6 +143,10 @@ export class CodePanel {
       this.code();
       const element = this.codeRef().nativeElement;
       this.collapsible.set(element.scrollHeight > CLAMP_PX + 8);
+    });
+
+    this.destroyRef.onDestroy(() => {
+      clearTimeout(this.resetTimer);
     });
   }
 
