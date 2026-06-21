@@ -362,6 +362,70 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
 }
 
 /* ------------------------------------------------------------------ *
+ * Posted comment bodies (/examples) — rich text the editor serialized,
+ * rendered back as static HTML outside a `.ProseMirror` surface, so it
+ * needs its own (consumer-owned) styling for marks, lists and mentions.
+ * ------------------------------------------------------------------ */
+.qalma-comment-body > :last-child {
+  margin-bottom: 0;
+}
+
+.qalma-comment-body p {
+  margin: 0 0 0.5rem;
+  line-height: 1.55;
+}
+
+.qalma-comment-body strong {
+  font-weight: 600;
+}
+
+.qalma-comment-body em {
+  font-style: italic;
+}
+
+.qalma-comment-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.qalma-comment-body a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.qalma-comment-body ul,
+.qalma-comment-body ol {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.qalma-comment-body ul {
+  list-style: disc;
+}
+
+.qalma-comment-body ol {
+  list-style: decimal;
+}
+
+.qalma-comment-body :not(pre) > code {
+  border-radius: 0.25rem;
+  background: var(--color-muted);
+  padding: 0.125rem 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.qalma-comment-body [data-qalma-mention] {
+  border-radius: 0.25rem;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+  font-weight: 600;
+  padding: 0.0625rem 0.25rem;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ *
  * Docs prose — typography for markdown content pages (`/docs/*`)
  * ------------------------------------------------------------------ */
 :where(.qalma-prose, .analog-markdown-route) {
