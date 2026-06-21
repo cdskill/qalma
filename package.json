@@ -20,7 +20,10 @@
     "preview:docs": "nx serve-static docs",
     "release": "nx release --skip-publish && node tools/sync-changelog-doc.mjs",
     "prerelease": "nx release prerelease --skip-publish && node tools/sync-changelog-doc.mjs",
-    "prerelease:dry-run": "nx release prerelease --skip-publish --dry-run"
+    "prerelease:dry-run": "nx release prerelease --skip-publish --dry-run",
+    "release:beta:init": "nx release preminor --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
+    "release:beta": "nx release prerelease --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
+    "release:beta:dry-run": "nx release prerelease --preid beta --skip-publish --dry-run"
   },
   "private": true,
   "packageManager": "pnpm@10.23.0",

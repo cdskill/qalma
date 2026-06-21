@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://qalma.dev
+    about: Guides, the plugin reference, and a live demo.
+  - name: Questions & discussion
+    url: https://github.com/cdskill/qalma/discussions
+    about: Ask a question or share what you're building before opening an issue.
