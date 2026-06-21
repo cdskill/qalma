@@ -66,6 +66,13 @@ import { PosthogService } from '../services/posthog.service';
             Playground
           </a>
           <a
+            routerLink="/examples"
+            routerLinkActive="text-foreground"
+            class="transition-colors hover:text-foreground"
+          >
+            Examples
+          </a>
+          <a
             routerLink="/docs/introduction"
             routerLinkActive="text-foreground"
             class="transition-colors hover:text-foreground"
@@ -152,6 +159,14 @@ import { PosthogService } from '../services/posthog.service';
               (click)="mobileNavOpen.set(false)"
             >
               Playground
+            </a>
+            <a
+              routerLink="/examples"
+              routerLinkActive="bg-accent-subtle !text-accent"
+              class="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              (click)="mobileNavOpen.set(false)"
+            >
+              Examples
             </a>
             <a
               routerLink="/docs/introduction"

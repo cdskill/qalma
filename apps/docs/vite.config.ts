@@ -39,6 +39,7 @@ export default defineConfig(() => {
           // présence dans le sitemap, même si le crawl évolue.
           routes: [
             '/',
+            '/examples',
             '/docs/introduction',
             '/docs/installation',
             '/docs/quick-start',
