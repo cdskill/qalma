@@ -1,3 +1,13 @@
+## 0.1.0-beta.1 (2026-06-23)
+
+### 🚀 Features
+
+- **editor:** add Angular forms adapter ([a1b498f](https://github.com/cdskill/qalma/commit/a1b498f))
+
+### 🩹 Fixes
+
+- **editor:** preserve pre-mount empty checks ([b22100b](https://github.com/cdskill/qalma/commit/b22100b))
+
 ## 0.1.0-beta.0 (2026-06-21)
 
 ### 🚀 Features
