@@ -1,7 +1,14 @@
 import { computed } from '@angular/core';
+import { vi } from 'vitest';
 
-import { HardBreakPlugin, HorizontalRulePlugin, ImagePlugin } from '../../index';
-import { createQalmaEditor } from '../../index';
+import {
+  BlockquotePlugin,
+  HardBreakPlugin,
+  HorizontalRulePlugin,
+  ImagePlugin,
+  ListsPlugin,
+  createQalmaEditor,
+} from '../../index';
 import { mountEditor } from '../../../testing/editor-test-utils';
 
 describe('QalmaEditorController.isEmpty', () => {
@@ -100,5 +107,53 @@ describe('QalmaEditorController.isEmpty', () => {
     expect(createQalmaEditor().isEmpty()).toBe(true);
     expect(createQalmaEditor({ content: '<p></p>' }).isEmpty()).toBe(true);
     expect(createQalmaEditor({ content: '<p>Draft</p>' }).isEmpty()).toBe(false);
+  });
+
+  it('uses the document model for serialized empty content before mount', () => {
+    expect(createQalmaEditor({ content: '<p>&nbsp;</p>' }).isEmpty()).toBe(true);
+    expect(
+      createQalmaEditor({
+        content: '<p><br></p>',
+        plugins: [HardBreakPlugin],
+      }).isEmpty(),
+    ).toBe(true);
+    expect(
+      createQalmaEditor({
+        content: '<blockquote><p></p></blockquote>',
+        plugins: [BlockquotePlugin],
+      }).isEmpty(),
+    ).toBe(true);
+    expect(
+      createQalmaEditor({
+        content: '<ul><li><p></p></li></ul>',
+        plugins: [ListsPlugin],
+      }).isEmpty(),
+    ).toBe(true);
+  });
+
+  it('keeps the pre-mount empty check safe without a document global', () => {
+    const originalDocument = globalThis.document;
+
+    vi.stubGlobal('document', undefined);
+
+    try {
+      expect(createQalmaEditor({ content: '<p>&nbsp;</p>' }).isEmpty()).toBe(
+        true,
+      );
+      expect(createQalmaEditor({ content: '<p><br></p>' }).isEmpty()).toBe(
+        true,
+      );
+      expect(createQalmaEditor({ content: '<p>Draft</p>' }).isEmpty()).toBe(
+        false,
+      );
+      expect(
+        createQalmaEditor({
+          content: '<hr>',
+          plugins: [HorizontalRulePlugin],
+        }).isEmpty(),
+      ).toBe(false);
+    } finally {
+      vi.stubGlobal('document', originalDocument);
+    }
   });
 });
