@@ -137,6 +137,22 @@ if (link) {
 `query()` returns `null` when the query is not registered or when the query has
 no value for the current selection. `hasQuery(queryName)` checks registration.
 
+## Empty state
+
+`isEmpty()` reports whether the document has no user-visible content — no text
+and no media (images, mentions, tables, horizontal rules). Empty paragraphs,
+empty containers, and hard breaks all count as empty.
+
+```typescript
+readonly canSubmit = computed(() => !this.editor.isEmpty());
+```
+
+It is computed from the document model, so it never touches the DOM and is safe
+to call during [server-side rendering](/docs/ssr). Like the other read models it
+tracks editor state, so it stays live inside `computed` and `effect`. The
+[forms adapter](/docs/forms-integration) uses it to map an empty editor to an
+empty control value so `Validators.required` behaves with rich text.
+
 ## Updating content and editability
 
 `setHtml()` replaces the whole document. Before mount it only updates the HTML

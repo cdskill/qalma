@@ -7,6 +7,7 @@ export type ExampleId =
   | 'comment-box'
   | 'mail-box'
   | 'product-review'
+  | 'form-states'
   | 'notion-doc'
   | 'markdown-notes';
 
@@ -138,6 +139,73 @@ function submit() {
   };
 }`;
 
+const FORM_STATES_RECIPE = `import { Component, computed, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  type ValidatorFn,
+} from '@angular/forms';
+import {
+  createQalmaEditor,
+  QalmaContent,
+  QalmaEditor,
+  TextFormattingKit,
+} from '@qalma/editor';
+// The forms adapter lives in a secondary entry point — import it
+// only where you bind the editor to a form control.
+import { QalmaControlValueAccessor } from '@qalma/editor/forms';
+
+@Component({
+  selector: 'app-form-states',
+  imports: [
+    ReactiveFormsModule,
+    QalmaControlValueAccessor,
+    QalmaEditor,
+    QalmaContent,
+  ],
+  template: \`
+    <qalma-editor [editor]="editor" [formControl]="body">
+      <qalma-content />
+    </qalma-editor>
+  \`,
+})
+export class FormStates {
+  // An empty editor normalizes to '' through the adapter, so the
+  // standard Validators.required just works with rich text.
+  readonly body = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required],
+  });
+
+  readonly editor = createQalmaEditor({ plugins: [...TextFormattingKit] });
+
+  // AbstractControl.events ticks on value / status / touched / pristine
+  // changes — bridge it to a signal so an OnPush view tracks live state.
+  private readonly events = toSignal(this.body.events);
+  readonly state = computed(() => {
+    this.events();
+
+    return {
+      status: this.body.status, // VALID | INVALID | DISABLED
+      touched: this.body.touched,
+      dirty: this.body.dirty,
+      errors: this.body.errors,
+    };
+  });
+
+  // Toggle validators at runtime, then revalidate.
+  setValidators(validators: ValidatorFn[]) {
+    this.body.setValidators(validators);
+    this.body.updateValueAndValidity();
+  }
+
+  reset() {
+    this.body.reset(''); // -> writeValue('') -> editor shows an empty paragraph
+  }
+}`;
+
 const NOTION_DOC_RECIPE = `import {
   createQalmaEditor,
   HeadingsPlugin,
@@ -247,6 +315,13 @@ export const EXAMPLES: readonly ExampleMeta[] = [
     tagline: 'Editor inside a form',
     icon: 'lucideStar',
     recipe: PRODUCT_REVIEW_RECIPE,
+  },
+  {
+    id: 'form-states',
+    title: 'Form states',
+    tagline: 'Reactive forms adapter, live validation',
+    icon: 'lucideGauge',
+    recipe: FORM_STATES_RECIPE,
   },
   {
     id: 'notion-doc',
