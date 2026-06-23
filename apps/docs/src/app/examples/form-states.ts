@@ -28,7 +28,12 @@ import {
 } from '@qalma/editor';
 import { QalmaControlValueAccessor } from '@qalma/editor/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideBold, lucideItalic, lucideList } from '@ng-icons/lucide';
+import {
+  lucideBold,
+  lucideItalic,
+  lucideList,
+  lucideTriangleAlert,
+} from '@ng-icons/lucide';
 
 type Tone = 'valid' | 'invalid' | 'on' | 'off';
 
@@ -56,7 +61,14 @@ interface StateChip {
     QalmaEditor,
     QalmaToolbar,
   ],
-  providers: [provideIcons({ lucideBold, lucideItalic, lucideList })],
+  providers: [
+    provideIcons({
+      lucideBold,
+      lucideItalic,
+      lucideList,
+      lucideTriangleAlert,
+    }),
+  ],
   template: `
     @let snapshot = state();
 
@@ -124,21 +136,11 @@ interface StateChip {
           <ul class="space-y-1">
             @for (message of errors(); track message) {
               <li class="flex items-start gap-1.5 text-xs text-destructive">
-                <svg
+                <ng-icon
                   class="mt-0.5 size-3.5 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  name="lucideTriangleAlert"
                   aria-hidden="true"
-                >
-                  <path d="M12 9v4M12 17h.01" />
-                  <path
-                    d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
-                  />
-                </svg>
+                />
                 {{ message }}
               </li>
             }
