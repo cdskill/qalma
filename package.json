@@ -12,6 +12,7 @@
     "test:sandbox": "nx test sandbox",
     "e2e:sandbox": "nx e2e sandbox-e2e",
     "guard:protected-test-changes": "node tools/guard-protected-test-changes.mjs",
+    "docs:llms-full": "node apps/docs/scripts/generate-llms-full.mjs",
     "lint:editor": "nx lint editor",
     "lint:sandbox": "nx lint sandbox",
     "serve:sandbox": "nx serve sandbox",

@@ -3,6 +3,7 @@
 import analog from '@analogjs/platform';
 import { defineConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { generateLlmsFull } from './scripts/generate-llms-full.mjs';
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
@@ -22,6 +23,12 @@ export default defineConfig(() => {
       },
     },
     plugins: [
+      {
+        name: 'qalma-llms-full',
+        buildStart() {
+          generateLlmsFull();
+        },
+      },
       analog({
         // SSG : prérend les pages en HTML statique sans produire de serveur Node.
         // Sortie 100% statique → hébergeable sur Amplify (static) / S3+CloudFront.

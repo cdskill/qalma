@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Qalma is a headless, plugin-based rich text editor for Angular, built on ProseMirror. Composable primitives, Tailwind-first styling, your art direction."
+      content="Qalma is an Angular-first headless rich text editor toolkit built on ProseMirror. Compose typed plugins, signal-friendly state, and consumer-owned UI."
     />
 
     <!-- Canonical + social. Per-page og:url/og:title/og:description and the
@@ -33,7 +33,7 @@
     />
     <meta
       property="og:description"
-      content="A headless, plugin-based rich text editor for Angular, built on ProseMirror. Composable primitives, Tailwind-first styling, your art direction."
+      content="An Angular-first headless rich text editor toolkit built on ProseMirror. Typed plugins, signal-friendly state, and consumer-owned UI."
     />
     <meta property="og:image" content="https://qalma.dev/og-image.png" />
     <meta
@@ -54,21 +54,66 @@
     />
     <meta
       name="twitter:description"
-      content="A headless, plugin-based rich text editor for Angular, built on ProseMirror."
+      content="An Angular-first headless rich text editor toolkit built on ProseMirror."
     />
     <meta name="twitter:image" content="https://qalma.dev/og-image.png" />
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Qalma",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Web",
-        "description": "A headless, plugin-based rich text editor for Angular, built on ProseMirror.",
-        "url": "https://qalma.dev/",
-        "softwareRequirements": "Angular",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://qalma.dev/#software",
+            "name": "Qalma",
+            "alternateName": "@qalma/editor",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "runtimePlatform": "Angular",
+            "description": "Angular-first, headless rich text editor toolkit built on ProseMirror.",
+            "url": "https://qalma.dev/",
+            "downloadUrl": "https://www.npmjs.com/package/@qalma/editor",
+            "softwareHelp": "https://qalma.dev/docs/introduction",
+            "softwareRequirements": "Angular 21 or later",
+            "isAccessibleForFree": true,
+            "license": "https://opensource.org/license/mit",
+            "keywords": [
+              "Angular",
+              "rich text editor",
+              "headless editor",
+              "ProseMirror",
+              "TypeScript",
+              "signals"
+            ],
+            "sameAs": [
+              "https://github.com/cdskill/qalma",
+              "https://www.npmjs.com/package/@qalma/editor"
+            ],
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://qalma.dev/#source",
+            "name": "Qalma source code",
+            "codeRepository": "https://github.com/cdskill/qalma",
+            "programmingLanguage": ["TypeScript", "HTML", "CSS"],
+            "runtimePlatform": "Angular",
+            "license": "https://opensource.org/license/mit",
+            "targetProduct": { "@id": "https://qalma.dev/#software" }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://qalma.dev/#website",
+            "name": "Qalma",
+            "url": "https://qalma.dev/",
+            "description": "Documentation and examples for Qalma, an Angular-first headless rich text editor toolkit built on ProseMirror.",
+            "about": { "@id": "https://qalma.dev/#software" }
+          }
+        ]
       }
     </script>
 

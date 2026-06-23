@@ -15,10 +15,20 @@
   "homepage": "https://qalma.dev/",
   "keywords": [
     "angular",
+    "angular-editor",
     "editor",
     "headless",
+    "headless-editor",
+    "plugin-based",
     "prosemirror",
-    "rich-text"
+    "prosemirror-editor",
+    "rich-text",
+    "rich-text-editor",
+    "rte",
+    "signals",
+    "typescript",
+    "wysiwyg",
+    "wysiwyg-editor"
   ],
   "publishConfig": {
     "access": "public",
