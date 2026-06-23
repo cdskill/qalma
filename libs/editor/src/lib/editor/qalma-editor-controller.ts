@@ -229,8 +229,9 @@ export class QalmaEditorController {
    * Whether the document has no user-visible content: no text and no media
    * (images, mentions, tables, horizontal rules). Empty paragraphs, empty
    * structural containers (blockquotes, lists) and hard breaks all count as
-   * empty. Computed from the document model, so it never touches the DOM and is
-   * safe to call during server-side rendering — unlike re-parsing `html()`.
+   * empty. Computed from the document model when one exists; before mount,
+   * serialized HTML is parsed through the editor schema when a DOM parser is
+   * available, with a schema-aware string fallback for server-side rendering.
    * Tracks editor state like the other read models, so it stays live inside
    * `computed`/`effect`. Form adapters use it to normalize an empty editor to an
    * empty control value.
@@ -244,9 +245,7 @@ export class QalmaEditorController {
       return isEmptyDocument(doc);
     }
 
-    const html = this.html().trim();
-
-    return html === '' || html === EMPTY_DOCUMENT_HTML;
+    return isEmptyHtmlDocument(this.html(), this.schema);
   }
 
   setEditable(editable: boolean): void {
@@ -328,6 +327,50 @@ function isEmptyDocument(doc: ProseMirrorNode): boolean {
   });
 
   return !hasContent;
+}
+
+function isEmptyHtmlDocument(html: string, schema: Schema): boolean {
+  if (canParseHtmlDocument()) {
+    return isEmptyDocument(parseHtmlDocument(html, schema));
+  }
+
+  return isEmptySerializedHtml(html, schema);
+}
+
+function canParseHtmlDocument(): boolean {
+  return (
+    typeof document !== 'undefined' &&
+    typeof document.createElement === 'function'
+  );
+}
+
+function isEmptySerializedHtml(html: string, schema: Schema): boolean {
+  const trimmedHtml = html.trim();
+
+  if (trimmedHtml === '') {
+    return true;
+  }
+
+  if (
+    (schema.nodes['image'] && /<img\b/i.test(trimmedHtml)) ||
+    (schema.nodes['horizontalRule'] && /<hr\b/i.test(trimmedHtml)) ||
+    (schema.nodes['table'] && /<table\b/i.test(trimmedHtml)) ||
+    (schema.nodes['mention'] &&
+      /<span\b[^>]*\bdata-qalma-mention\b/i.test(trimmedHtml))
+  ) {
+    return false;
+  }
+
+  return (
+    trimmedHtml
+      .replace(/<br\b[^>]*>/gi, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;|&#160;|&#xa0;/gi, ' ')
+      .replace(/&#8203;|&#x200b;|&ZeroWidthSpace;/gi, '')
+      .replace(/\u00a0/g, ' ')
+      .replace(/\u200b/g, '')
+      .trim().length === 0
+  );
 }
 
 /**

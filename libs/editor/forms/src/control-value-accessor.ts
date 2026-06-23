@@ -96,7 +96,7 @@ export class QalmaControlValueAccessor
   /**
    * Current control value for the editor. Reads `html()` unconditionally so the
    * `effect` tracks it, then collapses an empty document to `''` via the
-   * DOM-free `isEmpty()` query (so `Validators.required` behaves).
+   * editor's `isEmpty()` query (so `Validators.required` behaves).
    */
   private currentValue(): string {
     const editor = this.editorHost.editor();
