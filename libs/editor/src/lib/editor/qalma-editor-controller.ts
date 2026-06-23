@@ -25,6 +25,8 @@ import {
 import { createQalmaSchema } from '../prosemirror/schema';
 import { createQalmaState } from '../prosemirror/state';
 
+const EMPTY_DOCUMENT_HTML = '<p></p>';
+
 export interface QalmaEditorOptions {
   content?: string;
   editable?: boolean;
@@ -56,7 +58,7 @@ export class QalmaEditorController {
     this.commandStates = createCommandStateRegistry(this.schema, this.plugins);
     this.queries = createQueryRegistry(this.schema, this.plugins);
 
-    this.htmlState = signal(options.content ?? '<p></p>');
+    this.htmlState = signal(options.content ?? EMPTY_DOCUMENT_HTML);
     this.editableState = signal(options.editable ?? true);
 
     this.html = this.htmlState.asReadonly();
@@ -223,6 +225,30 @@ export class QalmaEditorController {
     return serializeMarkdownDocument(this.currentDoc());
   }
 
+  /**
+   * Whether the document has no user-visible content: no text and no media
+   * (images, mentions, tables, horizontal rules). Empty paragraphs, empty
+   * structural containers (blockquotes, lists) and hard breaks all count as
+   * empty. Computed from the document model, so it never touches the DOM and is
+   * safe to call during server-side rendering — unlike re-parsing `html()`.
+   * Tracks editor state like the other read models, so it stays live inside
+   * `computed`/`effect`. Form adapters use it to normalize an empty editor to an
+   * empty control value.
+   */
+  isEmpty(): boolean {
+    this.viewVersion();
+
+    const doc = this.editorState?.doc ?? this.pendingDoc;
+
+    if (doc) {
+      return isEmptyDocument(doc);
+    }
+
+    const html = this.html().trim();
+
+    return html === '' || html === EMPTY_DOCUMENT_HTML;
+  }
+
   setEditable(editable: boolean): void {
     this.editableState.set(editable);
     this.editorView?.setProps({
@@ -278,6 +304,47 @@ export class QalmaEditorController {
       'aria-label': 'Rich text editor',
     };
   }
+}
+
+function isEmptyDocument(doc: ProseMirrorNode): boolean {
+  if (doc.textContent.replace(/\u200b/g, '').trim().length > 0) {
+    return false;
+  }
+
+  let hasContent = false;
+
+  doc.descendants((node) => {
+    if (hasContent) {
+      return false;
+    }
+
+    if (isContentNode(node)) {
+      hasContent = true;
+
+      return false;
+    }
+
+    return true;
+  });
+
+  return !hasContent;
+}
+
+/**
+ * A node that counts as content even when the document carries no text: media
+ * atoms (images, mentions), tables, and block-level leaves (horizontal rules,
+ * and any future block embed). Hard breaks — inline, non-atom leaves — do not.
+ */
+function isContentNode(node: ProseMirrorNode): boolean {
+  if (node.isText) {
+    return false;
+  }
+
+  return (
+    node.type.spec.atom === true ||
+    node.type.name === 'table' ||
+    (node.isLeaf && !node.type.isInline)
+  );
 }
 
 export function createQalmaEditor(

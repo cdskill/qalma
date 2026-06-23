@@ -87,9 +87,7 @@ Angular reactivity.
 ```typescript
 import { computed, effect } from '@angular/core';
 
-readonly hasContent = computed(() =>
-  this.editor.html().replace(/<[^>]+>/g, '').trim().length > 0,
-);
+readonly hasContent = computed(() => !this.editor.isEmpty());
 
 constructor() {
   effect(() => {
@@ -98,9 +96,14 @@ constructor() {
 }
 ```
 
-For form-specific synchronization, use the pattern in
-[Forms Integration](/docs/forms-integration) so external writes and editor
-writes do not loop.
+`isEmpty()` is the canonical "is there anything here?" check: it ignores empty
+paragraphs and hard breaks, still counts media such as images and tables, and
+stays reactive inside `computed`. See
+[Editor & Controller](/docs/editor-controller#empty-state).
+
+For form-specific synchronization, use the adapter in
+[Forms Integration](/docs/forms-integration) so Angular owns validation,
+disabled state, touched state, and resets.
 
 ## JSON
 

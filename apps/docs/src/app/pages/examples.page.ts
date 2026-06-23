@@ -8,6 +8,7 @@ import { RouteMeta } from '@analogjs/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideFileText,
+  lucideGauge,
   lucideLayoutDashboard,
   lucideMail,
   lucideMessageSquare,
@@ -19,6 +20,7 @@ import { CodePanel } from '../examples/code-panel';
 import { CommentBox } from '../examples/comment-box';
 import { DocsHeader } from '../components/docs-header';
 import { EXAMPLES, type ExampleId } from '../examples/examples-registry';
+import { FormStates } from '../examples/form-states';
 import { MailBox } from '../examples/mail-box';
 import { MarkdownNotes } from '../examples/markdown-notes';
 import { NotionDoc } from '../examples/notion-doc';
@@ -51,6 +53,7 @@ export const routeMeta: RouteMeta = {
     DocsHeader,
     CodePanel,
     CommentBox,
+    FormStates,
     MailBox,
     MarkdownNotes,
     NotionDoc,
@@ -60,6 +63,7 @@ export const routeMeta: RouteMeta = {
   providers: [
     provideIcons({
       lucideFileText,
+      lucideGauge,
       lucideLayoutDashboard,
       lucideMail,
       lucideMessageSquare,
@@ -152,6 +156,9 @@ export const routeMeta: RouteMeta = {
                 }
                 @case ('product-review') {
                   <app-product-review />
+                }
+                @case ('form-states') {
+                  <app-form-states />
                 }
                 @case ('notion-doc') {
                   <app-notion-doc />

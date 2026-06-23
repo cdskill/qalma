@@ -26,7 +26,8 @@ markup.
 npm install @qalma/editor
 ```
 
-`@angular/core` `>=21 <22` is a peer dependency.
+`@angular/core` `>=21 <22` is a peer dependency. `@angular/forms` is an
+optional peer dependency used only by the `@qalma/editor/forms` entrypoint.
 
 ## Quick start
 
@@ -115,6 +116,8 @@ const markdown = editor.getMarkdown(); // export to Markdown
   `execute()` on click, reflects `isCommandActive()` via
   `.qalma-command-active` and `aria-pressed`, and disables itself when
   `canExecute()` is false. Pass a command argument with `[qalmaCommandValue]`.
+- `QalmaControlValueAccessor` from `@qalma/editor/forms` — optional Angular
+  forms adapter for `formControl`, `formControlName`, and `ngModel`.
 
 ### Plugins and kits
 

@@ -914,39 +914,39 @@ qalma-content .ProseMirror .qalma-code-block pre {
   line-height: 1.55;
 }
 
-qalma-content .ProseMirror .hljs-attr {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-attr {
   color: var(--hl-attr);
 }
-qalma-content .ProseMirror .hljs-built_in {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-built_in {
   color: var(--hl-builtin);
 }
-qalma-content .ProseMirror .hljs-comment {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-comment {
   color: var(--hl-comment);
   font-style: italic;
 }
-qalma-content .ProseMirror .hljs-keyword {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-keyword {
   color: var(--hl-keyword);
 }
-qalma-content .ProseMirror .hljs-literal,
-qalma-content .ProseMirror .hljs-number {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-literal,
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-number {
   color: var(--hl-number);
 }
-qalma-content .ProseMirror .hljs-meta {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-meta {
   color: var(--hl-meta);
 }
-qalma-content .ProseMirror .hljs-params {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-params {
   color: var(--color-foreground);
 }
-qalma-content .ProseMirror .hljs-string {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-string {
   color: var(--hl-string);
 }
-qalma-content .ProseMirror .hljs-title {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-title {
   color: var(--hl-title);
 }
-qalma-content .ProseMirror .hljs-type {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-type {
   color: var(--hl-type);
 }
-qalma-content .ProseMirror .hljs-variable {
+:where(qalma-content .ProseMirror, .docs-example-code) .hljs-variable {
   color: var(--hl-variable);
 }
 

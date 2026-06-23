@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  computed,
   afterRenderEffect,
   effect,
   inject,
@@ -17,11 +18,15 @@ import {
   lucideChevronUp,
   lucideCopy,
 } from '@ng-icons/lucide';
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/typescript';
+import { createLowlight } from 'lowlight';
 
 import { PosthogService } from '../services/posthog.service';
 
 /** Collapsed height (px) before the fade + "show all" control kicks in. */
 const CLAMP_PX = 340;
+const lowlight = createLowlight({ javascript, typescript });
 
 /**
  * The "cookbook" half of an example: the source that produced the demo, with a
@@ -47,7 +52,9 @@ const CLAMP_PX = 340;
     @let isExpanded = expanded();
     @let canCollapse = collapsible();
 
-    <figure class="m-0 flex h-full flex-col overflow-hidden rounded-xl border border-border bg-muted">
+    <figure
+      class="docs-example-code m-0 flex h-full flex-col overflow-hidden rounded-xl border border-border bg-muted"
+    >
       <figcaption
         class="flex items-center justify-between border-b border-border px-4 py-2"
       >
@@ -80,7 +87,7 @@ const CLAMP_PX = 340;
           <pre
             #codeEl
             class="m-0 overflow-x-auto px-4 py-3.5 font-mono text-[0.8125rem] leading-relaxed text-foreground"
-          ><code>{{ code() }}</code></pre>
+          ><code [innerHTML]="highlightedCode()"></code></pre>
         </div>
 
         @if (canCollapse && !isExpanded) {
@@ -92,7 +99,11 @@ const CLAMP_PX = 340;
               class="pointer-events-auto mb-3 inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground shadow-sm transition-colors hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
               (click)="expanded.set(true)"
             >
-              <ng-icon name="lucideChevronDown" class="text-sm" aria-hidden="true" />
+              <ng-icon
+                name="lucideChevronDown"
+                class="text-sm"
+                aria-hidden="true"
+              />
               Show all
             </button>
           </div>
@@ -125,6 +136,9 @@ export class CodePanel {
   protected readonly expanded = signal(false);
   protected readonly collapsible = signal(false);
   protected readonly copied = signal(false);
+  protected readonly highlightedCode = computed(() =>
+    renderHighlightedCode(this.code(), this.language()),
+  );
 
   private readonly codeRef =
     viewChild.required<ElementRef<HTMLElement>>('codeEl');
@@ -161,4 +175,109 @@ export class CodePanel {
       example: this.exampleId(),
     });
   }
+}
+
+interface HighlightElement {
+  type: 'element';
+  properties?: {
+    className?: unknown;
+  };
+  children?: unknown[];
+}
+
+interface HighlightText {
+  type: 'text';
+  value: string;
+}
+
+function renderHighlightedCode(code: string, language: string): string {
+  const grammar = normalizeLanguage(language);
+
+  if (!lowlight.registered(grammar)) {
+    return escapeHtml(code);
+  }
+
+  try {
+    const tree = lowlight.highlight(grammar, code);
+
+    return renderHighlightNodes(tree.children);
+  } catch {
+    return escapeHtml(code);
+  }
+}
+
+function normalizeLanguage(language: string): string {
+  const value = language.trim().toLowerCase();
+
+  if (value === 'ts' || value === 'typescript') {
+    return 'typescript';
+  }
+
+  if (value === 'js' || value === 'javascript') {
+    return 'javascript';
+  }
+
+  return value;
+}
+
+function renderHighlightNodes(nodes: readonly unknown[]): string {
+  return nodes.map((node) => renderHighlightNode(node)).join('');
+}
+
+function renderHighlightNode(node: unknown): string {
+  if (isHighlightText(node)) {
+    return escapeHtml(node.value);
+  }
+
+  if (!isHighlightElement(node)) {
+    return '';
+  }
+
+  const content = renderHighlightNodes(node.children ?? []);
+  const className = getHighlightClassName(node);
+
+  return className ? `<span class="${className}">${content}</span>` : content;
+}
+
+function isHighlightElement(node: unknown): node is HighlightElement {
+  return (
+    typeof node === 'object' &&
+    node !== null &&
+    'type' in node &&
+    node.type === 'element'
+  );
+}
+
+function isHighlightText(node: unknown): node is HighlightText {
+  return (
+    typeof node === 'object' &&
+    node !== null &&
+    'type' in node &&
+    node.type === 'text' &&
+    'value' in node &&
+    typeof node.value === 'string'
+  );
+}
+
+function getHighlightClassName(node: HighlightElement): string | null {
+  const className = node.properties?.className;
+
+  if (!Array.isArray(className)) {
+    return null;
+  }
+
+  const classes = className.filter(
+    (value): value is string =>
+      typeof value === 'string' && value.startsWith('hljs-'),
+  );
+
+  return classes.length > 0 ? classes.join(' ') : null;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
