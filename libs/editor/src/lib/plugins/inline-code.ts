@@ -30,7 +30,7 @@ const inlineCodeMark: MarkSpec = {
   toDOM: () => ['code', 0],
 };
 
-export const InlineCodePlugin = createConfigurableQalmaPlugin(
+export const InlineCodePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   INLINE_CODE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertInlineCodePluginOptions(options);

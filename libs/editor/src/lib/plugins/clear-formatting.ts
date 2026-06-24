@@ -3,7 +3,7 @@ import { EditorState } from 'prosemirror-state';
 
 import { createQalmaPlugin, QalmaCommandHandler, QalmaPlugin } from './qalma-plugin';
 
-export const ClearFormattingPlugin = createQalmaPlugin({
+export const ClearFormattingPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'clearFormatting',
   commands: (schema) => ({
     clearFormatting: createClearFormattingCommand(schema.nodes['paragraph']),

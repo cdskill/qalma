@@ -12,10 +12,10 @@ import {
   MentionPlugin,
   QalmaPlugin,
   SubscriptSuperscriptPlugin,
-  TablePlugin,
   TaskListPlugin,
   TextFormattingKit,
 } from '../../index';
+import { TablePlugin } from '@qalma/editor/table';
 import { mountEditor } from '../../../testing/editor-test-utils';
 
 function markdownOf(html: string, plugins: readonly QalmaPlugin[]): string {

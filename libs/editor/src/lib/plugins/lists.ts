@@ -74,7 +74,7 @@ const listItemNode: NodeSpec = {
   ],
 };
 
-export const ListsPlugin = createConfigurableQalmaPlugin(
+export const ListsPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   LISTS_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertListsPluginOptions(options);

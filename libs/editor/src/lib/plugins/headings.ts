@@ -36,7 +36,7 @@ export const HEADINGS_PLUGIN_DEFAULT_OPTIONS: Readonly<HeadingsPluginOptions> =
     inputRules: true,
   });
 
-export const HeadingsPlugin = createConfigurableQalmaPlugin(
+export const HeadingsPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   HEADINGS_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertHeadingsPluginOptions(options);

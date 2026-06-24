@@ -28,7 +28,7 @@ const superscriptMark: MarkSpec = {
   toDOM: () => ['sup', 0],
 };
 
-export const SubscriptSuperscriptPlugin = createQalmaPlugin({
+export const SubscriptSuperscriptPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'subscriptSuperscript',
   marks: {
     subscript: subscriptMark,

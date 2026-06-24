@@ -42,7 +42,7 @@ import { PosthogService } from '../services/posthog.service';
 
 const SEED = `<p>Hi team,</p>
 <p>Quick recap before the launch on <strong>Friday</strong>:</p>
-<ul><li><p>Docs are live — see the <a href="https://qalma.dev/examples">examples page</a></p></li><li><p>Bundle is down to <strong>~78&nbsp;KB</strong> gzip</p></li></ul>
+<ul><li><p>Docs are live — see the <a href="https://qalma.dev/examples">examples page</a></p></li><li><p>Bundle is down to <strong>~77&nbsp;KB</strong> gzip</p></li></ul>
 <p>Shout if anything looks off.</p>
 <hr>
 <p>— Sent with Qalma</p>`;

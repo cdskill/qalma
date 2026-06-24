@@ -10,8 +10,13 @@ backed by [`prosemirror-tables`](https://github.com/ProseMirror/prosemirror-tabl
 plus commands to insert and edit tables. Cells hold block content, so
 paragraphs, lists, and headings can live inside them.
 
+`TablePlugin` ships from the `@qalma/editor/table` subpath — not the main entry
+point — so the `prosemirror-tables` engine (~12 KB gzip) only lands in your
+bundle when you actually import tables.
+
 ```typescript
-import { TablePlugin, createQalmaEditor } from '@qalma/editor';
+import { createQalmaEditor } from '@qalma/editor';
+import { TablePlugin } from '@qalma/editor/table';
 
 const editor = createQalmaEditor({
   plugins: [TablePlugin],

@@ -37,7 +37,7 @@ interface DragHandleBlock {
   to: number;
 }
 
-export const DragHandlePlugin = createQalmaPlugin({
+export const DragHandlePlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'dragHandle',
   commands: () => ({
     selectBlock: createSelectBlockCommand(),

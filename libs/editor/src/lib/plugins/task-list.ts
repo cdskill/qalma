@@ -73,7 +73,7 @@ const taskItemNode: NodeSpec = {
   },
 };
 
-export const TaskListPlugin = createQalmaPlugin({
+export const TaskListPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'taskList',
   nodes: {
     taskList: taskListNode,

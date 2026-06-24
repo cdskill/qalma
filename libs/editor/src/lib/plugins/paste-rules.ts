@@ -23,7 +23,7 @@ export const PASTE_RULES_PLUGIN_DEFAULT_OPTIONS: Readonly<PasteRulesPluginOption
     defaultProtocol: 'https',
   });
 
-export const PasteRulesPlugin = createConfigurableQalmaPlugin(
+export const PasteRulesPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertPasteRulesPluginOptions(options);

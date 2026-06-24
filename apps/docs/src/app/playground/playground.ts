@@ -34,13 +34,13 @@ import {
   SelectionPlugin,
   SlashCommandPlugin,
   SubscriptSuperscriptPlugin,
-  TablePlugin,
   TaskListPlugin,
   TextAlignPlugin,
   TextFormattingKit,
   TrailingParagraphPlugin,
   createQalmaEditor,
 } from '@qalma/editor';
+import { TablePlugin } from '@qalma/editor/table';
 import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
 import {

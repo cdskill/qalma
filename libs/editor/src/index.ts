@@ -25,7 +25,6 @@ export * from './lib/plugins/qalma-plugin';
 export * from './lib/plugins/selection';
 export * from './lib/plugins/slash-command';
 export * from './lib/plugins/subscript-superscript';
-export * from './lib/plugins/table';
 export * from './lib/plugins/task-list';
 export * from './lib/plugins/text-align';
 export * from './lib/plugins/text-formatting';

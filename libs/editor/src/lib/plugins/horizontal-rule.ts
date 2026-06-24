@@ -29,7 +29,7 @@ const horizontalRuleNode: NodeSpec = {
   toDOM: () => ['hr'],
 };
 
-export const HorizontalRulePlugin = createConfigurableQalmaPlugin(
+export const HorizontalRulePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   HORIZONTAL_RULE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertHorizontalRulePluginOptions(options);

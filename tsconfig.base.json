@@ -17,7 +17,8 @@
     "skipDefaultLibCheck": true,
     "paths": {
       "@qalma/editor": ["./libs/editor/src/index.ts"],
-      "@qalma/editor/forms": ["./libs/editor/forms/src/index.ts"]
+      "@qalma/editor/forms": ["./libs/editor/forms/src/index.ts"],
+      "@qalma/editor/table": ["./libs/editor/table/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

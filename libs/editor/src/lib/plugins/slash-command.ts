@@ -45,7 +45,7 @@ const slashCommandPluginKey = new PluginKey<SlashCommandPluginStorage>(
   'qalmaSlashCommand',
 );
 
-export const SlashCommandPlugin = createConfigurableQalmaPlugin(
+export const SlashCommandPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   SLASH_COMMAND_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertSlashCommandPluginOptions(options);

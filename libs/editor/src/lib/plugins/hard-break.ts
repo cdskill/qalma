@@ -13,7 +13,7 @@ const hardBreakNode: NodeSpec = {
   leafText: () => '\n',
 };
 
-export const HardBreakPlugin = createQalmaPlugin({
+export const HardBreakPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'hardBreak',
   nodes: {
     hardBreak: hardBreakNode,

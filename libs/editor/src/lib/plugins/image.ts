@@ -43,7 +43,7 @@ export const IMAGE_PLUGIN_DEFAULT_OPTIONS: Readonly<ImagePluginOptions> =
     defaultAlt: '',
   });
 
-export const ImagePlugin = createConfigurableQalmaPlugin(
+export const ImagePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   IMAGE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertImagePluginOptions(options);
