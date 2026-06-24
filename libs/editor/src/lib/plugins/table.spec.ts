@@ -1,4 +1,4 @@
-import { TABLE_PLUGIN_DEFAULT_OPTIONS, TablePlugin } from '../../index';
+import { TABLE_PLUGIN_DEFAULT_OPTIONS, TablePlugin } from '@qalma/editor/table';
 import { mountEditor, selectEditorRange } from '../../../testing/editor-test-utils';
 
 describe('TablePlugin', () => {

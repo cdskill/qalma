@@ -13,7 +13,7 @@ export const HISTORY_PLUGIN_DEFAULT_OPTIONS: Readonly<HistoryPluginOptions> =
     newGroupDelay: 500,
   });
 
-export const HistoryPlugin = createConfigurableQalmaPlugin(
+export const HistoryPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   HISTORY_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertHistoryPluginOptions(options);

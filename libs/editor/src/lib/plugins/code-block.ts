@@ -40,7 +40,7 @@ export const CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS: Readonly<CodeBlockPluginOptions>
     inputRules: true,
   });
 
-export const CodeBlockPlugin = createConfigurableQalmaPlugin(
+export const CodeBlockPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   CODE_BLOCK_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertCodeBlockPluginOptions(options);

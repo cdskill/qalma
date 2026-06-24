@@ -216,7 +216,6 @@ const NOTION_DOC_RECIPE = `import {
   TaskListPlugin,
   BlockquotePlugin,
   HorizontalRulePlugin,
-  TablePlugin,
   CodeBlockPlugin,
   SlashCommandPlugin,
   DragHandlePlugin,
@@ -227,6 +226,7 @@ const NOTION_DOC_RECIPE = `import {
   HistoryPlugin,
   TrailingParagraphPlugin,
 } from '@qalma/editor';
+import { TablePlugin } from '@qalma/editor/table';
 
 // No toolbar — composition happens through a slash menu and a drag handle.
 const editor = createQalmaEditor({

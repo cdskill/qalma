@@ -52,7 +52,7 @@ const strikeMark: MarkSpec = {
   toDOM: () => ['s', 0],
 };
 
-export const BoldPlugin = createQalmaPlugin({
+export const BoldPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'bold',
   marks: {
     strong: strongMark,
@@ -68,7 +68,7 @@ export const BoldPlugin = createQalmaPlugin({
   }),
 });
 
-export const ItalicPlugin = createQalmaPlugin({
+export const ItalicPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'italic',
   marks: {
     em: emMark,
@@ -84,7 +84,7 @@ export const ItalicPlugin = createQalmaPlugin({
   }),
 });
 
-export const UnderlinePlugin = createQalmaPlugin({
+export const UnderlinePlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'underline',
   marks: {
     underline: underlineMark,
@@ -100,7 +100,7 @@ export const UnderlinePlugin = createQalmaPlugin({
   }),
 });
 
-export const StrikePlugin = createQalmaPlugin({
+export const StrikePlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'strike',
   marks: {
     strike: strikeMark,

@@ -10,6 +10,6 @@
   "angularCompilerOptions": {
     "compilationMode": "partial"
   },
-  "include": ["src/**/*.ts", "forms/**/*.ts"],
+  "include": ["src/**/*.ts", "forms/**/*.ts", "table/**/*.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

@@ -37,7 +37,7 @@ export const MENTION_PLUGIN_DEFAULT_OPTIONS: Readonly<MentionPluginOptions> =
     appendSpaceOnInsert: true,
   });
 
-export const MentionPlugin = createConfigurableQalmaPlugin(
+export const MentionPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   MENTION_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertMentionPluginOptions(options);

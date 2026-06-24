@@ -19,7 +19,7 @@ export const HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS: Readonly<HighlightPluginOptions> 
     defaultColor: 'rgb(254, 240, 138)',
   });
 
-export const HighlightPlugin = createConfigurableQalmaPlugin(
+export const HighlightPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   HIGHLIGHT_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     const defaultColor = normalizeCssColor(

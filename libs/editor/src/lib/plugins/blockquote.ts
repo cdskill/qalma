@@ -32,7 +32,7 @@ const blockquoteNode: NodeSpec = {
   toDOM: () => ['blockquote', 0],
 };
 
-export const BlockquotePlugin = createConfigurableQalmaPlugin(
+export const BlockquotePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   BLOCKQUOTE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertBlockquotePluginOptions(options);

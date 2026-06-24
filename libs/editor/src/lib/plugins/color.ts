@@ -9,7 +9,7 @@ import {
 
 export type ColorCommandValue = string;
 
-export const ColorPlugin = createQalmaPlugin({
+export const ColorPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'color',
   marks: {
     textStyle: createTextStyleMark(),

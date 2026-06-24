@@ -9,7 +9,7 @@ export interface SelectionState {
   text: string;
 }
 
-export const SelectionPlugin = createQalmaPlugin({
+export const SelectionPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'selection',
   queries: () => ({
     selection: (state) => createSelectionState(state),

@@ -65,7 +65,7 @@ export const LINK_PLUGIN_DEFAULT_OPTIONS: Readonly<LinkPluginOptions> =
     onClick: null,
   });
 
-export const LinkPlugin = createConfigurableQalmaPlugin(
+export const LinkPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   LINK_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertLinkPluginOptions(options);

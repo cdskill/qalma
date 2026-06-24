@@ -28,7 +28,7 @@ import {
   QalmaCommandHandler,
   QalmaCommandValue,
   QalmaPlugin,
-} from './qalma-plugin';
+} from '@qalma/editor';
 
 export interface InsertTableValue {
   rows?: number;
@@ -63,7 +63,7 @@ const tableSpecs = tableNodes({
   cellAttributes: {},
 });
 
-export const TablePlugin = createConfigurableQalmaPlugin(
+export const TablePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   TABLE_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertTablePluginOptions(options);

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T21:04:00.528Z",
+  "generatedAt": "2026-06-24T22:59:54.420Z",
   "node": "v24.13.1",
   "note": "Gzip/brotli of an esbuild-bundled, tree-shaken, minified standard editor. Angular + rxjs marked external.",
   "standard": [
@@ -18,10 +18,10 @@
       "label": "@qalma/editor",
       "pkg": "@qalma/editor",
       "engine": "ProseMirror",
-      "version": "0.0.1-alpha.5",
-      "raw": 265947,
-      "gzip": 79831,
-      "brotli": 69860
+      "version": "0.1.0-beta.2",
+      "raw": 256327,
+      "gzip": 78599,
+      "brotli": 68916
     },
     {
       "id": "ngx-editor",
@@ -49,10 +49,10 @@
     "label": "@qalma/editor (minimal)",
     "pkg": "@qalma/editor",
     "engine": "ProseMirror",
-    "version": "0.0.1-alpha.5",
-    "raw": 265929,
-    "gzip": 79811,
-    "brotli": 69787
+    "version": "0.1.0-beta.2",
+    "raw": 234475,
+    "gzip": 72251,
+    "brotli": 63334
   },
   "prosemirrorBaseline": {
     "id": "prosemirror-baseline",

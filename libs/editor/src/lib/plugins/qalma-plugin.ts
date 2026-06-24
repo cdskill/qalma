@@ -35,6 +35,11 @@ export interface ConfigurableQalmaPlugin<TOptions extends object>
   configure(options?: Partial<TOptions>): ConfigurableQalmaPlugin<TOptions>;
 }
 
+// Tree-shaking note: the library ships as a single FESM, so a bundler cannot
+// drop an unused `export const XPlugin = createQalmaPlugin(...)` unless the call
+// is marked side-effect-free. Always prefix plugin/kit factory exports with
+// the Rollup/Terser pure-call annotation before `createQalmaPlugin(...)`
+// so editors that don't import a plugin don't pay for its code.
 export function createQalmaPlugin(plugin: QalmaPlugin): QalmaPlugin {
   return plugin;
 }

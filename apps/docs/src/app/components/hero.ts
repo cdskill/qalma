@@ -78,9 +78,9 @@ import { PosthogService } from '../services/posthog.service';
         (click)="trackBundleSize()"
         class="group mx-auto mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
       >
-        <span class="font-medium text-foreground">~78&nbsp;KB</span> gzip for a
+        <span class="font-medium text-foreground">~77&nbsp;KB</span> gzip for a
         full editor —
-        <span class="text-accent">37% lighter than Tiptap</span>
+        <span class="text-accent">38% lighter than Tiptap</span>
         <ng-icon
           name="lucideArrowRight"
           class="transition-transform group-hover:translate-x-0.5"

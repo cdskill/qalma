@@ -25,12 +25,12 @@ import {
   QalmaEditor,
   SelectionPlugin,
   SlashCommandPlugin,
-  TablePlugin,
   TaskListPlugin,
   TextFormattingKit,
   TrailingParagraphPlugin,
   createQalmaEditor,
 } from '@qalma/editor';
+import { TablePlugin } from '@qalma/editor/table';
 
 import {
   PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,

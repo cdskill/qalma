@@ -44,7 +44,7 @@ export const TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS: Readonly<TextAlignPluginOptions>
     nodes: TEXT_ALIGN_NODES,
   });
 
-export const TextAlignPlugin = createConfigurableQalmaPlugin(
+export const TextAlignPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   TEXT_ALIGN_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertTextAlignPluginOptions(options);

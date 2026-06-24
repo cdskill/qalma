@@ -10,6 +10,12 @@
 import { build } from 'esbuild';
 import { gzipSync, brotliCompressSync, constants } from 'node:zlib';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const QALMA_LOCAL_DIST = process.env.QALMA_LOCAL_DIST
+  ? resolve(process.env.QALMA_LOCAL_DIST)
+  : null;
+const QALMA_VERSION = process.env.QALMA_VERSION ?? null;
 
 const FRAMEWORK_EXTERNALS = [
   '@angular/*',
@@ -26,11 +32,41 @@ const TARGETS = [
 ];
 
 function version(pkg) {
+  if (pkg === '@qalma/editor' && QALMA_VERSION) {
+    return QALMA_VERSION;
+  }
+
+  if (pkg === '@qalma/editor' && QALMA_LOCAL_DIST) {
+    return JSON.parse(readFileSync(`${QALMA_LOCAL_DIST}/package.json`, 'utf8'))
+      .version;
+  }
+
   try {
     return JSON.parse(readFileSync(`node_modules/${pkg}/package.json`, 'utf8')).version;
   } catch {
     return '?';
   }
+}
+
+function qalmaLocalPlugin() {
+  if (!QALMA_LOCAL_DIST) {
+    return null;
+  }
+
+  return {
+    name: 'qalma-local-dist',
+    setup(build) {
+      build.onResolve({ filter: /^@qalma\/editor$/ }, () => ({
+        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor.mjs`,
+      }));
+      build.onResolve({ filter: /^@qalma\/editor\/forms$/ }, () => ({
+        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-forms.mjs`,
+      }));
+      build.onResolve({ filter: /^@qalma\/editor\/table$/ }, () => ({
+        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-table.mjs`,
+      }));
+    },
+  };
 }
 
 async function measure(target) {
@@ -44,6 +80,7 @@ async function measure(target) {
     target: 'es2022',
     legalComments: 'none',
     external: FRAMEWORK_EXTERNALS,
+    plugins: [qalmaLocalPlugin()].filter(Boolean),
     write: false,
     logLevel: 'silent',
   });

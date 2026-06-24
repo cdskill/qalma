@@ -19,7 +19,7 @@ export const PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS: Readonly<PlaceholderPluginOptio
     className: 'qalma-placeholder',
   });
 
-export const PlaceholderPlugin = createConfigurableQalmaPlugin(
+export const PlaceholderPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
   (options) => {
     assertPlaceholderPluginOptions(options);

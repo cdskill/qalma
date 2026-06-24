@@ -8,7 +8,7 @@ import { EditorView } from 'prosemirror-view';
 
 import { createQalmaPlugin, QalmaPlugin } from './qalma-plugin';
 
-export const TrailingParagraphPlugin = createQalmaPlugin({
+export const TrailingParagraphPlugin = /* @__PURE__ */ createQalmaPlugin({
   key: 'trailingParagraph',
   prosemirrorPlugins: (schema) => [
     createTrailingParagraphProseMirrorPlugin(schema.nodes['paragraph']),

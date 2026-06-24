@@ -15,6 +15,15 @@ npm install
 npm run bench
 ```
 
+To measure the published package pinned in `package.json` instead of the current
+workspace build:
+
+```sh
+cd bench/bundle-size
+npm install
+npm run bench:published
+```
+
 You should get the same numbers (± a few bytes across esbuild patch versions).
 Results are also written to `results.json`.
 
@@ -69,5 +78,5 @@ bundled) matches this benchmark's ~91 KB.
 
 ## Pinned versions
 
-See `package.json`. Current run: `@qalma/editor@0.0.1-alpha.5`,
+See `package.json`. Current run: local `@qalma/editor@0.1.0-beta.2` candidate,
 `ngx-editor@18.0.0`, `@tiptap/*@3.26.1`, `quill@2.0.3`.
