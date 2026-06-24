@@ -1,3 +1,9 @@
+## 0.1.0-beta.2 (2026-06-24)
+
+### 🔥 Performance
+
+- **repo:** reduce default editor bundle size ([#19](https://github.com/cdskill/qalma/pull/19))
+
 ## 0.1.0-beta.1 (2026-06-23)
 
 ### 🚀 Features
