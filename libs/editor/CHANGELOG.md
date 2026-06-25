@@ -1,3 +1,9 @@
+## 0.1.0-beta.3 (2026-06-25)
+
+### 🩹 Fixes
+
+- **editor:** prevent Safari slash command crash ([#20](https://github.com/cdskill/qalma/pull/20))
+
 ## 0.1.0-beta.2 (2026-06-24)
 
 ### 🔥 Performance
