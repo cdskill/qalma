@@ -9,7 +9,48 @@ import {
   ListsPlugin,
   createQalmaEditor,
 } from '../../index';
-import { mountEditor } from '../../../testing/editor-test-utils';
+import {
+  getEditorView,
+  mountEditor,
+} from '../../../testing/editor-test-utils';
+
+describe('QalmaEditorController.getCoordinatesAtPosition', () => {
+  it('returns null before the editor view is mounted', () => {
+    expect(createQalmaEditor().getCoordinatesAtPosition(1)).toBeNull();
+  });
+
+  it('returns editor view coordinates for a mounted document position', () => {
+    const mounted = mountEditor({ content: '<p>Hello</p>' });
+    const view = getEditorView(mounted.editor);
+    const coords = { left: 10, right: 12, top: 20, bottom: 24 };
+    const coordsAtPos = vi.spyOn(view, 'coordsAtPos').mockReturnValue(coords);
+
+    try {
+      expect(mounted.editor.getCoordinatesAtPosition(3)).toEqual(coords);
+      expect(coordsAtPos).toHaveBeenCalledWith(3);
+    } finally {
+      coordsAtPos.mockRestore();
+      mounted.unmount();
+    }
+  });
+
+  it('returns null for invalid positions and view measurement failures', () => {
+    const mounted = mountEditor({ content: '<p>Hello</p>' });
+    const view = getEditorView(mounted.editor);
+    const coordsAtPos = vi.spyOn(view, 'coordsAtPos').mockImplementation(() => {
+      throw new Error('Could not measure position.');
+    });
+
+    try {
+      expect(mounted.editor.getCoordinatesAtPosition(-1)).toBeNull();
+      expect(mounted.editor.getCoordinatesAtPosition(100)).toBeNull();
+      expect(mounted.editor.getCoordinatesAtPosition(3)).toBeNull();
+    } finally {
+      coordsAtPos.mockRestore();
+      mounted.unmount();
+    }
+  });
+});
 
 describe('QalmaEditorController.isEmpty', () => {
   it('treats a freshly mounted editor as empty', () => {

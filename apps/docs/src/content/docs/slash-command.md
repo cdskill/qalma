@@ -34,7 +34,7 @@ Keep the menu in your app or docs playground. A typical selection flow is:
 
 1. Read `editor.query&lt;SlashCommandState&gt;('slashCommand')`.
 2. Filter your own command list with `state.query`.
-3. Render an Angular overlay near the current DOM selection.
+3. Render an Angular overlay near `editor.getCoordinatesAtPosition(state.to)`.
 4. On pick, run `editor.execute('deleteSlashCommand')`.
 5. Optionally run `editor.execute('splitSlashCommandBlock')` for non-empty
    paragraphs when the selected command creates a block.

@@ -33,6 +33,13 @@ export interface QalmaEditorOptions {
   plugins?: readonly QalmaPlugin[];
 }
 
+export interface QalmaEditorCoordinates {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 export class QalmaEditorController {
   readonly html: Signal<string>;
   readonly editable: Signal<boolean>;
@@ -257,6 +264,24 @@ export class QalmaEditorController {
 
   focus(): void {
     this.editorView?.focus();
+  }
+
+  getCoordinatesAtPosition(position: number): QalmaEditorCoordinates | null {
+    this.viewVersion();
+
+    if (!this.editorView || !this.editorState) {
+      return null;
+    }
+
+    if (position < 0 || position > this.editorState.doc.content.size) {
+      return null;
+    }
+
+    try {
+      return this.editorView.coordsAtPos(position);
+    } catch {
+      return null;
+    }
   }
 
   private dispatchTransaction(transaction: Transaction): void {

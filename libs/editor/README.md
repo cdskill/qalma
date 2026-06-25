@@ -72,6 +72,7 @@ Builds a `QalmaEditorController`, the headless API your components bind to:
 | `canExecute(command, value?)` | Whether a command would currently succeed.                             |
 | `isCommandActive(command)`    | Whether a toggleable command is active for the current selection.      |
 | `query<T>(name)`              | Reads plugin-provided state, e.g. the link or image under the cursor.  |
+| `getCoordinatesAtPosition(pos)` | Reads viewport coordinates for a document position, or `null`.       |
 | `setHtml(html)`               | Replaces the document content from an HTML string.                     |
 | `getJSON()`                   | Serializes the document to ProseMirror's native, lossless JSON.        |
 | `setJSON(doc)`                | Replaces the document content from a `QalmaDocument` JSON object.       |
