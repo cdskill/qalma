@@ -160,7 +160,16 @@ export class SandboxSlashCommandController {
     this.activeIndex.set(
       Math.min(activeIndex, Math.max(0, options.length - 1)),
     );
-    this.placement.set(createSlashCommandPlacement(options.length));
+
+    if (options.length === 0) {
+      this.placement.set(null);
+
+      return;
+    }
+
+    this.placement.set(
+      createSlashCommandPlacement(this.editor, slashCommand.to, options.length),
+    );
   }
 
   handleSlashCommandKeydown(event: Event): void {
@@ -314,16 +323,11 @@ function getNextActiveIndex(
 }
 
 function createSlashCommandPlacement(
+  editor: QalmaEditorController,
+  position: number,
   optionCount: number,
 ): SandboxSlashCommandPlacement | null {
-  const selection = window.getSelection();
-
-  if (!selection || selection.rangeCount === 0) {
-    return null;
-  }
-
-  const range = selection.getRangeAt(0).cloneRange();
-  const rect = getRangeRect(range);
+  const rect = editor.getCoordinatesAtPosition(position);
 
   if (!rect) {
     return null;
@@ -366,35 +370,4 @@ function getSlashCommandMenuHeight(optionCount: number): number {
     SLASH_COMMAND_MENU_VERTICAL_PADDING +
       Math.max(1, optionCount) * SLASH_COMMAND_MENU_OPTION_HEIGHT,
   );
-}
-
-function getRangeRect(range: Range): DOMRect | null {
-  const rect = range.getBoundingClientRect();
-
-  if (rect.width > 0 || rect.height > 0) {
-    return rect;
-  }
-
-  const clientRect = range.getClientRects()[0];
-
-  if (clientRect) {
-    return clientRect;
-  }
-
-  if (!range.collapsed) {
-    return null;
-  }
-
-  const marker = document.createElement('span');
-
-  marker.textContent = '\u200b';
-  marker.style.cssText =
-    'display:inline-block;width:0;height:1em;overflow:hidden;';
-  range.insertNode(marker);
-
-  const markerRect = marker.getBoundingClientRect();
-
-  marker.remove();
-
-  return markerRect.width > 0 || markerRect.height > 0 ? markerRect : null;
 }

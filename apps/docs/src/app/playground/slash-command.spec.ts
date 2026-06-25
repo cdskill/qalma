@@ -18,6 +18,25 @@ import {
   PlaygroundSlashCommandOption,
 } from './slash-command';
 
+describe('PlaygroundSlashCommandController.refresh', () => {
+  it('keeps the menu closed when the cursor coordinates cannot be measured', () => {
+    const slashCommand: SlashCommandState = {
+      from: 1,
+      to: 2,
+      query: '',
+      trigger: '/',
+    };
+    const controller = new PlaygroundSlashCommandController(
+      createQueryOnlyEditor(slashCommand),
+    );
+
+    expect(() => controller.refresh()).not.toThrow();
+    expect(controller.slashCommand()).toEqual(slashCommand);
+    expect(controller.placement()).toBeNull();
+    expect(controller.open()).toBe(false);
+  });
+});
+
 describe('PlaygroundSlashCommandController.insert', () => {
   it('renders the block on a new line instead of transforming the current block', () => {
     const { editor, host } = mountEditor('<h1>Title /</h1>', [
@@ -185,6 +204,15 @@ function insertText(editor: QalmaEditorController, text: string): void {
   }
 
   view.dispatch(view.state.tr.insertText(text));
+}
+
+function createQueryOnlyEditor(
+  slashCommand: SlashCommandState,
+): QalmaEditorController {
+  return {
+    getCoordinatesAtPosition: () => null,
+    query: () => slashCommand,
+  } as unknown as QalmaEditorController;
 }
 
 function option(

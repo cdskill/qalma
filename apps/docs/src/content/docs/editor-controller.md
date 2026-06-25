@@ -137,6 +137,13 @@ if (link) {
 `query()` returns `null` when the query is not registered or when the query has
 no value for the current selection. `hasQuery(queryName)` checks registration.
 
+## Position coordinates
+
+`getCoordinatesAtPosition(position)` returns viewport coordinates for a document
+position, or `null` when the editor is not mounted, the position is invalid, or
+the browser cannot measure it. Use it for consumer-owned overlays such as slash
+menus without reaching into ProseMirror's `EditorView`.
+
 ## Empty state
 
 `isEmpty()` reports whether the document has no user-visible content — no text
