@@ -3,9 +3,9 @@
  *
  * Node and mark serializers are keyed by Qalma's (camelCase) schema names.
  * Everything CommonMark/GFM can represent is emitted as Markdown; everything it
- * cannot (underline, text color, highlight, sub/superscript, mentions) falls
- * back to inline HTML, which CommonMark permits — so the output stays complete
- * and valid rather than silently dropping content.
+ * cannot (underline, monospace, text color, highlight, sub/superscript,
+ * mentions) falls back to inline HTML, which CommonMark permits — so the
+ * output stays complete and valid rather than silently dropping content.
  *
  * The serializer runs with `strict: false`, so third-party nodes/marks with no
  * serializer degrade to their text content instead of throwing.
@@ -138,6 +138,10 @@ const marks: MarkdownMarkSerializerMap = {
   },
   // Marks below have no CommonMark/GFM syntax: fall back to inline HTML.
   underline: { open: '<u>', close: '</u>' },
+  monospace: {
+    open: '<span data-qalma-monospace="">',
+    close: '</span>',
+  },
   subscript: { open: '<sub>', close: '</sub>' },
   superscript: { open: '<sup>', close: '</sup>' },
   highlight: {

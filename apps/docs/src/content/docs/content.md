@@ -155,6 +155,7 @@ content:
 | Links, images | `[text](href)`, `![alt](src)` |
 | Headings, blockquote, lists, task lists, tables | `#`, `>`, `-`/`1.`, `- [x]`, GFM pipe table |
 | Underline | `&lt;u&gt;...&lt;/u&gt;` |
+| Monospace | `&lt;span data-qalma-monospace=""&gt;...&lt;/span&gt;` |
 | Subscript / superscript | `&lt;sub&gt;...&lt;/sub&gt;` / `&lt;sup&gt;...&lt;/sup&gt;` |
 | Text color / highlight | `&lt;span style&gt;` / `&lt;mark&gt;` |
 | Mention | the mention label as plain text |
@@ -171,6 +172,7 @@ Each plugin decides how its node or mark parses and serializes:
 | ------------------- | ------------------------------------------------------------------------------------------------ |
 | `TextFormattingKit` | `&lt;strong&gt;`, `&lt;em&gt;`, `&lt;u&gt;`, `&lt;s&gt;`                                         |
 | `InlineCodePlugin`  | `&lt;code&gt;`                                                                                   |
+| `MonospacePlugin`   | `&lt;span data-qalma-monospace=""&gt;`                                                           |
 | `HeadingsPlugin`    | `&lt;h1&gt;` through configured levels                                                           |
 | `ListsPlugin`       | `&lt;ul&gt;`, `&lt;ol&gt;`, `&lt;li&gt;`                                                         |
 | `BlockquotePlugin`  | `&lt;blockquote&gt;`                                                                             |

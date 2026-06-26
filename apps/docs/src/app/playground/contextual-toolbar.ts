@@ -15,6 +15,7 @@ import {
   lucideBold,
   lucideCode,
   lucideItalic,
+  lucideLetterText,
   lucideLink,
 } from '@ng-icons/lucide';
 
@@ -32,6 +33,7 @@ export interface PlaygroundContextualToolbarPlacement {
       lucideBold,
       lucideCode,
       lucideItalic,
+      lucideLetterText,
       lucideLink,
     }),
   ],
@@ -90,6 +92,22 @@ export interface PlaygroundContextualToolbarPlacement {
           <ng-icon
             class="text-[0.9rem]"
             name="lucideCode"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          appBtn
+          variant="ghost"
+          size="icon"
+          type="button"
+          class="!h-[1.85rem] !w-[1.85rem] cursor-pointer rounded-[0.4rem] disabled:cursor-not-allowed [&.qalma-command-active]:bg-accent-subtle [&.qalma-command-active]:text-accent"
+          qalmaCommand="toggleMonospace"
+          title="Monospace"
+          aria-label="Monospace"
+        >
+          <ng-icon
+            class="text-[0.9rem]"
+            name="lucideLetterText"
             aria-hidden="true"
           />
         </button>

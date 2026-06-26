@@ -110,6 +110,14 @@ qalma-content .ProseMirror :not(pre) > code {
   font-size: 0.875em;
 }
 
+qalma-content .ProseMirror [data-qalma-monospace] {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  font-size: 0.925em;
+  letter-spacing: 0;
+}
+
 qalma-content .ProseMirror .sandbox-code-block {
   margin-bottom: 0.75rem;
   overflow: hidden;

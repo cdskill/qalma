@@ -69,6 +69,7 @@ application needs one.
 | ---------------------------- | ------------------------------------- |
 | `TextFormattingKit`          | `strong`, `em`, `underline`, `strike` |
 | `InlineCodePlugin`           | `code`                                |
+| `MonospacePlugin`            | `monospace`                           |
 | `SubscriptSuperscriptPlugin` | `subscript`, `superscript`            |
 | `ColorPlugin`                | `textStyle`                           |
 | `HighlightPlugin`            | `highlight`                           |

@@ -20,7 +20,7 @@ The current editor already includes:
 | ------------------ | --------------------------------------------------------------------------------------------------- |
 | Angular primitives | `QalmaEditor`, `QalmaContent`, `QalmaToolbar`, `QalmaCommand`                                       |
 | Controller         | Signals for HTML/editability, command execution, command state, queries, content replacement, focus |
-| Formatting         | Text formatting, inline code, color, highlight, subscript/superscript, clear formatting             |
+| Formatting         | Text formatting, inline code, monospace, color, highlight, subscript/superscript, clear formatting  |
 | Structure          | Headings, lists, blockquotes, hard breaks, trailing paragraphs                                      |
 | Media and links    | Links, inline images                                                                                |
 | Productivity       | Selection state, drag handles, mentions, slash commands, paste rules, code blocks, history          |

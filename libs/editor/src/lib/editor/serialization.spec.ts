@@ -10,6 +10,7 @@ import {
   LinkPlugin,
   ListsPlugin,
   MentionPlugin,
+  MonospacePlugin,
   QalmaPlugin,
   SubscriptSuperscriptPlugin,
   TaskListPlugin,
@@ -156,10 +157,16 @@ describe('Markdown serialization', () => {
   });
 
   describe('HTML fallback for marks Markdown cannot represent', () => {
-    it('wraps underline, sub/superscript, highlight, and color in inline HTML', () => {
+    it('wraps underline, monospace, sub/superscript, highlight, and color in inline HTML', () => {
       expect(
         markdownOf('<p><u>under</u></p>', [...TextFormattingKit]).trim(),
       ).toBe('<u>under</u>');
+      expect(
+        markdownOf(
+          '<p><span data-qalma-monospace="">token</span></p>',
+          [MonospacePlugin],
+        ).trim(),
+      ).toBe('<span data-qalma-monospace="">token</span>');
       expect(
         markdownOf('<p><sub>lo</sub><sup>hi</sup></p>', [
           SubscriptSuperscriptPlugin,

@@ -73,7 +73,8 @@ spreading those four plugins into the editor.
 
 For semantic inline snippets, add `InlineCodePlugin` separately. It exposes
 `toggleInlineCode`, `Mod-e`, and the single-backtick input rule documented on
-the Inline Code page.
+the Inline Code page. For typography-only monospace text, add
+`MonospacePlugin` separately so the content does not become inline code.
 
 ## Styling
 
