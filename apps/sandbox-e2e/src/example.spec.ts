@@ -169,6 +169,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const alignRight = toolbar.getByRole('button', { name: 'Align right' });
   const justify = toolbar.getByRole('button', { name: 'Justify' });
   const underline = toolbar.getByRole('button', { name: 'Underline' });
+  const monospace = toolbar.getByRole('button', { name: 'Monospace' });
   const subscript = toolbar.getByRole('button', { name: 'Subscript' });
   const superscript = toolbar.getByRole('button', { name: 'Superscript' });
   const highlight = toolbar.getByRole('button', {
@@ -210,7 +211,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const redo = toolbar.getByRole('button', { name: 'Redo' });
 
   await expect(page.locator('qalma-editor > button')).toHaveCount(0);
-  await expect(toolbar.getByRole('button')).toHaveCount(45);
+  await expect(toolbar.getByRole('button')).toHaveCount(46);
   await expect(paragraph).toHaveAttribute('title', 'Paragraph');
   await expect(heading1).toHaveAttribute('title', 'Heading 1');
   await expect(heading2).toHaveAttribute('title', 'Heading 2');
@@ -236,6 +237,8 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(
     toolbar.getByRole('button', { name: 'Strikethrough' }),
   ).toHaveAttribute('title', 'Strikethrough');
+  await expect(monospace).toHaveAttribute('title', 'Monospace');
+  await expect(monospace).toBeEnabled();
   await expect(subscript).toHaveAttribute('title', 'Subscript');
   await expect(subscript).toBeEnabled();
   await expect(superscript).toHaveAttribute('title', 'Superscript');
@@ -445,7 +448,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   );
   await clearHighlight.click();
   await expect(serializedHtml(page)).toContainText(
-    'strikethrough</s>, <code>inline code</code>, highlight, <span style="color: rgb(14, 116, 144);',
+    'strikethrough</s>, <code>inline code</code>, <span data-qalma-monospace="">monospace labels</span>, highlight, <span style="color: rgb(14, 116, 144);',
   );
 
   await page.locator('.ProseMirror sub').selectText();
@@ -471,7 +474,7 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   );
   await clearBackgroundColor.click();
   await expect(serializedHtml(page)).toContainText(
-    '<code>inline code</code>, highlight, color, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>',
+    '<code>inline code</code>, <span data-qalma-monospace="">monospace labels</span>, highlight, color, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>',
   );
 
   const imagePrompts = [exampleImageSrc, 'Inserted image', 'Demo image'];
