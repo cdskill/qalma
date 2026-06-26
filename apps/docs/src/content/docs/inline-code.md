@@ -10,6 +10,9 @@ list items, headings, and other inline-content blocks. It serializes to
 `&lt;code&gt;...&lt;/code&gt;` and stays fully headless: your Angular app owns the
 button, icon, menu item, and styling.
 
+For typography-only monospace text, use `MonospacePlugin` instead. Inline code
+keeps code semantics, `Mod-e`, and the optional single-backtick input rule.
+
 ```typescript
 import { InlineCodePlugin, QalmaCommand, QalmaContent, QalmaEditor, QalmaToolbar, createQalmaEditor } from '@qalma/editor';
 

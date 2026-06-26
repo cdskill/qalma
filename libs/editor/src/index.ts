@@ -19,6 +19,7 @@ export * from './lib/plugins/inline-code';
 export * from './lib/plugins/link';
 export * from './lib/plugins/lists';
 export * from './lib/plugins/mention';
+export * from './lib/plugins/monospace';
 export * from './lib/plugins/paste-rules';
 export * from './lib/plugins/placeholder';
 export * from './lib/plugins/qalma-plugin';

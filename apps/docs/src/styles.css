@@ -318,6 +318,12 @@ qalma-content .ProseMirror [data-qalma-mention] {
   color: var(--color-accent);
 }
 
+qalma-content .ProseMirror [data-qalma-monospace] {
+  font-family: var(--font-mono);
+  font-size: 0.925em;
+  letter-spacing: 0;
+}
+
 qalma-content .ProseMirror img {
   display: inline-block;
   vertical-align: bottom;
@@ -414,6 +420,12 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   padding: 0.125rem 0.3rem;
   font-family: var(--font-mono);
   font-size: 0.875em;
+}
+
+.qalma-comment-body [data-qalma-monospace] {
+  font-family: var(--font-mono);
+  font-size: 0.925em;
+  letter-spacing: 0;
 }
 
 .qalma-comment-body [data-qalma-mention] {

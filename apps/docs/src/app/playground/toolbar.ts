@@ -36,6 +36,7 @@ import {
   lucideList,
   lucideListOrdered,
   lucideListTodo,
+  lucideLetterText,
   lucideOutdent,
   lucidePaintBucket,
   lucidePilcrow,
@@ -92,6 +93,7 @@ import {
       lucideList,
       lucideListOrdered,
       lucideListTodo,
+      lucideLetterText,
       lucideOutdent,
       lucidePaintBucket,
       lucidePilcrow,
@@ -207,6 +209,19 @@ import {
         aria-label="Inline code"
       >
         <ng-icon [class]="iconClass" name="lucideCode" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        [class]="commandClass"
+        qalmaCommand="toggleMonospace"
+        title="Monospace"
+        aria-label="Monospace"
+      >
+        <ng-icon
+          [class]="iconClass"
+          name="lucideLetterText"
+          aria-hidden="true"
+        />
       </button>
       <button
         type="button"

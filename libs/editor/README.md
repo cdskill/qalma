@@ -137,6 +137,7 @@ plugin instance with merged options, e.g.
 | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `BoldPlugin`, `ItalicPlugin`, `UnderlinePlugin`, `StrikePlugin` (`TextFormattingKit`) | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                            |
 | `InlineCodePlugin`                                                                    | `toggleInlineCode` (`Mod-e`, single-backtick input rule)                                                                   |
+| `MonospacePlugin`                                                                     | `toggleMonospace`                                                                                                          |
 | `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                                                     |
 | `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                                                    |
 | `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                                                         |

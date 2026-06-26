@@ -23,6 +23,7 @@ import {
   MENTION_PLUGIN_DEFAULT_OPTIONS,
   MentionPlugin,
   MentionState,
+  MonospacePlugin,
   PASTE_RULES_PLUGIN_DEFAULT_OPTIONS,
   PasteRulesPlugin,
   PLACEHOLDER_PLUGIN_DEFAULT_OPTIONS,
@@ -68,7 +69,7 @@ describe('App', () => {
       'ProseMirror editor foundation',
     );
     expect(compiled.querySelectorAll('[role="toolbar"] button')).toHaveLength(
-      45,
+      46,
     );
     expect(
       compiled.querySelector('[aria-label="Clear formatting"]'),
@@ -89,6 +90,7 @@ describe('App', () => {
     expect(compiled.querySelector('[aria-label="Subscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Superscript"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Inline code"]')).not.toBeNull();
+    expect(compiled.querySelector('[aria-label="Monospace"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Task list"]')).not.toBeNull();
     expect(compiled.querySelector('[aria-label="Image URL"]')).not.toBeNull();
     expect(
@@ -160,6 +162,10 @@ describe('App', () => {
     expect(
       compiled.querySelector('.ProseMirror p code:not([class])')?.textContent,
     ).toBe('inline code');
+    expect(
+      compiled.querySelector('.ProseMirror [data-qalma-monospace]')
+        ?.textContent,
+    ).toBe('monospace labels');
     expect(compiled.querySelector('.ProseMirror sub')?.textContent).toBe('2');
     expect(compiled.querySelector('.ProseMirror sup')?.textContent).toBe('2');
     expect(
@@ -324,6 +330,49 @@ describe('App', () => {
       '<p>Use <code>createQalmaEditor</code> to start.</p>',
     );
     expect(editor.isCommandActive('toggleInlineCode')).toBeTrue();
+
+    editor.unmount(host);
+  });
+
+  it('should expose monospace through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content: '<p>Use PRODUCT_TOKEN as a label.</p>',
+      plugins: [MonospacePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 5, 18);
+
+    expect(MonospacePlugin.key).toBe('monospace');
+    expect(editor.canExecute('toggleMonospace')).toBeTrue();
+    expect(editor.execute('toggleMonospace')).toBeTrue();
+    expect(editor.isCommandActive('toggleMonospace')).toBeTrue();
+    expect(editor.html()).toBe(
+      '<p>Use <span data-qalma-monospace="">PRODUCT_TOKEN</span> as a label.</p>',
+    );
+    expect(editor.execute('toggleMonospace')).toBeTrue();
+    expect(editor.isCommandActive('toggleMonospace')).toBeFalse();
+    expect(editor.html()).toBe('<p>Use PRODUCT_TOKEN as a label.</p>');
+
+    editor.unmount(host);
+  });
+
+  it('should parse serialized monospace through the public plugin', () => {
+    const editor = createQalmaEditor({
+      content:
+        '<p>Use <span data-qalma-monospace="">PRODUCT_TOKEN</span> as a label.</p>',
+      plugins: [MonospacePlugin],
+    });
+    const host = document.createElement('div');
+
+    editor.mount(host);
+    selectEditorRange(editor, 5, 18);
+
+    expect(editor.html()).toBe(
+      '<p>Use <span data-qalma-monospace="">PRODUCT_TOKEN</span> as a label.</p>',
+    );
+    expect(editor.isCommandActive('toggleMonospace')).toBeTrue();
 
     editor.unmount(host);
   });
