@@ -1,3 +1,9 @@
+## 0.1.0-beta.4 (2026-06-26)
+
+### 🚀 Features
+
+- **editor:** add monospace text formatting plugin ([8663e71](https://github.com/cdskill/qalma/commit/8663e71))
+
 ## 0.1.0-beta.3 (2026-06-25)
 
 ### 🩹 Fixes
