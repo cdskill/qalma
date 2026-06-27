@@ -10,11 +10,15 @@ import { RouterOutlet } from '@angular/router';
 
 import { PosthogService } from './services/posthog.service';
 import { environment } from '../environments/environment';
+import { NavigationProgress } from './components/navigation-progress';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: ` <router-outlet /> `,
+  imports: [NavigationProgress, RouterOutlet],
+  template: `
+    <app-navigation-progress />
+    <router-outlet />
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {

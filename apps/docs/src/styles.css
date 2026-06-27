@@ -1,7 +1,7 @@
 @import 'tailwindcss';
-/* CDK overlay positioning — required by the Spartan (brain) popovers used in
- * the playground toolbar's color pickers. */
-@import '@angular/cdk/overlay-prebuilt.css';
+/* Spartan brain preset provides the shared Helm utilities used by local
+ * wrappers, including CDK overlay positioning and progress animations. */
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
 
 /* ------------------------------------------------------------------ *
  * Qalma design system
