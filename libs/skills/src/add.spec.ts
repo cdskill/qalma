@@ -58,6 +58,18 @@ describe('addSkill', () => {
     expect(readFileSync(join(destination, 'SKILL.md'), 'utf8')).toBe('updated');
   });
 
+  it('replaces an existing destination with force instead of merging stale files', () => {
+    const destination = join(root, 'out', 'qalma');
+    addSkill({ source, destination });
+    writeFileSync(join(destination, 'stale.md'), 'stale');
+
+    const result = addSkill({ source, destination, force: true });
+
+    expect(result.overwritten).toBe(true);
+    expect(result.files).toHaveLength(2);
+    expect(existsSync(join(destination, 'stale.md'))).toBe(false);
+  });
+
   it('throws when the source folder is missing', () => {
     expect(() =>
       addSkill({ source: join(root, 'nope'), destination: join(root, 'out') }),

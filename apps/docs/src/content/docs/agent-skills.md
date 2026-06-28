@@ -58,7 +58,8 @@ For Claude Code, install to `./.claude/skills/qalma`:
 npx @qalma/skills add --target claude
 ```
 
-For Codex, install to `./.codex/skills/qalma`:
+For Codex, install to `./.agents/skills/qalma`, the project-local skills
+directory Codex scans by default:
 
 ```bash
 npx @qalma/skills add --target codex
@@ -76,7 +77,7 @@ npx @qalma/skills add --dir ./tools/agent-skills/qalma
 | ------ | ----------- |
 | `--target agents` | Install to `./.agents/skills/qalma`. This is the default. |
 | `--target claude` | Install to `./.claude/skills/qalma`. |
-| `--target codex` | Install to `./.codex/skills/qalma`. |
+| `--target codex` | Install to `./.agents/skills/qalma`, the same location as `agents`. |
 | `--dir &lt;path&gt;` | Install to an explicit folder instead of a known target. |
 | `--cwd &lt;path&gt;` | Resolve the target directory from another working directory. |
 | `--force` | Replace an existing Qalma skill folder. |

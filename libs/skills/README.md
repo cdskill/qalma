@@ -17,7 +17,7 @@ npx @qalma/skills add
 # Claude Code → ./.claude/skills/qalma
 npx @qalma/skills add --target claude
 
-# Codex → ./.codex/skills/qalma
+# Codex → ./.agents/skills/qalma
 npx @qalma/skills add --target codex
 
 # Explicit location
@@ -33,6 +33,9 @@ npx @qalma/skills add --dir ./tools/agents/qalma --force
 
 The command refuses to overwrite an existing folder unless `--force` is passed,
 so it never silently discards local edits.
+
+The `codex` target writes to `./.agents/skills/qalma`, the same project-local
+skills directory Codex scans by default.
 
 ## Programmatic API
 

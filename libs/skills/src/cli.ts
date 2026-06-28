@@ -36,6 +36,7 @@ Options:
 Examples:
   npx @qalma/skills add
   npx @qalma/skills add --target claude
+  npx @qalma/skills add --target codex
   npx @qalma/skills add --dir ./tools/agents/qalma --force
 `;
 

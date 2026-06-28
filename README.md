@@ -141,6 +141,9 @@ npx @qalma/skills add --target claude
 npx @qalma/skills add --target codex
 ```
 
+The `codex` target writes to `./.agents/skills/qalma`, the same project-local
+skills directory Codex scans by default.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please read [AGENTS.md](AGENTS.md) for the

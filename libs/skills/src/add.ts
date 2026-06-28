@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  rmSync,
   statSync,
 } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -46,6 +47,9 @@ export function addSkill(options: AddSkillOptions): AddSkillResult {
   }
 
   mkdirSync(dirname(destination), { recursive: true });
+  if (overwritten) {
+    rmSync(destination, { recursive: true, force: true });
+  }
   cpSync(source, destination, { recursive: true, force: true });
 
   return { destination, files: listFiles(destination), overwritten };

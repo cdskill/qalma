@@ -9,12 +9,13 @@ export type SkillTarget = 'agents' | 'claude' | 'codex';
 
 /**
  * Conventional project-local directory each tool reads `SKILL.md` folders from.
- * `agents` is the tool-agnostic default also used by this repository.
+ * `agents` is the tool-agnostic default also used by this repository. Codex
+ * also scans `.agents/skills`, so `codex` is an alias for that target.
  */
 const TARGET_ROOTS: Record<SkillTarget, string> = {
   agents: '.agents/skills',
   claude: '.claude/skills',
-  codex: '.codex/skills',
+  codex: '.agents/skills',
 };
 
 export function isSkillTarget(value: string): value is SkillTarget {
