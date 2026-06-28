@@ -20,6 +20,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     items: [
       { title: 'Introduction', href: '/docs/introduction' },
       { title: 'Installation', href: '/docs/installation' },
+      { title: 'Agent Skills', href: '/docs/agent-skills' },
       { title: 'Quick Start', href: '/docs/quick-start' },
     ],
   },
