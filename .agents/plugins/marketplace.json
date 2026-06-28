@@ -1,0 +1,20 @@
+{
+  "name": "qalma",
+  "interface": {
+    "displayName": "Qalma"
+  },
+  "plugins": [
+    {
+      "name": "qalma",
+      "source": {
+        "source": "local",
+        "path": "./plugins/qalma"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

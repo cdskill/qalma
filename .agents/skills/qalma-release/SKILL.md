@@ -1,21 +1,21 @@
 ---
 name: qalma-release
-description: Guide npm releases and the publish pipeline for @qalma/editor. Use when discussing or changing versioning, the release scripts, the GitHub Actions release workflow, the Nx release configuration, npm publishConfig, or npm Trusted Publisher setup.
+description: Guide npm releases and the publish pipeline for @qalma/editor and @qalma/skills. Use when discussing or changing versioning, the release scripts, the GitHub Actions release workflow, the Nx release configuration, npm publishConfig, or npm Trusted Publisher setup.
 ---
 
 # Qalma Release
 
-`@qalma/editor` is published to npm under the `latest` dist-tag while the public
-API stabilizes. The package is pre-1.0 and now uses beta prereleases for public
-early-adopter cuts. There is no stable version to reserve `latest` for yet, so
-`latest` tracks the newest beta and remains what npmjs features and what
-`npm install @qalma/editor` resolves.
+`@qalma/editor` and `@qalma/skills` are published to npm under the `latest`
+dist-tag while the public API stabilizes. The packages are pre-1.0 and now use
+beta prereleases for public early-adopter cuts. There is no stable version to
+reserve `latest` for yet, so `latest` tracks the newest beta and remains what
+npmjs features and what plain installs resolve.
 
 Releases are tag-driven: a `vX.Y.Z[-prerelease]` git tag pushed to `main`
 triggers GitHub Actions, which builds, re-derives the version from the tag, and
-publishes via npm's OIDC Trusted Publisher (no npm token in CI). When a stable
-`1.0.0` is cut, publish it as `latest` and move later prereleases back to a
-separate `next`/`beta` dist-tag.
+publishes both packages via npm's OIDC Trusted Publisher (no npm token in CI).
+When a stable `1.0.0` is cut, publish it as `latest` and move later
+prereleases back to a separate `next`/`beta` dist-tag.
 
 For the full architecture, history, and troubleshooting, read
 [release-pipeline.md](references/release-pipeline.md).
@@ -39,10 +39,12 @@ For the full architecture, history, and troubleshooting, read
 
    These scripts or commands run `nx release ... --skip-publish`, then sync the
    generated editor changelog into the docs changelog. The release portion:
-   - Runs the `preVersionCommand` (`pnpm nx build editor`).
+   - Runs the `preVersionCommand`
+     (`pnpm nx run-many -t build -p editor skills`).
    - Writes the new version into `libs/editor/package.json` and
-     `dist/libs/editor/package.json`.
-   - Generates `libs/editor/CHANGELOG.md` from conventional commits.
+     `dist/libs/editor/package.json`, plus `libs/skills/package.json` and
+     `dist/libs/skills/package.json`.
+   - Generates project changelogs from conventional commits.
    - Commits the manifest and changelog change as
      `chore(release): publish <version>`.
    - Creates an annotated tag `v<version>` on that commit.
@@ -55,10 +57,16 @@ For the full architecture, history, and troubleshooting, read
 
 4. `git push --follow-tags` to push the commit and the tag. Pushing the tag is
    the actual deploy trigger — `.github/workflows/release.yml` runs, publishes
-   `@qalma/editor@<version>` under the `latest` dist-tag, then creates a GitHub
-   release whose notes are this version's section of `CHANGELOG.md`.
+   `@qalma/editor@<version>` and `@qalma/skills@<version>` under the `latest`
+   dist-tag, then creates a GitHub release whose notes are this version's
+   section of `libs/editor/CHANGELOG.md`.
 5. Watch the "Release" workflow run in GitHub Actions to confirm the publish
    and the GitHub release both succeeded.
+
+Before the first coupled tag, ensure `@qalma/skills` exists on npm and has the
+same Trusted Publisher configuration as `@qalma/editor`. If npm package settings
+are not available yet, bootstrap `@qalma/skills` once manually, configure the
+Trusted Publisher, then let tags publish both packages going forward.
 
 ## Versioning Conventions
 
@@ -70,9 +78,9 @@ For the full architecture, history, and troubleshooting, read
 - Keep the historical alpha line as history only. Do not cut new alpha releases
   unless the project intentionally reopens an alpha track and updates this skill
   plus the release scripts again.
-- Never push a `v*` tag for a version already published to npm — the workflow's
-  `first_release` check only guards the very first publish; re-publishing an
-  existing version will fail.
+- Never push a `v*` tag for a version already published to npm — the workflow
+  checks both package versions before publishing, and re-publishing an existing
+  version fails before any package is published.
 - `BREAKING CHANGE:` commit footers still document API breaks for history, even
   though the package remains pre-1.0.
 
@@ -81,6 +89,6 @@ For the full architecture, history, and troubleshooting, read
 - Run plain `nx release` (without `--skip-publish`) locally — it will attempt
   `npm publish` from your machine and re-introduce the 2FA/token friction the
   Trusted Publisher setup removed.
-- Hand-edit `libs/editor/package.json`'s `version` field — use the beta release
-  scripts or `pnpm nx release <version> --skip-publish` so the commit, tag, and
-  `dist` manifest stay in sync.
+- Hand-edit package `version` fields — use the beta release scripts or
+  `pnpm nx release <version> --skip-publish` so the commit, tag, and `dist`
+  manifests stay in sync.

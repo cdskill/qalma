@@ -1,6 +1,6 @@
 ---
 name: qalma-docs-sync
-description: Synchronize Qalma documentation surfaces after adding, changing, renaming, or removing an editor plugin, command, query, kit, public option, sandbox/playground behavior, or docs navigation entry. Use with Qalma plugin work to keep apps/docs, libs/editor/README.md, AGENTS.md, and repository skills accurate.
+description: Synchronize Qalma documentation surfaces after adding, changing, renaming, or removing an editor plugin, command, query, kit, public option, sandbox/playground behavior, docs navigation entry, or public agent guidance. Use with Qalma plugin work to keep apps/docs, libs/editor/README.md, plugins/qalma, AGENTS.md, and repository skills accurate.
 ---
 
 # Qalma Docs Sync
@@ -35,7 +35,11 @@ Run this after any plugin or public editor capability changes.
    - `AGENTS.md` for durable agent instructions.
    - `.agents/skills/qalma-plugin-development` if plugin definition-of-done or
      workflow expectations change.
-8. Validate the changed surface with the narrowest useful checks:
+8. Update `plugins/qalma/skills/qalma` when public agent guidance becomes stale:
+   - Add, rename, or remove public plugin names, commands, queries, and options.
+   - Keep integration examples aligned with current public imports.
+   - Keep contributor workflow guidance aligned with repository expectations.
+9. Validate the changed surface with the narrowest useful checks:
    - `pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit`
    - `pnpm exec tsc -p apps/docs/tsconfig.json --noEmit`
    - `pnpm nx build docs`

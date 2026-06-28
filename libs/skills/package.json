@@ -1,0 +1,41 @@
+{
+  "name": "@qalma/skills",
+  "version": "0.1.0-beta.4",
+  "description": "Install the Qalma agent skill pack into Claude Code, Codex, or any SKILL.md-aware agent.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdskill/qalma.git",
+    "directory": "libs/skills"
+  },
+  "bugs": {
+    "url": "https://github.com/cdskill/qalma/issues"
+  },
+  "homepage": "https://qalma.dev/",
+  "keywords": [
+    "qalma",
+    "angular",
+    "rich-text-editor",
+    "skills",
+    "claude",
+    "claude-code",
+    "codex",
+    "agent",
+    "cli"
+  ],
+  "type": "commonjs",
+  "bin": {
+    "qalma-skills": "./src/cli.js"
+  },
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "files": [
+    "src",
+    "pack",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  }
+}

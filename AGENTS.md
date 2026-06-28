@@ -46,6 +46,9 @@ extension points over exposing raw ProseMirror details.
 - Preserve unique plugin keys, schema names, command names, and shortcuts.
 - Keep the public barrel intentional and small. Do not export internal
   ProseMirror helpers or compatibility aliases without a concrete need.
+- Keep `plugins/qalma` as the public agent skill pack for Codex,
+  Claude-compatible skill loaders, and other agents that consume `SKILL.md`
+  folders.
 
 ## Angular Conventions
 
@@ -63,6 +66,8 @@ extension points over exposing raw ProseMirror details.
 - Read the current implementation before proposing or applying architecture.
 - Keep changes scoped and avoid speculative abstractions.
 - Add behavior to the sandbox only through the same public API a consumer uses.
+- Keep `plugins/qalma` aligned when public plugin capabilities, command names,
+  queries, integration patterns, or contribution workflows change.
 - Update `AGENTS.md` or the relevant repository skill when a change makes its
   architecture, workflow, public API, or validation guidance inaccurate.
 - Cover public behavior and important failure modes with the narrowest useful

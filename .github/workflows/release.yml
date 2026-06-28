@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish npm package
+    name: Publish npm packages
     runs-on: ubuntu-latest
 
     steps:
@@ -51,11 +51,13 @@ jobs:
           pnpm nx run-many -t lint
           pnpm exec tsc -p libs/editor/tsconfig.lib.json --noEmit
           pnpm exec tsc -p libs/editor/tsconfig.spec.json --noEmit
+          pnpm exec tsc -p libs/skills/tsconfig.lib.json --noEmit
           pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
           pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
           pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
           pnpm nx test editor -- --run
           pnpm nx test sandbox -- --run
+          pnpm nx test skills -- --run
           pnpm nx build sandbox
           pnpm nx e2e sandbox-e2e -- --project=chromium
 
@@ -93,9 +95,25 @@ jobs:
             --git-tag=false \
             --stage-changes=false
 
-      - name: Publish package with trusted publishing
+      - name: Verify package versions are unpublished
         shell: bash
-        run: npm publish dist/libs/editor --access public --tag latest --provenance
+        run: |
+          for PACKAGE_ROOT in dist/libs/editor dist/libs/skills; do
+            PACKAGE_NAME="$(node -p "require('./${PACKAGE_ROOT}/package.json').name")"
+            PACKAGE_VERSION="$(node -p "require('./${PACKAGE_ROOT}/package.json').version")"
+
+            if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+              echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published on npm." >&2
+              exit 1
+            fi
+          done
+
+      - name: Publish packages with trusted publishing
+        shell: bash
+        run: |
+          for PACKAGE_ROOT in dist/libs/skills dist/libs/editor; do
+            npm publish "$PACKAGE_ROOT" --access public --tag latest --provenance
+          done
 
       - name: Create GitHub release
         shell: bash
