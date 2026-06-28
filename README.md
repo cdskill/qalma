@@ -119,6 +119,31 @@ PRs that modify tests, E2E specs, snapshots, test configs, CI workflows, or
 the test-change guard need the `approved-test-change` label. The label is meant
 to force human review before a regression is accepted by weakening the tests.
 
+## Agent skills
+
+Qalma ships an experimental agent skill pack in [`plugins/qalma`](plugins/qalma)
+for Codex, Claude Code, and other agents that can consume `SKILL.md` folders. It
+teaches agents how to integrate `@qalma/editor`, compose headless Angular UI,
+author Qalma plugins, and debug common editor issues. The same skill source backs
+the npm installer.
+
+Install the skill pack in a project from npm:
+
+```sh
+npx @qalma/skills add
+```
+
+The npm CLI writes to `./.agents/skills/qalma` by default. It can also target
+tool-specific locations:
+
+```sh
+npx @qalma/skills add --target claude
+npx @qalma/skills add --target codex
+```
+
+The `codex` target writes to `./.agents/skills/qalma`, the same project-local
+skills directory Codex scans by default.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please read [AGENTS.md](AGENTS.md) for the

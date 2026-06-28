@@ -156,3 +156,5 @@ If the toolbar toggles formatting and `Ctrl/Cmd + Z` undoes it, you're ready.
 - [Quick Start](/docs/quick-start) — build a real editor with headings, lists
   and a live HTML output.
 - [Plugins](/docs/plugins) — the full catalogue of features you can opt into.
+- [Agent Skills](/docs/agent-skills) — install Qalma guidance for Codex,
+  Claude Code, or another `SKILL.md`-aware coding agent.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Qalma"
+  short_description: "Build Angular rich text editors with Qalma."
+  default_prompt: "Use $qalma to integrate Qalma in my Angular editor app."

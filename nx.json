@@ -72,10 +72,10 @@
     }
   },
   "release": {
-    "projects": ["editor"],
+    "projects": ["editor", "skills"],
     "version": {
-      "preVersionCommand": "pnpm nx build editor",
-      "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/editor"]
+      "preVersionCommand": "pnpm nx run-many -t build -p editor skills",
+      "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/{projectName}"]
     },
     "changelog": {
       "automaticFromRef": true,

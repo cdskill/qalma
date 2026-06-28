@@ -1,0 +1,41 @@
+{
+  "name": "skills",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/skills/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/dist/libs/skills"],
+      "options": {
+        "outputPath": "dist/libs/skills",
+        "main": "libs/skills/src/index.ts",
+        "tsConfig": "libs/skills/tsconfig.lib.json",
+        "assets": [
+          "libs/skills/README.md",
+          {
+            "input": "plugins/qalma/skills",
+            "glob": "**/*",
+            "output": "pack/skills"
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/vitest:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/skills"],
+      "options": {
+        "configFile": "libs/skills/vite.config.ts"
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/skills"
+      }
+    }
+  }
+}
