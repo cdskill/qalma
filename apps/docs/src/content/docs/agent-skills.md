@@ -111,31 +111,6 @@ The installed folder is named `qalma` and contains:
 The skill is documentation and workflow guidance for agents. It does not run in
 your application bundle.
 
-## Local Marketplace Install
-
-If you are contributing to Qalma from a local clone, you can also install the
-same skill source through agent marketplace manifests.
-
-Codex:
-
-```bash
-codex plugin marketplace add .
-codex plugin add qalma@qalma
-```
-
-Claude Code:
-
-```text
-/plugin marketplace add .
-/plugin install qalma@qalma
-```
-
-For most application projects, prefer the npm installer:
-
-```bash
-npx @qalma/skills add
-```
-
 ## Next Steps
 
 - [Installation](/docs/installation) — install `@qalma/editor` in Angular.

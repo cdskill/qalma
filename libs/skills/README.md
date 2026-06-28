@@ -39,11 +39,3 @@ so it never silently discards local edits.
 ```ts
 import { addSkill, bundledSkillSource, targetDir } from '@qalma/skills';
 ```
-
-## Marketplace install (alternative)
-
-Agents with native plugin marketplaces can install the pack directly from the
-Qalma repository instead of this CLI:
-
-- **Claude Code:** `/plugin marketplace add .` then `/plugin install qalma@qalma`
-- **Codex:** `codex plugin marketplace add .` then `codex plugin add qalma@qalma`

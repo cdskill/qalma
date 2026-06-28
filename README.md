@@ -125,7 +125,7 @@ Qalma ships an experimental agent skill pack in [`plugins/qalma`](plugins/qalma)
 for Codex, Claude Code, and other agents that can consume `SKILL.md` folders. It
 teaches agents how to integrate `@qalma/editor`, compose headless Angular UI,
 author Qalma plugins, and debug common editor issues. The same skill source backs
-the npm installer and the marketplace manifest for each tool.
+the npm installer.
 
 Install the skill pack in a project from npm:
 
@@ -139,32 +139,6 @@ tool-specific locations:
 ```sh
 npx @qalma/skills add --target claude
 npx @qalma/skills add --target codex
-```
-
-Marketplace installs from a local clone remain available for contributor
-workflows:
-
-- Codex reads [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json).
-- Claude Code reads [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
-
-**Codex:**
-
-```sh
-codex plugin marketplace add .
-codex plugin add qalma@qalma
-```
-
-**Claude Code** — run inside the CLI:
-
-```text
-/plugin marketplace add .
-/plugin install qalma@qalma
-```
-
-Or load it directly for a single session without installing:
-
-```sh
-claude --plugin-dir ./plugins/qalma
 ```
 
 ## Contributing

@@ -23,8 +23,6 @@ Use this reference only when working inside the Qalma source repository.
 - `apps/sandbox`: executable consumer documentation.
 - `apps/docs`: public documentation.
 - `plugins/qalma`: public agent skills for external users and contributors.
-- `.agents/plugins/marketplace.json`: Codex marketplace catalog for the pack.
-- `.claude-plugin/marketplace.json`: Claude Code marketplace catalog for the pack.
 
 ## Public Capability Changes
 
