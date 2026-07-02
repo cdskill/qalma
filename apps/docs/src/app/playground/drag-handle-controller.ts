@@ -5,12 +5,11 @@ import {
   QalmaEditorController,
 } from '@qalma/editor';
 
-const DRAG_START_DISTANCE = 4;
+const DRAG_START_DISTANCE = 8;
 const HANDLE_EDGE_MARGIN = 8;
 const HANDLE_GAP = 8;
-const HANDLE_WIDTH = 30;
-const HANDLE_MAX_VERTICAL_OFFSET = 24;
-const HANDLE_MIN_VERTICAL_OFFSET = 14;
+const HANDLE_BUTTON_SIZE = 30;
+const HANDLE_VERTICAL_MARGIN = 14;
 const DROP_LINE_EDGE_MARGIN = 8;
 
 export interface PlaygroundDragHandleView {
@@ -71,6 +70,7 @@ export class PlaygroundDragHandleController {
   private surface: HTMLElement | null = null;
   private currentBlock: HTMLElement | null = null;
   private pendingBlock: HTMLElement | null = null;
+  private lastPointerClientY: number | null = null;
   private refreshFrame: number | null = null;
   private handleKey: string | null = null;
   private dragSession: PlaygroundDragSession | null = null;
@@ -115,6 +115,7 @@ export class PlaygroundDragHandleController {
   hide(): void {
     this.currentBlock = null;
     this.pendingBlock = null;
+    this.lastPointerClientY = null;
     this.cancelScheduledRefresh();
     this.setHandle(null);
   }
@@ -175,8 +176,8 @@ export class PlaygroundDragHandleController {
       return;
     }
 
-    if (block === this.currentBlock && this.refreshFrame === null) {
-      return;
+    if (event instanceof PointerEvent) {
+      this.lastPointerClientY = event.clientY;
     }
 
     this.pendingBlock = block;
@@ -347,19 +348,21 @@ export class PlaygroundDragHandleController {
     const minX = surfaceRect.left + HANDLE_EDGE_MARGIN;
     const maxX = Math.max(
       minX,
-      surfaceRect.right - HANDLE_EDGE_MARGIN - HANDLE_WIDTH,
+      surfaceRect.right - HANDLE_EDGE_MARGIN - HANDLE_BUTTON_SIZE,
     );
-    const verticalOffset = clamp(
-      Math.min(rect.height / 2, HANDLE_MAX_VERTICAL_OFFSET),
-      HANDLE_MIN_VERTICAL_OFFSET,
-      Math.max(HANDLE_MIN_VERTICAL_OFFSET, rect.height / 2),
+    const verticalMargin = Math.min(HANDLE_VERTICAL_MARGIN, rect.height / 2);
+    const pointerY = this.lastPointerClientY ?? rect.top + rect.height / 2;
+    const rowY = clamp(
+      pointerY,
+      rect.top + verticalMargin,
+      rect.bottom - verticalMargin,
     );
     const x = Math.round(
-      clamp(rect.left - HANDLE_GAP - HANDLE_WIDTH, minX, maxX),
+      clamp(rect.left - HANDLE_GAP - HANDLE_BUTTON_SIZE, minX, maxX),
     );
     const y = Math.round(
       clamp(
-        rect.top + verticalOffset,
+        rowY - HANDLE_BUTTON_SIZE / 2,
         surfaceRect.top + HANDLE_EDGE_MARGIN,
         surfaceRect.bottom - HANDLE_EDGE_MARGIN,
       ),
@@ -370,7 +373,7 @@ export class PlaygroundDragHandleController {
     this.currentBlock = block;
     this.setHandle({
       target,
-      transform: `translate3d(${x}px, ${y}px, 0) translateY(-50%)`,
+      transform: `translate3d(${x}px, ${y}px, 0)`,
       blockType: block.dataset['qalmaDragHandleType'] ?? 'block',
       canMoveUp,
       canMoveDown,
