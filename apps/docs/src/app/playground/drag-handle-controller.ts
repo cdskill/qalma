@@ -4,12 +4,12 @@ import {
   DragHandleMoveCommandValue,
   QalmaEditorController,
 } from '@qalma/editor';
+import { anchorToRect } from '@qalma/kit';
 
 const DRAG_START_DISTANCE = 8;
 const HANDLE_EDGE_MARGIN = 8;
 const HANDLE_GAP = 8;
 const HANDLE_BUTTON_SIZE = 30;
-const HANDLE_VERTICAL_MARGIN = 14;
 const DROP_LINE_EDGE_MARGIN = 8;
 
 export interface PlaygroundDragHandleView {
@@ -345,35 +345,21 @@ export class PlaygroundDragHandleController {
     }
 
     const surfaceRect = surface.getBoundingClientRect();
-    const minX = surfaceRect.left + HANDLE_EDGE_MARGIN;
-    const maxX = Math.max(
-      minX,
-      surfaceRect.right - HANDLE_EDGE_MARGIN - HANDLE_BUTTON_SIZE,
-    );
-    const verticalMargin = Math.min(HANDLE_VERTICAL_MARGIN, rect.height / 2);
-    const pointerY = this.lastPointerClientY ?? rect.top + rect.height / 2;
-    const rowY = clamp(
-      pointerY,
-      rect.top + verticalMargin,
-      rect.bottom - verticalMargin,
-    );
-    const x = Math.round(
-      clamp(rect.left - HANDLE_GAP - HANDLE_BUTTON_SIZE, minX, maxX),
-    );
-    const y = Math.round(
-      clamp(
-        rowY - HANDLE_BUTTON_SIZE / 2,
-        surfaceRect.top + HANDLE_EDGE_MARGIN,
-        surfaceRect.bottom - HANDLE_EDGE_MARGIN,
-      ),
-    );
+    const position = anchorToRect(rect, {
+      placement: 'left',
+      boundary: surfaceRect,
+      size: { width: HANDLE_BUTTON_SIZE, height: HANDLE_BUTTON_SIZE },
+      gap: HANDLE_GAP,
+      edgeMargin: HANDLE_EDGE_MARGIN,
+      align: this.lastPointerClientY ?? rect.top + rect.height / 2,
+    });
     const canMoveUp = this.editor().canExecute('moveBlockUp', target);
     const canMoveDown = this.editor().canExecute('moveBlockDown', target);
 
     this.currentBlock = block;
     this.setHandle({
       target,
-      transform: `translate3d(${x}px, ${y}px, 0)`,
+      transform: `translate3d(${Math.round(position.left)}px, ${Math.round(position.top)}px, 0)`,
       blockType: block.dataset['qalmaDragHandleType'] ?? 'block',
       canMoveUp,
       canMoveDown,
@@ -527,8 +513,4 @@ function isRectVisibleInsideSurface(
     rect.right > surfaceRect.left &&
     rect.left < surfaceRect.right
   );
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }

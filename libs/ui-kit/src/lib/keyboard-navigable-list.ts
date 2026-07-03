@@ -9,28 +9,30 @@ export interface KeyboardNavigableListOptions<T> {
  * Arrow-key navigation + Enter-to-select for autocomplete-style popovers
  * (mention menu, slash command menu). Shared so both features stop
  * reimplementing the same wrap-around index math.
+ *
+ * Takes a plain key string rather than a `KeyboardEvent` — some callers
+ * relay keys through a `CustomEvent` (no real `KeyboardEvent` to read),
+ * so preventing the default action is left to the caller.
  */
 export class KeyboardNavigableList<T> {
   constructor(private readonly options: KeyboardNavigableListOptions<T>) {}
 
-  /** Returns true when the key was handled (caller should stop further propagation). */
-  handleKeydown(event: KeyboardEvent): boolean {
+  /** Returns true when the key was handled (caller should stop further propagation / preventDefault). */
+  handleKey(key: string): boolean {
     const items = this.options.items();
 
     if (items.length === 0) {
       return false;
     }
 
-    switch (event.key) {
+    switch (key) {
       case 'ArrowDown':
-        event.preventDefault();
         this.options.setActiveIndex(
           (this.options.activeIndex() + 1) % items.length,
         );
 
         return true;
       case 'ArrowUp':
-        event.preventDefault();
         this.options.setActiveIndex(
           (this.options.activeIndex() - 1 + items.length) % items.length,
         );
@@ -44,7 +46,6 @@ export class KeyboardNavigableList<T> {
           return false;
         }
 
-        event.preventDefault();
         this.options.onSelect(item, index);
 
         return true;

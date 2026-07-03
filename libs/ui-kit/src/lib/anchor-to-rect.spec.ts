@@ -85,6 +85,22 @@ describe('anchorToRect', () => {
     expect(position.top).toBe(90 - 24);
   });
 
+  it('centers the floating element when it is taller than the anchor', () => {
+    // A single-line block (e.g. a 24px-tall paragraph) is routinely shorter
+    // than a 30px handle button. Centering, not edge-clamping, is the only
+    // sane fallback.
+    const anchor = { top: 80, bottom: 104, left: 180, right: 680 };
+
+    const position = anchorToRect(anchor, {
+      placement: 'left',
+      boundary: { top: 0, bottom: 900, left: 0, right: 1280 },
+      size: { width: 30, height: 30 },
+      align: 80, // pointer near the very top of the block
+    });
+
+    expect(position.top).toBe(80 + (104 - 80) / 2 - 30 / 2);
+  });
+
   it('keeps the floating element within the horizontal boundary', () => {
     const anchor = { top: 300, bottom: 320, left: 1250, right: 1270 };
 

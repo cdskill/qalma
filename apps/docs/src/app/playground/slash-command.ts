@@ -4,6 +4,7 @@ import {
   QalmaEditorController,
   SlashCommandState,
 } from '@qalma/editor';
+import { KeyboardNavigableList } from '@qalma/kit';
 
 export interface PlaygroundSlashCommandOption {
   id: string;
@@ -155,6 +156,14 @@ export class PlaygroundSlashCommandController {
       this.options().length > 0,
   );
 
+  private readonly keyboardNav =
+    new KeyboardNavigableList<PlaygroundSlashCommandOption>({
+      items: () => this.options(),
+      activeIndex: () => this.activeIndex(),
+      setActiveIndex: (index) => this.activeIndex.set(index),
+      onSelect: (option) => this.insert(option),
+    });
+
   constructor(private readonly editor: QalmaEditorController) {}
 
   refresh(): void {
@@ -267,19 +276,7 @@ export class PlaygroundSlashCommandController {
       return true;
     }
 
-    if (key === 'ArrowDown') {
-      this.moveActiveOption(1);
-
-      return true;
-    }
-
-    if (key === 'ArrowUp') {
-      this.moveActiveOption(-1);
-
-      return true;
-    }
-
-    if (key === 'Enter' || key === 'Tab') {
+    if (key === 'Tab') {
       const option = this.options()[this.activeIndex()];
 
       if (option) {
@@ -287,19 +284,11 @@ export class PlaygroundSlashCommandController {
 
         return true;
       }
+
+      return false;
     }
 
-    return false;
-  }
-
-  private moveActiveOption(delta: number): void {
-    const length = this.options().length;
-
-    if (length === 0) {
-      return;
-    }
-
-    this.activeIndex.update((index) => (index + delta + length) % length);
+    return this.keyboardNav.handleKey(key);
   }
 }
 

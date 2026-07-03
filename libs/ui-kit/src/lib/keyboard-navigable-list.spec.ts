@@ -2,10 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { KeyboardNavigableList } from './keyboard-navigable-list';
 
-function createEvent(key: string): KeyboardEvent {
-  return new KeyboardEvent('keydown', { key, cancelable: true });
-}
-
 describe('KeyboardNavigableList', () => {
   it('moves the active index forward on ArrowDown and wraps at the end', () => {
     let activeIndex = 0;
@@ -19,11 +15,11 @@ describe('KeyboardNavigableList', () => {
       onSelect: vi.fn(),
     });
 
-    expect(list.handleKeydown(createEvent('ArrowDown'))).toBe(true);
+    expect(list.handleKey('ArrowDown')).toBe(true);
     expect(setActiveIndex).toHaveBeenLastCalledWith(1);
 
     activeIndex = 2;
-    expect(list.handleKeydown(createEvent('ArrowDown'))).toBe(true);
+    expect(list.handleKey('ArrowDown')).toBe(true);
     expect(setActiveIndex).toHaveBeenLastCalledWith(0);
   });
 
@@ -39,7 +35,7 @@ describe('KeyboardNavigableList', () => {
       onSelect: vi.fn(),
     });
 
-    expect(list.handleKeydown(createEvent('ArrowUp'))).toBe(true);
+    expect(list.handleKey('ArrowUp')).toBe(true);
     expect(setActiveIndex).toHaveBeenLastCalledWith(2);
   });
 
@@ -52,7 +48,7 @@ describe('KeyboardNavigableList', () => {
       onSelect,
     });
 
-    expect(list.handleKeydown(createEvent('Enter'))).toBe(true);
+    expect(list.handleKey('Enter')).toBe(true);
     expect(onSelect).toHaveBeenCalledWith('b', 1);
   });
 
@@ -66,7 +62,7 @@ describe('KeyboardNavigableList', () => {
       onSelect,
     });
 
-    expect(list.handleKeydown(createEvent('a'))).toBe(false);
+    expect(list.handleKey('a')).toBe(false);
     expect(onSelect).not.toHaveBeenCalled();
     expect(setActiveIndex).not.toHaveBeenCalled();
   });
@@ -79,7 +75,7 @@ describe('KeyboardNavigableList', () => {
       onSelect: vi.fn(),
     });
 
-    expect(list.handleKeydown(createEvent('ArrowDown'))).toBe(false);
-    expect(list.handleKeydown(createEvent('Enter'))).toBe(false);
+    expect(list.handleKey('ArrowDown')).toBe(false);
+    expect(list.handleKey('Enter')).toBe(false);
   });
 });

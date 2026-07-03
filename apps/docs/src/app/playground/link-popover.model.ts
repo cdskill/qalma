@@ -1,3 +1,5 @@
+import { anchorToRect } from '@qalma/kit';
+
 export interface LinkPopover extends LinkPopoverPlacement {
   editing: boolean;
   element: HTMLAnchorElement | null;
@@ -12,17 +14,30 @@ export interface LinkPopoverPlacement {
   top: number;
 }
 
+const LINK_POPOVER_WIDTH = 360;
+// Both the editing and preview rows are a single h-9 (36px) control plus
+// padding/border; this is an estimate since the actual element isn't
+// rendered yet when the placement is computed.
+const LINK_POPOVER_HEIGHT_ESTIMATE = 56;
+
 export function createLinkPopoverPlacement(
   element: HTMLElement,
 ): LinkPopoverPlacement {
   const rect = element.getBoundingClientRect();
-  const width = 360;
-  const leftBoundary = Math.max(16, window.innerWidth - width - 16);
 
-  return {
-    left: Math.min(Math.max(rect.left, 16), leftBoundary),
-    top: rect.bottom + 8,
-  };
+  return anchorToRect(rect, {
+    placement: 'bottom',
+    boundary: {
+      top: 0,
+      bottom: window.innerHeight,
+      left: 0,
+      right: window.innerWidth,
+    },
+    size: { width: LINK_POPOVER_WIDTH, height: LINK_POPOVER_HEIGHT_ESTIMATE },
+    gap: 8,
+    edgeMargin: 16,
+    align: 'start',
+  });
 }
 
 export function findEditorLinkElement(

@@ -4,6 +4,7 @@ import {
   MentionState,
   QalmaEditorController,
 } from '@qalma/editor';
+import { KeyboardNavigableList } from '@qalma/kit';
 
 export interface PlaygroundMentionOption {
   id: string;
@@ -96,6 +97,14 @@ export class PlaygroundMentionController {
   );
 
   private requestId = 0;
+  private readonly keyboardNav = new KeyboardNavigableList<PlaygroundMentionOption>(
+    {
+      items: () => this.suggestions(),
+      activeIndex: () => this.activeIndex(),
+      setActiveIndex: (index) => this.activeIndex.set(index),
+      onSelect: (option) => this.insert(option),
+    },
+  );
 
   constructor(
     private readonly editor: QalmaEditorController,
@@ -173,19 +182,7 @@ export class PlaygroundMentionController {
       return true;
     }
 
-    if (key === 'ArrowDown') {
-      this.moveActiveOption(1);
-
-      return true;
-    }
-
-    if (key === 'ArrowUp') {
-      this.moveActiveOption(-1);
-
-      return true;
-    }
-
-    if (key === 'Enter' || key === 'Tab' || key === ' ' || key === 'Spacebar') {
+    if (key === 'Tab' || key === ' ' || key === 'Spacebar') {
       const option = this.suggestions()[this.activeIndex()];
 
       if (option) {
@@ -193,9 +190,11 @@ export class PlaygroundMentionController {
 
         return true;
       }
+
+      return false;
     }
 
-    return false;
+    return this.keyboardNav.handleKey(key);
   }
 
   setActiveIndex(index: number): void {
@@ -224,16 +223,6 @@ export class PlaygroundMentionController {
     this.suggestions.set([]);
     this.loading.set(false);
     this.activeIndex.set(0);
-  }
-
-  private moveActiveOption(delta: number): void {
-    const length = this.suggestions().length;
-
-    if (length === 0) {
-      return;
-    }
-
-    this.activeIndex.update((index) => (index + delta + length) % length);
   }
 }
 

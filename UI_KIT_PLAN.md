@@ -73,10 +73,13 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       sélection de texte ProseMirror ou une range de mention n'a pas
       toujours d'élément DOM à ancrer) → primitive dédiée légère, pas
       d'adoption de CDK Overlay dans cette slice.
-- [x] Tests unitaires (17 tests, `anchor-to-rect.spec.ts` reproduit
+- [x] Tests unitaires (18 tests, `anchor-to-rect.spec.ts` reproduit
       notamment le scénario réel du drag handle vérifié en live plus tôt).
-      E2E `apps/sandbox-e2e` pas encore touché — rien à tester en e2e tant
-      que ces primitives ne sont branchées nulle part (Phase 4).
+- [x] **Branché dans les 4 consommateurs réels** (voir détail dans le log —
+      retour utilisateur pris en compte, pas resté en primitives inutilisées).
+      E2E `apps/sandbox-e2e` toujours pas touché — sandbox n'utilise aucune
+      de ces features aujourd'hui (drag handle, link popover, mention,
+      slash-command sont uniquement dans `apps/docs/playground`).
 
 ### Phase 3 — Boutons de toolbar
 - [ ] `ToolbarButton` générique (`command`, `value`, `activeQuery`).
@@ -84,14 +87,20 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       `{command, icon, tooltip, activeQuery}[]` couvrant marks / blocks /
       align / history / table-si-`isInTable`.
 
-### Phase 4 — Wrappers de features
-- [ ] `DragHandle` + `BlockActionsMenu` (porte la logique déjà fixée dans
-      `apps/docs/src/app/playground/drag-handle-controller.ts`, sert de
-      référence).
-- [ ] `LinkPopover` (anchor + dismiss).
-- [ ] `ContextualToolbar` (anchor + dismiss, réutilise `ToolbarButton`).
-- [ ] `MentionMenu` / `SlashCommandMenu` (anchor + dismiss + keyboard-nav,
-      données fournies par le host).
+### Phase 4 — Wrappers de features (composants réutilisables dans `@qalma/kit`)
+Distinct de la Phase 2 : la Phase 2 a branché les *primitives* dans le code
+existant d'`apps/docs` (moins de duplication, bugs corrigés). Il reste à
+extraire ces features en vrais composants exportés par `@qalma/kit`, que
+`apps/docs` ET `apps/sandbox` pourraient tous les deux consommer :
+- [ ] `DragHandle` + `BlockActionsMenu` en composant `@qalma/kit` (la logique
+      controller est déjà saine, `anchorToRect` déjà branché).
+- [ ] `LinkPopover` en composant `@qalma/kit` (positionnement déjà fixé).
+- [ ] `ContextualToolbar` — garder son propre positionnement point-ancre +
+      CSS self-centering (pas `anchorToRect`, voir log : largeur dynamique,
+      mauvais candidat pour un size fixe).
+- [ ] `MentionMenu` / `SlashCommandMenu` en composants `@qalma/kit` (garder
+      LEUR positionnement flip-above existant, qui est plus avancé que
+      `anchorToRect` aujourd'hui ; `KeyboardNavigableList` déjà branché).
 
 ### Phase 5 — Dogfooding
 - [ ] Migrer `apps/docs/playground` sur `@qalma/kit` (supprime une
@@ -146,3 +155,62 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
   que remplacement des 4 existantes) — retour utilisateur pris en compte.
   Phase 4 (brancher les 4 consommateurs existants sur ces primitives) est
   donc avancée immédiatement après, plutôt que reportée après les Phases 3.
+- 2026-07-04 — Branchement réel des primitives dans les 4 consommateurs
+  existants (PAS ENCORE COMMIT, à la demande explicite). En le faisant
+  vraiment (pas juste en pensée), plusieurs choses se sont révélées :
+  - **Vrai bug trouvé dans `anchorToRect`** : quand l'élément flottant est
+    plus haut que le bloc ancré (cas courant — un bouton de 30px contre un
+    paragraphe d'une ligne de 24px), le clamp donnait un résultat arbitraire
+    au lieu de centrer. Corrigé (`resolveCrossAxis` détecte
+    `size >= span` et centre), test dédié ajouté, et ça reproduit
+    exactement l'ancien comportement de `drag-handle-controller.ts` pour ce
+    cas (dégénère déjà en centrage pour les blocs courts).
+  - **`drag-handle-controller.ts`** : `updateFromBlock` utilise maintenant
+    `anchorToRect` (placement `left`, align = position du curseur). Le
+    `clamp()` local et `HANDLE_VERTICAL_MARGIN` supprimés. Test existant
+    (`translate3d(142px, 77px, 0)`) toujours vert sans modification —
+    migration bit-perfect. Revérifié en live dans le navigateur (bouton
+    aligné sur la ligne survolée, ne saute plus à l'ouverture du menu).
+  - **`link-popover.model.ts`** : `createLinkPopoverPlacement` réécrite avec
+    `anchorToRect` (placement `bottom`, align `start`). Corrige le vrai bug
+    identifié en Phase 0 : l'ancien code ne clampait JAMAIS verticalement
+    (`rect.bottom + 8` pouvait sortir de l'écran) — hauteur estimée à 56px
+    (ligne unique `h-9` + padding) faute d'élément réel à mesurer au moment
+    du calcul.
+  - **`selection-toolbar-controller.ts` : intentionnellement PAS migré.**
+    Son positionnement (point-ancre + `translate(-50%,-100%)` en CSS,
+    laissant le navigateur centrer sur la taille réelle et non estimée)
+    est mieux adapté à un contenu de largeur dynamique que ma primitive
+    actuelle, qui a besoin d'une taille fixe en JS. Le forcer aurait
+    dégradé le comportement, pas amélioré.
+  - **`mention.ts` / `slash-command.ts` : positionnement intentionnellement
+    PAS migré.** Leur logique maison (flip au-dessus si pas de place en
+    dessous, `maxHeight` dynamique selon l'espace disponible) est plus
+    avancée que ce que fait `anchorToRect` aujourd'hui — migrer aurait été
+    une régression. `KeyboardNavigableList`, en revanche, EST branché dans
+    les deux : `handleNavigationKey` délègue ArrowUp/ArrowDown/Enter à la
+    primitive et garde Escape/Tab/Espace en local (`moveActiveOption` local
+    supprimé, devenu mort). Ça a forcé une correction d'API sur la
+    primitive elle-même : `handleKeydown(event: KeyboardEvent)` →
+    `handleKey(key: string)`, parce que ce système relaie les touches via
+    un `CustomEvent` (`detail.key`), pas un vrai `KeyboardEvent` — découvert
+    seulement en essayant de brancher un 2e vrai consommateur.
+  - **`DismissibleOverlay` reste non branché.** Les 4 flows de dismiss
+    existants sont hétérogènes (hover-based pour le link popover,
+    keydown scopé à la surface pour le contextual toolbar, boutons +
+    Escape pour le drag handle menu) — aucun n'est un remplacement direct
+    sans revoir aussi le comportement. Pas fait dans cette slice pour ne
+    pas mélanger "brancher les primitives existantes" et "changer des
+    comportements de dismiss non demandés".
+  - Vérifié en live dans le navigateur : positionnement du drag handle
+    (inchangé, toujours correct), navigation clavier mention (ArrowDown
+    ×2 → index 2, ArrowUp → index 1, Enter → insertion + fermeture réelles)
+    et slash-command (même chose + Escape → fermeture) — testé en pilotant
+    les vraies instances des contrôleurs via `ng.getComponent`, pas
+    seulement via les tests unitaires de la primitive.
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor,sandbox` : tout
+    vert (22 tests `docs` inchangés, 18 tests `ui-kit`).
+  - Prochaine étape : Phase 3 (`ToolbarButton` générique + registry) — en
+    attente de feu vert. Phase 4 restante (extraire ces features en vrais
+    composants `@qalma/kit` réutilisables par `apps/sandbox`) reste à faire
+    séparément.

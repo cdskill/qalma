@@ -107,6 +107,15 @@ function resolveCrossAxis(
   end: number,
   size: number,
 ): number {
+  const span = end - start;
+
+  if (size >= span) {
+    // The floating element doesn't fit within the anchor (e.g. a
+    // single-line block shorter than the button anchored to it). Center it
+    // instead of clamping to an arbitrary edge.
+    return start + span / 2 - size / 2;
+  }
+
   if (typeof align === 'number') {
     return clamp(align - size / 2, start, end - size);
   }
