@@ -176,7 +176,7 @@ export class PlaygroundDragHandleController {
       return;
     }
 
-    if (event instanceof PointerEvent) {
+    if (event instanceof MouseEvent) {
       this.lastPointerClientY = event.clientY;
     }
 

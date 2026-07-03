@@ -190,7 +190,7 @@ describe('DragHandlePlugin', () => {
     const handle = controller.handle();
 
     expect(handle?.target).toEqual({ pos: 0 });
-    expect(handle?.transform).toContain('translate3d(142px, 94px, 0)');
+    expect(handle?.transform).toContain('translate3d(142px, 77px, 0)');
 
     surface.dispatchEvent(createPointerMoveEvent());
 
