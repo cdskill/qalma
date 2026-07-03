@@ -52,16 +52,31 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       — repris tel quel des classes Tailwind déjà utilisées par `apps/docs`.
 
 ### Phase 2 — Primitives de comportement partagées
-- [ ] `anchorToRect(rect, surface)` — positionnement + clamp horizontal ET
-      vertical d'un élément flottant depuis un rect ProseMirror. Généralise
-      et corrige les 4 implémentations dispersées existantes.
-- [ ] Dismissible overlay — clic-dehors / Escape / scroll-aware hide, unifié.
-- [ ] Keyboard-navigable list — flèches haut/bas + enter/escape (mention,
-      slash command).
-- [ ] Évaluer l'appui sur `@spartan-ng/brain` (déjà présent, `BrnPopover`
-      déjà validé) avant de réinventer une couche custom.
-- [ ] Tests : unitaires sur le clamp/positionnement, e2e via
-      `apps/sandbox-e2e` (déjà existant).
+- [x] `anchorToRect(rect, options)` — positionnement + clamp horizontal ET
+      vertical d'un élément flottant depuis un rect ProseMirror. Placement
+      top/bottom/left/right + align `start`/`center`/`end`/nombre (pour
+      suivre un curseur, cas du drag handle). Ne touche PAS encore aux 4
+      implémentations dispersées existantes — ça, c'est la Phase 4
+      (wrappers de features), volontairement pas fait ici pour rester une
+      slice indépendante et testable seule.
+- [x] Dismissible overlay — `DismissibleOverlay` : clic-dehors (pointerdown
+      capturé sur `document`) + Escape, unifié. Le "hover-aware delay" du
+      link-popover (`scheduleHide` 160ms) reste spécifique à cette feature,
+      pas généralisé ici (pas assez de recul sur un 2e cas d'usage réel).
+- [x] Keyboard-navigable list — `KeyboardNavigableList<T>` : ArrowUp/
+      ArrowDown avec wrap, Enter pour sélectionner, signal-based
+      (`items()`/`activeIndex()`/`setActiveIndex()`), pour mention et
+      slash-command.
+- [x] Évalué `@spartan-ng/brain`/popover : `BrnPopover` s'ancre sur un
+      **élément trigger réel** (`brnPopoverTriggerFor`, hérite de
+      `BrnDialog`), pas sur un rect arbitraire. Ne convient pas ici (une
+      sélection de texte ProseMirror ou une range de mention n'a pas
+      toujours d'élément DOM à ancrer) → primitive dédiée légère, pas
+      d'adoption de CDK Overlay dans cette slice.
+- [x] Tests unitaires (17 tests, `anchor-to-rect.spec.ts` reproduit
+      notamment le scénario réel du drag handle vérifié en live plus tôt).
+      E2E `apps/sandbox-e2e` pas encore touché — rien à tester en e2e tant
+      que ces primitives ne sont branchées nulle part (Phase 4).
 
 ### Phase 3 — Boutons de toolbar
 - [ ] `ToolbarButton` générique (`command`, `value`, `activeQuery`).
@@ -112,3 +127,22 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
   + jsdom), commit séparé `fix(docs)` avant le commit `feat(ui-kit)`.
   Commits : `e81d461` (fix), `0c1539b` (feat). Prochaine étape : Phase 2
   (primitives partagées anchor/dismiss/keyboard-nav).
+- 2026-07-04 — Phase 2 commitée. Ajout de trois primitives pures dans
+  `libs/ui-kit/src/lib/` : `anchor-to-rect.ts` (positionnement + clamp
+  horizontal/vertical, placement top/bottom/left/right, align
+  start/center/end/nombre-suivant-curseur), `dismissible-overlay.ts`
+  (clic-dehors + Escape), `keyboard-navigable-list.ts` (flèches + Enter,
+  wrap-around). Évalué `@spartan-ng/brain`'s `BrnPopover` — écarté car
+  ancré sur un élément trigger réel, pas sur un rect arbitraire, donc pas
+  adapté à un rect de sélection ProseMirror. 17 tests unitaires ajoutés
+  (dont un qui reproduit exactement le scénario réel du drag handle vérifié
+  en live plus tôt dans la session). Piège rencontré et corrigé deux fois :
+  les tests utilisant `new PointerEvent(...)` cassent sous vitest/jsdom
+  (global absent) — repris la convention déjà en place dans
+  `drag-handle.spec.ts` (`new MouseEvent(...) as PointerEvent`).
+  `nx run-many -t lint,test,build -p ui-kit,docs,editor,sandbox` : tout vert.
+  **Correction de plan** : construire des primitives sans les brancher nulle
+  part ne règle pas la duplication (5ème implémentation inutilisée plutôt
+  que remplacement des 4 existantes) — retour utilisateur pris en compte.
+  Phase 4 (brancher les 4 consommateurs existants sur ces primitives) est
+  donc avancée immédiatement après, plutôt que reportée après les Phases 3.
