@@ -1,0 +1,28 @@
+{
+  "name": "ui-kit",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui-kit/src",
+  "prefix": "qalma",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/libs/ui-kit"],
+      "options": {
+        "project": "libs/ui-kit/ng-package.json",
+        "tsConfig": "libs/ui-kit/tsconfig.lib.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/vitest:test",
+      "outputs": ["{workspaceRoot}/coverage/libs/ui-kit"],
+      "options": {
+        "configFile": "libs/ui-kit/vite.config.ts"
+      }
+    }
+  }
+}

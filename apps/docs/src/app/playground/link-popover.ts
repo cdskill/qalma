@@ -15,11 +15,11 @@ import {
 } from '@ng-icons/lucide';
 
 import { LinkPopover } from './link-popover.model';
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon, HlmButton],
+  imports: [NgIcon, QalmaButton],
   providers: [
     provideIcons({
       lucideCheck,
@@ -64,7 +64,7 @@ import { HlmButton } from '../ui/button';
               />
             </label>
             <button
-              appBtn
+              qalmaBtn
               size="icon"
               type="button"
               [disabled]="!href().trim()"
@@ -75,7 +75,7 @@ import { HlmButton } from '../ui/button';
               <ng-icon name="lucideCheck" aria-hidden="true" />
             </button>
             <button
-              appBtn
+              qalmaBtn
               variant="outline"
               size="icon"
               type="button"
@@ -105,7 +105,7 @@ import { HlmButton } from '../ui/button';
               />
             </a>
             <button
-              appBtn
+              qalmaBtn
               variant="outline"
               size="icon"
               type="button"
@@ -116,7 +116,7 @@ import { HlmButton } from '../ui/button';
               <ng-icon name="lucidePencil" aria-hidden="true" />
             </button>
             <button
-              appBtn
+              qalmaBtn
               variant="ghost"
               size="icon"
               type="button"

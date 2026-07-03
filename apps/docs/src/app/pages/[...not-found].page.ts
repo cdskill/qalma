@@ -9,7 +9,7 @@ import {
 } from '@ng-icons/lucide';
 
 import { DocsHeader } from '../components/docs-header';
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 
 export const routeMeta: RouteMeta = {
   title: 'Page not found',
@@ -29,7 +29,7 @@ export const routeMeta: RouteMeta = {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-not-found',
-  imports: [RouterLink, NgIcon, DocsHeader, HlmButton],
+  imports: [RouterLink, NgIcon, DocsHeader, QalmaButton],
   providers: [
     provideIcons({
       lucideArrowLeft,
@@ -67,11 +67,11 @@ export const routeMeta: RouteMeta = {
           </p>
 
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a appBtn routerLink="/" variant="accent" size="lg">
+            <a qalmaBtn routerLink="/" variant="accent" size="lg">
               <ng-icon name="lucideArrowLeft" aria-hidden="true" />
               Back home
             </a>
-            <a appBtn routerLink="/docs/introduction" variant="outline" size="lg">
+            <a qalmaBtn routerLink="/docs/introduction" variant="outline" size="lg">
               <ng-icon name="lucideBookOpen" aria-hidden="true" />
               Read the docs
             </a>

@@ -15,7 +15,7 @@ import {
   lucideX,
 } from '@ng-icons/lucide';
 
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 import { ThemeToggle } from './theme-toggle';
 import { PosthogService } from '../services/posthog.service';
 import { DOCS_NAV } from '../docs/docs-nav';
@@ -39,7 +39,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-docs-header',
-  imports: [RouterLink, RouterLinkActive, NgIcon, HlmButton, ThemeToggle],
+  imports: [RouterLink, RouterLinkActive, NgIcon, QalmaButton, ThemeToggle],
   providers: [
     provideIcons({
       lucideGithub,
@@ -141,7 +141,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </button>
 
           <a
-            appBtn
+            qalmaBtn
             variant="ghost"
             size="icon"
             href="https://www.npmjs.com/package/@qalma/editor"
@@ -163,7 +163,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </a>
 
           <a
-            appBtn
+            qalmaBtn
             variant="ghost"
             size="icon"
             href="https://github.com/cdskill/qalma"

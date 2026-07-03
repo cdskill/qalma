@@ -21,7 +21,7 @@ import {
   PlaygroundDragDropIndicator,
   PlaygroundDragHandleView,
 } from './drag-handle-controller';
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 
 export interface PlaygroundDragStart {
   event: PointerEvent;
@@ -30,7 +30,7 @@ export interface PlaygroundDragStart {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon, HlmButton],
+  imports: [NgIcon, QalmaButton],
   providers: [
     provideIcons({
       lucideArrowDown,
@@ -72,7 +72,7 @@ export interface PlaygroundDragStart {
         (keydown.escape)="dismissFromKeyboard($event)"
       >
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"

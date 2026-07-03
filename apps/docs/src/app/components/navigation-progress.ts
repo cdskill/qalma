@@ -15,12 +15,12 @@ import {
 } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { HlmProgressImports } from '../ui/progress';
+import { QalmaProgressImports } from '@qalma/kit';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-navigation-progress',
-  imports: [...HlmProgressImports],
+  imports: [...QalmaProgressImports],
   template: `
     @if (isNavigating()) {
       <div
@@ -28,12 +28,12 @@ import { HlmProgressImports } from '../ui/progress';
         class="pointer-events-none fixed inset-x-0 top-0 z-[70] h-1 overflow-hidden"
       >
         <div
-          hlmProgress
+          qalmaProgress
           class="h-full rounded-none bg-accent-subtle"
           style="display: flex"
         >
           <div
-            hlmProgressIndicator
+            qalmaProgressIndicator
             class="origin-left rounded-r-full bg-accent shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_60%,transparent)]"
           ></div>
         </div>
@@ -42,7 +42,7 @@ import { HlmProgressImports } from '../ui/progress';
   `,
   styles: `
     @media (prefers-reduced-motion: reduce) {
-      [hlmProgressIndicator] {
+      [qalmaProgressIndicator] {
         animation: none;
         transform: none !important;
       }

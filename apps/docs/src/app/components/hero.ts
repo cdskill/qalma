@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideSparkles } from '@ng-icons/lucide';
 
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 import { InstallTabs } from './install-tabs';
 import { PosthogService } from '../services/posthog.service';
 
@@ -15,7 +15,7 @@ import { PosthogService } from '../services/posthog.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-hero',
-  imports: [NgIcon, HlmButton, InstallTabs, RouterLink],
+  imports: [NgIcon, QalmaButton, InstallTabs, RouterLink],
   providers: [provideIcons({ lucideArrowRight, lucideSparkles })],
   template: `
     <section
@@ -61,7 +61,7 @@ import { PosthogService } from '../services/posthog.service';
 
       <div class="mt-7 flex justify-center">
         <a
-          appBtn
+          qalmaBtn
           size="lg"
           routerLink="/docs/introduction"
           (click)="trackGetStarted()"

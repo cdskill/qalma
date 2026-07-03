@@ -19,7 +19,7 @@ import {
   lucideLink,
 } from '@ng-icons/lucide';
 
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 
 export interface PlaygroundContextualToolbarPlacement {
   transform: string;
@@ -27,7 +27,7 @@ export interface PlaygroundContextualToolbarPlacement {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon, HlmButton, QalmaCommand, QalmaToolbar],
+  imports: [NgIcon, QalmaButton, QalmaCommand, QalmaToolbar],
   providers: [
     provideIcons({
       lucideBold,
@@ -48,7 +48,7 @@ export interface PlaygroundContextualToolbarPlacement {
         (keydown.escape)="dismissFromKeyboard($event)"
       >
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"
@@ -64,7 +64,7 @@ export interface PlaygroundContextualToolbarPlacement {
           />
         </button>
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"
@@ -80,7 +80,7 @@ export interface PlaygroundContextualToolbarPlacement {
           />
         </button>
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"
@@ -96,7 +96,7 @@ export interface PlaygroundContextualToolbarPlacement {
           />
         </button>
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"
@@ -113,7 +113,7 @@ export interface PlaygroundContextualToolbarPlacement {
         </button>
         <span class="mx-0.5 h-5 w-px bg-border" aria-hidden="true"></span>
         <button
-          appBtn
+          qalmaBtn
           variant="ghost"
           size="icon"
           type="button"

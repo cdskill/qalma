@@ -8,17 +8,17 @@ import {
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMoon, lucideSun } from '@ng-icons/lucide';
 
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 import { PosthogService } from '../services/posthog.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-theme-toggle',
-  imports: [NgIcon, HlmButton],
+  imports: [NgIcon, QalmaButton],
   providers: [provideIcons({ lucideMoon, lucideSun })],
   template: `
     <button
-      appBtn
+      qalmaBtn
       variant="ghost"
       size="icon"
       type="button"

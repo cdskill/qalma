@@ -1,4 +1,3 @@
-/* eslint-disable @angular-eslint/directive-selector */
 import { Directionality } from '@angular/cdk/bidi';
 import {
   computed,
@@ -12,16 +11,17 @@ import {
   BrnProgressIndicator,
   injectBrnProgress,
 } from '@spartan-ng/brain/progress';
-import { clsx } from 'clsx';
+
+import { cn } from './cn';
 
 const PROGRESS_BASE =
-  'spartan-progress relative inline-flex w-full overflow-hidden';
+  'qalma-progress relative inline-flex w-full overflow-hidden';
 
 const PROGRESS_INDICATOR_BASE =
-  'spartan-progress-indicator h-full w-full flex-1 transition-all';
+  'qalma-progress-indicator h-full w-full flex-1 transition-all';
 
 @Directive({
-  selector: '[hlmProgress]',
+  selector: '[qalmaProgress]',
   hostDirectives: [
     {
       directive: BrnProgress,
@@ -32,25 +32,25 @@ const PROGRESS_INDICATOR_BASE =
     '[class]': 'computedClass()',
   },
 })
-export class HlmProgress {
+export class QalmaProgress {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly initialClass =
     this.host.nativeElement.getAttribute('class') ?? '';
 
   protected readonly computedClass = computed(() =>
-    clsx(PROGRESS_BASE, this.initialClass),
+    cn(PROGRESS_BASE, this.initialClass),
   );
 }
 
 @Directive({
-  selector: '[hlmProgressIndicator]',
+  selector: '[qalmaProgressIndicator]',
   hostDirectives: [BrnProgressIndicator],
   host: {
     '[class]': 'computedClass()',
     '[style.transform]': 'transform()',
   },
 })
-export class HlmProgressIndicator {
+export class QalmaProgressIndicator {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly progress = injectBrnProgress();
   private readonly dir = inject(Directionality, { optional: true });
@@ -72,7 +72,7 @@ export class HlmProgressIndicator {
   });
 
   protected readonly computedClass = computed(() =>
-    clsx(
+    cn(
       PROGRESS_INDICATOR_BASE,
       this.progressValue() === null && 'animate-indeterminate',
       this.initialClass,
@@ -95,7 +95,7 @@ export class HlmProgressIndicator {
   });
 }
 
-export const HlmProgressImports = [
-  HlmProgress,
-  HlmProgressIndicator,
+export const QalmaProgressImports = [
+  QalmaProgress,
+  QalmaProgressIndicator,
 ] as const;
