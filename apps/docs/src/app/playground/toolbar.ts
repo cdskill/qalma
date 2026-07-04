@@ -5,11 +5,8 @@ import {
   input,
   output,
 } from '@angular/core';
-import {
-  QalmaCommand,
-  QalmaEditorController,
-  QalmaToolbar,
-} from '@qalma/editor';
+import { QalmaEditorController, QalmaToolbar } from '@qalma/editor';
+import { QalmaToolbarButton } from '@qalma/kit';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAlignCenter,
@@ -66,7 +63,12 @@ import {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIcon, QalmaCommand, QalmaToolbar, PlaygroundColorPicker],
+  imports: [
+    NgIcon,
+    QalmaToolbar,
+    QalmaToolbarButton,
+    PlaygroundColorPicker,
+  ],
   providers: [
     provideIcons({
       lucideAlignCenter,
@@ -117,138 +119,70 @@ import {
       class="flex w-fit max-w-full flex-wrap items-center gap-0.5 border-b border-border bg-secondary/40 px-1.5 py-1.5"
     >
       <!-- Block style -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="setParagraph"
-        title="Paragraph"
-        aria-label="Paragraph"
-      >
-        <ng-icon [class]="iconClass" name="lucidePilcrow" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleHeading1"
-        title="Heading 1"
-        aria-label="Heading 1"
-      >
-        <ng-icon [class]="iconClass" name="lucideHeading1" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleHeading2"
-        title="Heading 2"
-        aria-label="Heading 2"
-      >
-        <ng-icon [class]="iconClass" name="lucideHeading2" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleHeading3"
-        title="Heading 3"
-        aria-label="Heading 3"
-      >
-        <ng-icon [class]="iconClass" name="lucideHeading3" aria-hidden="true" />
-      </button>
+      <qalma-toolbar-button
+        command="setParagraph"
+        icon="lucidePilcrow"
+        label="Paragraph"
+      />
+      <qalma-toolbar-button
+        command="toggleHeading1"
+        icon="lucideHeading1"
+        label="Heading 1"
+      />
+      <qalma-toolbar-button
+        command="toggleHeading2"
+        icon="lucideHeading2"
+        label="Heading 2"
+      />
+      <qalma-toolbar-button
+        command="toggleHeading3"
+        icon="lucideHeading3"
+        label="Heading 3"
+      />
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Inline formatting -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleBold"
-        title="Bold"
-        aria-label="Bold"
-      >
-        <ng-icon [class]="iconClass" name="lucideBold" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleItalic"
-        title="Italic"
-        aria-label="Italic"
-      >
-        <ng-icon [class]="iconClass" name="lucideItalic" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleUnderline"
-        title="Underline"
-        aria-label="Underline"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideUnderline"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleStrike"
-        title="Strikethrough"
-        aria-label="Strikethrough"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideStrikethrough"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleInlineCode"
-        title="Inline code"
-        aria-label="Inline code"
-      >
-        <ng-icon [class]="iconClass" name="lucideCode" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleMonospace"
-        title="Monospace"
-        aria-label="Monospace"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideLetterText"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleSubscript"
-        title="Subscript"
-        aria-label="Subscript"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideSubscript"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleSuperscript"
-        title="Superscript"
-        aria-label="Superscript"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideSuperscript"
-          aria-hidden="true"
-        />
-      </button>
+      <qalma-toolbar-button
+        command="toggleBold"
+        icon="lucideBold"
+        label="Bold"
+      />
+      <qalma-toolbar-button
+        command="toggleItalic"
+        icon="lucideItalic"
+        label="Italic"
+      />
+      <qalma-toolbar-button
+        command="toggleUnderline"
+        icon="lucideUnderline"
+        label="Underline"
+      />
+      <qalma-toolbar-button
+        command="toggleStrike"
+        icon="lucideStrikethrough"
+        label="Strikethrough"
+      />
+      <qalma-toolbar-button
+        command="toggleInlineCode"
+        icon="lucideCode"
+        label="Inline code"
+      />
+      <qalma-toolbar-button
+        command="toggleMonospace"
+        icon="lucideLetterText"
+        label="Monospace"
+      />
+      <qalma-toolbar-button
+        command="toggleSubscript"
+        icon="lucideSubscript"
+        label="Subscript"
+      />
+      <qalma-toolbar-button
+        command="toggleSuperscript"
+        icon="lucideSuperscript"
+        label="Superscript"
+      />
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
@@ -280,150 +214,74 @@ import {
         unsetCommand="unsetBackgroundColor"
         queryKey="backgroundColor"
       />
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="clearFormatting"
-        title="Clear formatting"
-        aria-label="Clear formatting"
-      >
-        <ng-icon [class]="iconClass" name="lucideEraser" aria-hidden="true" />
-      </button>
+      <qalma-toolbar-button
+        command="clearFormatting"
+        icon="lucideEraser"
+        label="Clear formatting"
+      />
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Alignment -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="setTextAlignLeft"
-        title="Align left"
-        aria-label="Align left"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideAlignLeft"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="setTextAlignCenter"
-        title="Align center"
-        aria-label="Align center"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideAlignCenter"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="setTextAlignRight"
-        title="Align right"
-        aria-label="Align right"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideAlignRight"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="setTextAlignJustify"
-        title="Justify"
-        aria-label="Justify"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideAlignJustify"
-          aria-hidden="true"
-        />
-      </button>
+      <qalma-toolbar-button
+        command="setTextAlignLeft"
+        icon="lucideAlignLeft"
+        label="Align left"
+      />
+      <qalma-toolbar-button
+        command="setTextAlignCenter"
+        icon="lucideAlignCenter"
+        label="Align center"
+      />
+      <qalma-toolbar-button
+        command="setTextAlignRight"
+        icon="lucideAlignRight"
+        label="Align right"
+      />
+      <qalma-toolbar-button
+        command="setTextAlignJustify"
+        icon="lucideAlignJustify"
+        label="Justify"
+      />
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Lists & blocks -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleBulletList"
-        title="Bullet list"
-        aria-label="Bullet list"
-      >
-        <ng-icon [class]="iconClass" name="lucideList" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleOrderedList"
-        title="Ordered list"
-        aria-label="Ordered list"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideListOrdered"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleTaskList"
-        title="Task list"
-        aria-label="Task list"
-      >
-        <ng-icon [class]="iconClass" name="lucideListTodo" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="liftListItem"
-        title="Outdent"
-        aria-label="Outdent"
-      >
-        <ng-icon [class]="iconClass" name="lucideOutdent" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="sinkListItem"
-        title="Indent"
-        aria-label="Indent"
-      >
-        <ng-icon [class]="iconClass" name="lucideIndent" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleBlockquote"
-        title="Blockquote"
-        aria-label="Blockquote"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideTextQuote"
-          aria-hidden="true"
-        />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="toggleCodeBlock"
-        title="Code block"
-        aria-label="Code block"
-      >
-        <ng-icon
-          [class]="iconClass"
-          name="lucideSquareCode"
-          aria-hidden="true"
-        />
-      </button>
+      <qalma-toolbar-button
+        command="toggleBulletList"
+        icon="lucideList"
+        label="Bullet list"
+      />
+      <qalma-toolbar-button
+        command="toggleOrderedList"
+        icon="lucideListOrdered"
+        label="Ordered list"
+      />
+      <qalma-toolbar-button
+        command="toggleTaskList"
+        icon="lucideListTodo"
+        label="Task list"
+      />
+      <qalma-toolbar-button
+        command="liftListItem"
+        icon="lucideOutdent"
+        label="Outdent"
+      />
+      <qalma-toolbar-button
+        command="sinkListItem"
+        icon="lucideIndent"
+        label="Indent"
+      />
+      <qalma-toolbar-button
+        command="toggleBlockquote"
+        icon="lucideTextQuote"
+        label="Blockquote"
+      />
+      <qalma-toolbar-button
+        command="toggleCodeBlock"
+        icon="lucideSquareCode"
+        label="Code block"
+      />
       @if (codeBlockActive()) {
         <select
           [class]="languageSelectClass"
@@ -482,122 +340,66 @@ import {
       >
         <ng-icon [class]="iconClass" name="lucideLink" aria-hidden="true" />
       </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="unsetLink"
-        title="Unlink"
-        aria-label="Unlink"
-      >
-        <ng-icon [class]="iconClass" name="lucideUnlink" aria-hidden="true" />
-      </button>
+      <qalma-toolbar-button
+        command="unsetLink"
+        icon="lucideUnlink"
+        label="Unlink"
+      />
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- Table -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="insertTable"
-        title="Insert table"
-        aria-label="Insert table"
-      >
-        <ng-icon [class]="iconClass" name="lucideTable" aria-hidden="true" />
-      </button>
+      <qalma-toolbar-button
+        command="insertTable"
+        icon="lucideTable"
+        label="Insert table"
+      />
       @if (inTable()) {
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="addRowAfter"
-          title="Add row"
-          aria-label="Add row"
-        >
-          <ng-icon
-            [class]="iconClass"
-            name="lucideBetweenHorizontalEnd"
-            aria-hidden="true"
-          />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="addColumnAfter"
-          title="Add column"
-          aria-label="Add column"
-        >
-          <ng-icon
-            [class]="iconClass"
-            name="lucideBetweenVerticalEnd"
-            aria-hidden="true"
-          />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="deleteRow"
-          title="Delete row"
-          aria-label="Delete row"
-        >
-          <ng-icon [class]="iconClass" name="lucideRows3" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="deleteColumn"
-          title="Delete column"
-          aria-label="Delete column"
-        >
-          <ng-icon
-            [class]="iconClass"
-            name="lucideColumns3"
-            aria-hidden="true"
-          />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="toggleHeaderRow"
-          title="Toggle header row"
-          aria-label="Toggle header row"
-        >
-          <ng-icon
-            [class]="iconClass"
-            name="lucideHeading"
-            aria-hidden="true"
-          />
-        </button>
-        <button
-          type="button"
-          [class]="commandClass"
-          qalmaCommand="deleteTable"
-          title="Delete table"
-          aria-label="Delete table"
-        >
-          <ng-icon [class]="iconClass" name="lucideTrash2" aria-hidden="true" />
-        </button>
+        <qalma-toolbar-button
+        command="addRowAfter"
+          icon="lucideBetweenHorizontalEnd"
+          label="Add row"
+      />
+        <qalma-toolbar-button
+        command="addColumnAfter"
+          icon="lucideBetweenVerticalEnd"
+          label="Add column"
+      />
+        <qalma-toolbar-button
+        command="deleteRow"
+          icon="lucideRows3"
+          label="Delete row"
+      />
+        <qalma-toolbar-button
+        command="deleteColumn"
+          icon="lucideColumns3"
+          label="Delete column"
+      />
+        <qalma-toolbar-button
+        command="toggleHeaderRow"
+          icon="lucideHeading"
+          label="Toggle header row"
+      />
+        <qalma-toolbar-button
+        command="deleteTable"
+          icon="lucideTrash2"
+          label="Delete table"
+      />
       }
 
       <span [class]="separatorClass" aria-hidden="true"></span>
 
       <!-- History -->
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="undo"
-        title="Undo"
-        aria-label="Undo"
-      >
-        <ng-icon [class]="iconClass" name="lucideUndo2" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        [class]="commandClass"
-        qalmaCommand="redo"
-        title="Redo"
-        aria-label="Redo"
-      >
-        <ng-icon [class]="iconClass" name="lucideRedo2" aria-hidden="true" />
-      </button>
+      <qalma-toolbar-button
+        command="undo"
+        icon="lucideUndo2"
+        label="Undo"
+      />
+      <qalma-toolbar-button
+        command="redo"
+        icon="lucideRedo2"
+        label="Redo"
+      />
     </qalma-toolbar>
   `,
 })

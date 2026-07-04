@@ -82,7 +82,14 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       slash-command sont uniquement dans `apps/docs/playground`).
 
 ### Phase 3 — Boutons de toolbar
-- [ ] `ToolbarButton` générique (`command`, `value`, `activeQuery`).
+- [x] `QalmaToolbarButton` générique (`command`, `value`, `icon`, `label`) —
+      composant élément `<qalma-toolbar-button>` (`display:contents`) qui rend
+      un `<button>` interne câblé à la directive `QalmaCommand` de
+      `@qalma/editor` + un `<ng-icon>`. Branché dans `PlaygroundToolbar` (34
+      boutons de commande migrés, migration bit-perfect). Pas d'`activeQuery` :
+      l'état actif vient de `QalmaCommand.isCommandActive`, suffisant pour les
+      boutons de commande purs ; les boutons à état dérivé d'une query (color
+      pickers, image/link) restent des contrôles custom hors de ce composant.
 - [ ] `Toolbar` composite + registry déclarative
       `{command, icon, tooltip, activeQuery}[]` couvrant marks / blocks /
       align / history / table-si-`isInTable`.
@@ -214,3 +221,48 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     attente de feu vert. Phase 4 restante (extraire ces features en vrais
     composants `@qalma/kit` réutilisables par `apps/sandbox`) reste à faire
     séparément.
+- 2026-07-04 — Phase 3, slice 1 : `QalmaToolbarButton` (PAS ENCORE COMMIT).
+  Composant `libs/ui-kit/src/lib/toolbar-button.ts` exporté par `@qalma/kit`.
+  Décisions de conception prises en la construisant :
+  - **Composant élément `<qalma-toolbar-button>`, pas directive sur `<button>`.**
+    Première tentative en `button[qalmaToolbarButton]` + `hostDirectives:
+    [QalmaCommand]` : rejetée par le lint. (1) `component-selector` du kit
+    impose `type: element` / kebab-case → un sélecteur d'attribut camelCase ne
+    passe pas ; (2) la règle a11y `@angular-eslint/template/elements-content`
+    côté docs interdit un `<button>` vide (34 erreurs) puisque l'icône serait
+    injectée par le template du composant, invisible à l'analyse. Solution :
+    élément `<qalma-toolbar-button>` qui rend un `<button>` INTERNE portant
+    `QalmaCommand` + `<ng-icon>` (l'icône est du contenu réel → règle a11y OK),
+    host en `display:contents` (classe Tailwind `contents`) pour que le bouton
+    interne reste l'item flex direct de `<qalma-toolbar>` (gap/align préservés).
+    Bonus vs hostDirectives : `[disabled]` s'applique au vrai `<button>`, pas à
+    un élément custom non-form.
+  - **`@qalma/kit` dépend désormais de `@qalma/editor` et `@ng-icons/core`** —
+    ajoutés en `peerDependencies` **optionnelles** (`peerDependenciesMeta`).
+    Peer (externe, non-bundlé) et non `dependencies` : pas de régression
+    tree-shaking pour un consommateur qui n'importe que `cn`/`anchorToRect`
+    (cf. [[plugin-entry-point-treeshaking]] — le problème visait les deps
+    tierces *bundlées* dans le FESM, pas les peers externes). `nx build ui-kit`
+    OK sans toucher `allowedNonPeerDependencies` (réservé aux non-peers).
+    Tags Nx vides → aucune contrainte de module-boundary sur ui-kit→editor.
+  - **Pas de spec unitaire** (aligné sur `command.ts`/`toolbar.ts` de l'editor,
+    non testés) : `QALMA_EDITOR_CONTEXT` n'est pas public et le vrai
+    `QalmaEditor` ne compile pas proprement sous JIT/vitest (NG0303/NG0950,
+    cf. `control-value-accessor.spec.ts`) → un test mockerait un token privé.
+    La preuve réelle est faite en live (consigne #4).
+  - `PlaygroundToolbar` : 34 blocs `<button qalmaCommand><ng-icon></button>`
+    → `<qalma-toolbar-button command icon label />`. Défaut de style du
+    composant = ancien `commandClass` shadcn exact (icône `text-[0.9rem]`) →
+    migration bit-perfect. `commandClass`/`iconClass` gardés : encore utilisés
+    par les 3 boutons custom (image/upload/link à handlers `(click)` propres).
+    `QalmaCommand` retiré des imports du toolbar (plus de `qalmaCommand` nu).
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor` : tout vert.
+  - Vérifié en live (home / playground) en pilotant le vrai contrôleur via
+    `ng.getComponent`/`ng.applyChanges` : rendu bit-perfect (28 boutons hors
+    table, host `display:contents`, bouton 29.6px ≈ 1.85rem, icônes SVG),
+    exécution réelle d'une commande (clic Italic curseur replié : état actif
+    + `aria-pressed` false→true→false, `isCommandActive` suit), zéro erreur
+    console.
+  - Prochaine étape : Phase 3 slice 2 (registry déclarative + `Toolbar`
+    composite piloté par données, branché dans les DEUX toolbars) — en attente
+    de feu vert.
