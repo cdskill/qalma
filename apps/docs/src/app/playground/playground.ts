@@ -42,6 +42,7 @@ import {
   createQalmaEditor,
 } from '@qalma/editor';
 import { TablePlugin } from '@qalma/editor/table';
+import { QalmaDragHandle, QalmaDragHandleDirective } from '@qalma/kit';
 import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
 import {
@@ -51,8 +52,6 @@ import {
 import { PlaygroundCodeHighlightPlugin } from './code-highlight-plugin';
 import { PLAYGROUND_DEMO_CONTENT } from './demo-content';
 import { PlaygroundContextualToolbar } from './contextual-toolbar';
-import { PlaygroundDragHandle } from './drag-handle';
-import { PlaygroundDragHandleDirective } from './drag-handle-directive';
 import {
   PLAYGROUND_EXAMPLE_IMAGE_ALT,
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
@@ -86,8 +85,8 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     QalmaEditor,
     PlaygroundLinkPopover,
     PlaygroundContextualToolbar,
-    PlaygroundDragHandle,
-    PlaygroundDragHandleDirective,
+    QalmaDragHandle,
+    QalmaDragHandleDirective,
     PlaygroundMentionMenu,
     PlaygroundSelectionToolbarDirective,
     PlaygroundSlashCommandMenu,
@@ -117,10 +116,10 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
 
       <qalma-content
         #mentionSurface
-        #dragHandle="appPlaygroundDragHandle"
+        #dragHandle="qalmaDragHandle"
         #selectionToolbar="appPlaygroundSelectionToolbar"
         class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:mx-auto [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:max-w-[61.5rem] [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
-        [appPlaygroundDragHandle]="editor"
+        [qalmaDragHandle]="editor"
         [appPlaygroundSelectionToolbar]="editor"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
@@ -143,7 +142,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
         (requestLink)="showContextualLinkEditor($event, selectionToolbar)"
       />
 
-      <app-playground-drag-handle
+      <qalma-drag-handle
         [editor]="editor"
         [handle]="dragHandle.handle()"
         [dropIndicator]="dragHandle.dropIndicator()"

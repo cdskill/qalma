@@ -8,3 +8,6 @@ export * from './lib/toolbar-icons';
 export * from './lib/anchor-to-rect';
 export * from './lib/dismissible-overlay';
 export * from './lib/keyboard-navigable-list';
+export * from './lib/drag-handle-controller';
+export * from './lib/drag-handle-directive';
+export * from './lib/drag-handle';

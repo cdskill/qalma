@@ -9,22 +9,22 @@ import {
 import { QalmaEditorController } from '@qalma/editor';
 
 import {
-  PlaygroundDragHandleController,
-  PlaygroundDragHandleView,
+  QalmaDragHandleController,
+  QalmaDragHandleView,
 } from './drag-handle-controller';
 
 @Directive({
-  exportAs: 'appPlaygroundDragHandle',
-  selector: '[appPlaygroundDragHandle]',
+  exportAs: 'qalmaDragHandle',
+  selector: '[qalmaDragHandle]',
 })
-export class PlaygroundDragHandleDirective {
+export class QalmaDragHandleDirective {
   readonly editor = input.required<QalmaEditorController>({
-    alias: 'appPlaygroundDragHandle',
+    alias: 'qalmaDragHandle',
   });
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly controller = new PlaygroundDragHandleController(() =>
+  private readonly controller = new QalmaDragHandleController(() =>
     this.editor(),
   );
 
@@ -42,7 +42,7 @@ export class PlaygroundDragHandleDirective {
     this.controller.hide();
   }
 
-  startDrag(event: PointerEvent, handle: PlaygroundDragHandleView): void {
+  startDrag(event: PointerEvent, handle: QalmaDragHandleView): void {
     this.controller.startDrag(event, handle);
   }
 }

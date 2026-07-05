@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  inject,
   input,
   output,
   signal,
@@ -16,16 +18,17 @@ import {
   lucideTrash2,
 } from '@ng-icons/lucide';
 
+import { QalmaButton } from './button';
+import { DismissibleOverlay } from './dismissible-overlay';
 import {
-  PlaygroundDragBlockHighlight,
-  PlaygroundDragDropIndicator,
-  PlaygroundDragHandleView,
+  QalmaDragBlockHighlight,
+  QalmaDragDropIndicator,
+  QalmaDragHandleView,
 } from './drag-handle-controller';
-import { QalmaButton } from '@qalma/kit';
 
-export interface PlaygroundDragStart {
+export interface QalmaDragStart {
   event: PointerEvent;
-  handle: PlaygroundDragHandleView;
+  handle: QalmaDragHandleView;
 }
 
 @Component({
@@ -41,11 +44,11 @@ export interface PlaygroundDragStart {
       lucideTrash2,
     }),
   ],
-  selector: 'app-playground-drag-handle',
+  selector: 'qalma-drag-handle',
   template: `
     @if (draggedBlockHighlight(); as highlight) {
       <div
-        data-playground-dragging-block-highlight
+        data-qalma-dragging-block-highlight
         class="pointer-events-none fixed left-0 top-0 z-20 rounded-md border border-accent bg-accent-subtle/80 opacity-70 shadow-md will-change-transform"
         [style.transform]="highlight.transform"
         [style.width.px]="highlight.width"
@@ -55,7 +58,7 @@ export interface PlaygroundDragStart {
 
     @if (dropIndicator(); as indicator) {
       <div
-        data-playground-drag-drop-line
+        data-qalma-drag-drop-line
         class="pointer-events-none fixed left-0 top-0 z-40 h-0.5 rounded-full bg-accent shadow-md will-change-transform"
         [style.transform]="indicator.transform"
         [style.width.px]="indicator.width"
@@ -64,7 +67,7 @@ export interface PlaygroundDragStart {
 
     @if (handle(); as handle) {
       <div
-        data-playground-drag-handle
+        data-qalma-drag-handle
         class="fixed left-0 top-0 z-30 flex items-start gap-1 will-change-transform"
         tabindex="-1"
         [style.transform]="handle.transform"
@@ -159,17 +162,30 @@ export interface PlaygroundDragStart {
     }
   `,
 })
-export class PlaygroundDragHandle {
+export class QalmaDragHandle {
   readonly editor = input.required<QalmaEditorController>();
-  readonly handle = input<PlaygroundDragHandleView | null>(null);
-  readonly dropIndicator = input<PlaygroundDragDropIndicator | null>(null);
-  readonly draggedBlockHighlight = input<PlaygroundDragBlockHighlight | null>(
+  readonly handle = input<QalmaDragHandleView | null>(null);
+  readonly dropIndicator = input<QalmaDragDropIndicator | null>(null);
+  readonly draggedBlockHighlight = input<QalmaDragBlockHighlight | null>(
     null,
   );
   readonly dismiss = output<void>();
-  readonly dragStart = output<PlaygroundDragStart>();
+  readonly dragStart = output<QalmaDragStart>();
 
   protected readonly menuOpen = signal(false);
+
+  constructor() {
+    // Close the block-actions menu on an outside pointerdown or Escape. A click
+    // on the handle button or the menu itself (both under `[data-qalma-drag-handle]`)
+    // is treated as inside, so it doesn't self-dismiss. Connected for the
+    // component's lifetime; the callback is a no-op while the menu is closed.
+    new DismissibleOverlay({
+      isInside: (target) =>
+        target instanceof Element &&
+        !!target.closest('[data-qalma-drag-handle]'),
+      onDismiss: () => this.menuOpen.set(false),
+    }).connect(inject(DestroyRef));
+  }
 
   protected toggleMenu(): void {
     this.menuOpen.update((open) => !open);
@@ -177,7 +193,7 @@ export class PlaygroundDragHandle {
 
   protected startDrag(
     event: PointerEvent,
-    handle: PlaygroundDragHandleView,
+    handle: QalmaDragHandleView,
   ): void {
     this.menuOpen.set(false);
     this.dragStart.emit({ event, handle });
@@ -185,12 +201,12 @@ export class PlaygroundDragHandle {
 
   protected canExecute(
     command: string,
-    handle: PlaygroundDragHandleView,
+    handle: QalmaDragHandleView,
   ): boolean {
     return this.editor().canExecute(command, handle.target);
   }
 
-  protected execute(command: string, handle: PlaygroundDragHandleView): void {
+  protected execute(command: string, handle: QalmaDragHandleView): void {
     if (this.editor().execute(command, handle.target)) {
       this.dismissHandle();
     }

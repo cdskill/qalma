@@ -107,8 +107,14 @@ Distinct de la Phase 2 : la Phase 2 a branché les *primitives* dans le code
 existant d'`apps/docs` (moins de duplication, bugs corrigés). Il reste à
 extraire ces features en vrais composants exportés par `@qalma/kit`, que
 `apps/docs` ET `apps/sandbox` pourraient tous les deux consommer :
-- [ ] `DragHandle` + `BlockActionsMenu` en composant `@qalma/kit` (la logique
-      controller est déjà saine, `anchorToRect` déjà branché).
+- [x] `DragHandle` + `BlockActionsMenu` en composant `@qalma/kit`. Extraction
+      des 3 fichiers (controller pur + directive adaptateur + composant
+      présentationnel) depuis `apps/docs/playground` vers `libs/ui-kit`,
+      renommés `Qalma*`, thème shadcn conservé bit-perfect. `DismissibleOverlay`
+      (primitive Phase 2 restée sans consommateur) branchée ici pour le
+      clic-dehors du menu — enfin un vrai consommateur. Menu d'actions gardé
+      hardcodé (5 actions standard = commandes du DragHandlePlugin). Branché
+      dans les DEUX consommateurs docs : `playground` ET `examples/notion-doc`.
 - [ ] `LinkPopover` en composant `@qalma/kit` (positionnement déjà fixé).
 - [ ] `ContextualToolbar` — garder son propre positionnement point-ancre +
       CSS self-centering (pas `anchorToRect`, voir log : largeur dynamique,
@@ -323,3 +329,46 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     (extraire drag-handle / link-popover / mention-menu / slash-command-menu en
     composants `@qalma/kit`) et Phase 5 (dogfooding : migrer playground puis
     sandbox — c'est là que la registry/composite servent un 2e consommateur).
+- 2026-07-05 — Phase 4, slice DragHandle (PAS ENCORE COMMIT). Décisions prises
+  avec l'utilisateur avant de démarrer : menu d'actions **hardcodé** (extraction
+  fidèle) ; **ajouter le clic-dehors via `DismissibleOverlay`** (retire une
+  primitive Phase 2 sans consommateur + améliore l'UX) ; périmètre **docs
+  uniquement** (sandbox n'a pas de drag-handle, ça reste Phase 5).
+  - `git mv` des 4 fichiers `apps/docs/playground/drag-handle{,-controller,
+    -directive}.ts` + `drag-handle.spec.ts` → `libs/ui-kit/src/lib/`
+    (spec renommé `drag-handle-controller.spec.ts`). Renommage `Playground`→
+    `Qalma` (blanket sûr : ces fichiers ne contiennent que des symboles
+    drag-handle), sélecteurs `app-playground-drag-handle`→`qalma-drag-handle`,
+    `appPlaygroundDragHandle`→`qalmaDragHandle`, attributs
+    `data-playground-drag-*`→`data-qalma-drag-*` (internes aux 4 fichiers,
+    aucun CSS/e2e externe — vérifié). Imports `@qalma/kit`→relatifs
+    (`./anchor-to-rect`, `./button`).
+  - `DismissibleOverlay` branché dans le composant : connecté pour la vie du
+    composant, `isInside = closest('[data-qalma-drag-handle]')` (grip + menu),
+    `onDismiss` ferme le menu (no-op quand fermé). Escape + clic-dehors gérés.
+    Le composant s'auto-fournit ses 6 icônes lucide via `provideIcons` dans son
+    propre décorateur (pas de helper séparé nécessaire : icônes rendues dans son
+    propre template, contrairement au cas toolbar).
+  - Directive (`[qalmaDragHandle]`, exportAs `qalmaDragHandle`) et controller
+    (`QalmaDragHandleController` + types `QalmaDragHandleView`/
+    `QalmaDragDropIndicator`/`QalmaDragBlockHighlight` + `QalmaDragStart`)
+    exportés du barrel. Pas de nouvelle dep : `@ng-icons/lucide` (peer optionnelle
+    ajoutée slice 2) couvre les icônes du menu ; `@qalma/editor` (peer) fournit
+    `DragHandleCommandValue`/`DragHandleMoveCommandValue`.
+  - Deux consommateurs docs rewire : `playground.ts` ET `examples/notion-doc.ts`
+    (ce dernier découvert par grep repo-wide — pas seulement le playground).
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor` : tout vert. Kit
+    28 tests (18 + 10 du spec drag-handle déplacé, qui monte un vrai éditeur +
+    DragHandlePlugin sous jsdom). Zéro référence orpheline repo-wide.
+  - Vérifié en live via le vrai contrôleur (`ng.getComponent`) : handle apparaît
+    au survol à la bonne position (`anchorToRect`, `translate3d(140px,401px,0)`,
+    grip 30×30) ; menu ouvre (5 actions) ; **clic-dehors ferme le menu** et le
+    handle persiste (nouveau `DismissibleOverlay`) ; Escape ferme ; **Duplicate
+    exécute** (20→21 blocs) + dismiss du handle. Capture non récupérable :
+    onglet preview `document.hidden=true` + viewport 0×0 → l'`IntersectionObserver`
+    du `@defer (on viewport)` ne monte pas le playground (piège d'env connu,
+    `preview_resize` ne débloque pas). Preuve fonctionnelle suffisante + build
+    prod propre.
+  - Prochaine étape : en attente de feu vert. Reste Phase 4 : `LinkPopover`,
+    `MentionMenu`/`SlashCommandMenu` (garder leur positionnement flip-above),
+    `ContextualToolbar` (garder son positionnement propre) ; puis Phase 5.

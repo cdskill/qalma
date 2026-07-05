@@ -10,7 +10,7 @@ import { TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { PlaygroundDragHandleController } from './drag-handle-controller';
+import { QalmaDragHandleController } from './drag-handle-controller';
 
 afterEach(() => {
   document.body.replaceChildren();
@@ -159,7 +159,7 @@ describe('DragHandlePlugin', () => {
     ]);
     const surface = document.createElement('div');
     const block = document.createElement('p');
-    const controller = new PlaygroundDragHandleController(() => editor);
+    const controller = new QalmaDragHandleController(() => editor);
 
     block.dataset['qalmaDragHandleBlock'] = '';
     block.dataset['qalmaDragHandlePos'] = '0';
@@ -211,7 +211,7 @@ describe('DragHandlePlugin', () => {
     const blockOne = createDragHandleBlock(0, 5);
     const blockTwo = createDragHandleBlock(5, 10);
     const blockThree = createDragHandleBlock(10, 17);
-    const controller = new PlaygroundDragHandleController(() => editor);
+    const controller = new QalmaDragHandleController(() => editor);
 
     content.className = 'ProseMirror';
     content.append(blockOne, blockTwo, blockThree);
@@ -311,7 +311,7 @@ describe('DragHandlePlugin', () => {
     ]);
     const surface = document.createElement('div');
     const block = document.createElement('p');
-    const controller = new PlaygroundDragHandleController(() => editor);
+    const controller = new QalmaDragHandleController(() => editor);
 
     block.dataset['qalmaDragHandleBlock'] = '';
     block.dataset['qalmaDragHandlePos'] = '0';

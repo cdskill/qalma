@@ -4,7 +4,7 @@ import {
   DragHandleMoveCommandValue,
   QalmaEditorController,
 } from '@qalma/editor';
-import { anchorToRect } from '@qalma/kit';
+import { anchorToRect } from './anchor-to-rect';
 
 const DRAG_START_DISTANCE = 8;
 const HANDLE_EDGE_MARGIN = 8;
@@ -12,7 +12,7 @@ const HANDLE_GAP = 8;
 const HANDLE_BUTTON_SIZE = 30;
 const DROP_LINE_EDGE_MARGIN = 8;
 
-export interface PlaygroundDragHandleView {
+export interface QalmaDragHandleView {
   target: DragHandleCommandValue;
   transform: string;
   blockType: string;
@@ -20,20 +20,20 @@ export interface PlaygroundDragHandleView {
   canMoveDown: boolean;
 }
 
-export interface PlaygroundDragDropIndicator {
+export interface QalmaDragDropIndicator {
   target: DragHandleMoveCommandValue;
   transform: string;
   width: number;
 }
 
-export interface PlaygroundDragBlockHighlight {
+export interface QalmaDragBlockHighlight {
   transform: string;
   width: number;
   height: number;
 }
 
-interface PlaygroundDragSession {
-  handle: PlaygroundDragHandleView;
+interface QalmaDragSession {
+  handle: QalmaDragHandleView;
   sourceBlock: HTMLElement;
   originX: number;
   originY: number;
@@ -56,12 +56,12 @@ interface DragDropCandidate {
   lineWidth: number;
 }
 
-export class PlaygroundDragHandleController {
-  private readonly handleState = signal<PlaygroundDragHandleView | null>(null);
+export class QalmaDragHandleController {
+  private readonly handleState = signal<QalmaDragHandleView | null>(null);
   private readonly dropIndicatorState =
-    signal<PlaygroundDragDropIndicator | null>(null);
+    signal<QalmaDragDropIndicator | null>(null);
   private readonly draggedBlockHighlightState =
-    signal<PlaygroundDragBlockHighlight | null>(null);
+    signal<QalmaDragBlockHighlight | null>(null);
 
   readonly handle = this.handleState.asReadonly();
   readonly dropIndicator = this.dropIndicatorState.asReadonly();
@@ -73,7 +73,7 @@ export class PlaygroundDragHandleController {
   private lastPointerClientY: number | null = null;
   private refreshFrame: number | null = null;
   private handleKey: string | null = null;
-  private dragSession: PlaygroundDragSession | null = null;
+  private dragSession: QalmaDragSession | null = null;
 
   constructor(private readonly editor: () => QalmaEditorController) {}
 
@@ -120,7 +120,7 @@ export class PlaygroundDragHandleController {
     this.setHandle(null);
   }
 
-  startDrag(event: PointerEvent, handle: PlaygroundDragHandleView): void {
+  startDrag(event: PointerEvent, handle: QalmaDragHandleView): void {
     if (event.button !== 0 || this.dragSession) {
       return;
     }
@@ -135,7 +135,7 @@ export class PlaygroundDragHandleController {
 
     event.preventDefault();
 
-    const session: PlaygroundDragSession = {
+    const session: QalmaDragSession = {
       handle,
       sourceBlock,
       originX: event.clientX,
@@ -194,7 +194,7 @@ export class PlaygroundDragHandleController {
 
     if (
       relatedTarget instanceof Element &&
-      relatedTarget.closest('[data-playground-drag-handle]')
+      relatedTarget.closest('[data-qalma-drag-handle]')
     ) {
       return;
     }
@@ -235,9 +235,9 @@ export class PlaygroundDragHandleController {
     this.finishDrag(true);
   }
 
-  private activateDragSession(session: PlaygroundDragSession): void {
+  private activateDragSession(session: QalmaDragSession): void {
     session.dragging = true;
-    this.surface?.setAttribute('data-playground-drag-active', 'true');
+    this.surface?.setAttribute('data-qalma-drag-active', 'true');
     document.body.style.cursor = 'grabbing';
     document.body.style.userSelect = 'none';
     this.updateDraggedBlockHighlight(session.sourceBlock);
@@ -289,7 +289,7 @@ export class PlaygroundDragHandleController {
     window.removeEventListener('pointermove', session.pointerMove);
     window.removeEventListener('pointerup', session.pointerUp);
     window.removeEventListener('pointercancel', session.pointerCancel);
-    this.surface?.removeAttribute('data-playground-drag-active');
+    this.surface?.removeAttribute('data-qalma-drag-active');
     document.body.style.cursor = session.previousBodyCursor;
     document.body.style.userSelect = session.previousBodyUserSelect;
     this.dragSession = null;
@@ -375,7 +375,7 @@ export class PlaygroundDragHandleController {
     this.refreshFrame = null;
   }
 
-  private setHandle(handle: PlaygroundDragHandleView | null): void {
+  private setHandle(handle: QalmaDragHandleView | null): void {
     const nextKey = handle
       ? [
           handle.target.pos,
@@ -395,7 +395,7 @@ export class PlaygroundDragHandleController {
   }
 
   private setDropIndicator(
-    indicator: PlaygroundDragDropIndicator | null,
+    indicator: QalmaDragDropIndicator | null,
   ): void {
     this.dropIndicatorState.set(indicator);
   }
