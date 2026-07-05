@@ -90,9 +90,17 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       l'état actif vient de `QalmaCommand.isCommandActive`, suffisant pour les
       boutons de commande purs ; les boutons à état dérivé d'une query (color
       pickers, image/link) restent des contrôles custom hors de ce composant.
-- [ ] `Toolbar` composite + registry déclarative
-      `{command, icon, tooltip, activeQuery}[]` couvrant marks / blocks /
-      align / history / table-si-`isInTable`.
+- [x] Registry déclarative (`toolbar-commands.ts`) : fragments de données purs
+      `ToolbarCommandItem[]` (HEADINGS / INLINE_MARKS / ALIGN / LISTS /
+      TABLE_INSERT / TABLE_OPS / HISTORY + CLEAR_FORMATTING / UNSET_LINK), plus
+      un type `ToolbarTemplateItem` (échappatoire `TemplateRef` pour les
+      contrôles custom intercalés). `QalmaToolbarRegistry` composite
+      (`<qalma-toolbar-registry [groups]>`, `display:contents`) : rend les
+      groupes séparés par un séparateur, filtre les groupes vides (pas de
+      séparateur orphelin), délègue chaque item à `QalmaToolbarButton` ou à un
+      `ngTemplateOutlet`. `provideQalmaToolbarIcons()` enregistre le jeu lucide
+      des fragments. Branché dans `PlaygroundToolbar` : le `table-si-isInTable`
+      est géré en composant la liste de groupes (`...(inTable() ? OPS : [])`).
 
 ### Phase 4 — Wrappers de features (composants réutilisables dans `@qalma/kit`)
 Distinct de la Phase 2 : la Phase 2 a branché les *primitives* dans le code
@@ -266,3 +274,52 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Prochaine étape : Phase 3 slice 2 (registry déclarative + `Toolbar`
     composite piloté par données, branché dans les DEUX toolbars) — en attente
     de feu vert.
+- 2026-07-04 — Phase 3, slice 2 : registry + composite (PAS ENCORE COMMIT).
+  Trois choix de scope tranchés avec l'utilisateur avant de démarrer :
+  (a) livrer **les deux** — fragments de données ET composite ; (b) icônes via
+  **`provideQalmaToolbarIcons()`** dans le kit (`@ng-icons/lucide` en peer
+  optionnelle) ; (c) périmètre **docs (playground) uniquement** ce coup-ci, la
+  migration sandbox reste en Phase 5.
+  - `libs/ui-kit/src/lib/toolbar-commands.ts` : types (`ToolbarCommandItem`,
+    `ToolbarTemplateItem`, `ToolbarItem`, `ToolbarGroup`) + fragments exportés
+    (source de vérité command/icon/label, réutilisables par sandbox en Phase 5)
+    + garde `isToolbarCommandItem`.
+  - `libs/ui-kit/src/lib/toolbar-registry.ts` : `QalmaToolbarRegistry`
+    (`qalma-toolbar-registry`, `display:contents`). Décision clé : le composite
+    rend **les items seulement**, pas de conteneur `role=toolbar` — c'est le
+    `<qalma-toolbar>` de `@qalma/editor` qui garde la sémantique, le composite
+    va dedans. Content-projection Angular étant statique (impossible de
+    sélectionner un `<ng-content>` par nom runtime dans un `@for`), les
+    contrôles custom passent par un `ToolbarTemplateItem { template: TemplateRef }`
+    + `ngTemplateOutlet` — le consommateur déclare des `<ng-template>` et les
+    référence dans le tableau de groupes. `visibleGroups` filtre les groupes
+    vides (sinon séparateur orphelin quand un groupe conditionnel disparaît).
+  - `libs/ui-kit/src/lib/toolbar-icons.ts` : `provideQalmaToolbarIcons()`.
+    `@ng-icons/lucide` ajouté en peer **optionnelle** (même logique que slice 1
+    — externe, tree-shakeable, seul ce module l'importe).
+  - `PlaygroundToolbar` réécrit : la liste explicite de `<qalma-toolbar-button>`
+    → `<qalma-toolbar-registry [groups]="toolbarGroups(color, codeLang, insert)">`
+    + 3 `<ng-template>` (color pickers / select langage / boutons image·upload·
+    link). `toolbarGroups(...)` est une **méthode** recevant les `TemplateRef`
+    en arguments de binding (pas un `computed` via `viewChild`) pour éviter le
+    problème de timing viewChild-dans-la-même-vue ; recrée le tableau à chaque
+    CD mais `@for track` stabilise le DOM. `provideIcons` local réduit de 40 à
+    6 icônes (les 34 du registry viennent du provider ; restent Baseline/
+    Highlighter/PaintBucket/Image/ImageUp/Link des contrôles custom).
+    `separatorClass` supprimé (géré par le composite) ; `commandClass`/
+    `iconClass`/`languageSelectClass` gardés (contrôles custom).
+  - Pas de spec unitaire (même raison que slice 1 : rendre la registry monte
+    des `QalmaToolbarButton` → `QalmaCommand` → `QALMA_EDITOR_CONTEXT` privé,
+    non montable proprement sous JIT/vitest). Preuve en live.
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor` : tout vert.
+  - Vérifié en live via le vrai contrôleur (`ng.getComponent`/`applyChanges`) :
+    8 groupes / 7 séparateurs, 28 boutons hors table, `display:contents` ;
+    groupe table conditionnel (34 boutons + 6 ops quand `isInTable`, filtré
+    sinon sans séparateur orphelin) ; bouton table rendu par la registry
+    exécute réellement (Add row : +1 `<tr>`) ; `<select>` langage (template
+    item) apparaît sur code block actif ; 34/34 icônes SVG rendues (chemin
+    `provideQalmaToolbarIcons`) ; zéro erreur console.
+  - Prochaine étape : en attente de feu vert. Restes ouverts : Phase 4
+    (extraire drag-handle / link-popover / mention-menu / slash-command-menu en
+    composants `@qalma/kit`) et Phase 5 (dogfooding : migrer playground puis
+    sandbox — c'est là que la registry/composite servent un 2e consommateur).

@@ -31,10 +31,14 @@
     "@angular/core": ">=21.0.0 <22.0.0",
     "@angular/common": ">=21.0.0 <22.0.0",
     "@ng-icons/core": ">=33.0.0",
+    "@ng-icons/lucide": ">=33.0.0",
     "@qalma/editor": ">=0.1.0-beta.0"
   },
   "peerDependenciesMeta": {
     "@ng-icons/core": {
+      "optional": true
+    },
+    "@ng-icons/lucide": {
       "optional": true
     },
     "@qalma/editor": {
