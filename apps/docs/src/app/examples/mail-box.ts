@@ -20,6 +20,7 @@ import {
   TextFormattingKit,
   createQalmaEditor,
 } from '@qalma/editor';
+import { LinkPopoverController, QalmaLinkPopover } from '@qalma/kit';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAlignCenter,
@@ -36,8 +37,6 @@ import {
   lucideUnderline,
 } from '@ng-icons/lucide';
 
-import { LinkPopoverController } from '../playground/link-popover-controller';
-import { PlaygroundLinkPopover } from '../playground/link-popover';
 import { PosthogService } from '../services/posthog.service';
 
 const SEED = `<p>Hi team,</p>
@@ -62,7 +61,7 @@ const SEED = `<p>Hi team,</p>
     QalmaContent,
     QalmaEditor,
     QalmaToolbar,
-    PlaygroundLinkPopover,
+    QalmaLinkPopover,
   ],
   providers: [
     provideIcons({
@@ -230,7 +229,7 @@ const SEED = `<p>Hi team,</p>
       </div>
     </div>
 
-    <app-playground-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"

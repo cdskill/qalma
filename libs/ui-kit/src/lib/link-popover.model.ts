@@ -1,4 +1,4 @@
-import { anchorToRect } from '@qalma/kit';
+import { anchorToRect } from './anchor-to-rect';
 
 export interface LinkPopover extends LinkPopoverPlacement {
   editing: boolean;

@@ -61,7 +61,7 @@ export class LinkPopoverController {
     if (
       nextTarget instanceof Element &&
       (findEditorLinkElement(nextTarget) ||
-        nextTarget.closest('[data-link-popover]'))
+        nextTarget.closest('[data-qalma-link-popover]'))
     ) {
       return;
     }

@@ -43,8 +43,11 @@ import {
 } from '@qalma/editor';
 import { TablePlugin } from '@qalma/editor/table';
 import {
+  LinkPopover,
+  LinkPopoverController,
   QalmaDragHandle,
   QalmaDragHandleDirective,
+  QalmaLinkPopover,
   QalmaMentionMenu,
   QalmaMentionOption,
   QalmaSlashCommandMenu,
@@ -64,9 +67,6 @@ import {
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
   PLAYGROUND_EXAMPLE_IMAGE_TITLE,
 } from './image';
-import { LinkPopoverController } from './link-popover-controller';
-import { PlaygroundLinkPopover } from './link-popover';
-import { LinkPopover } from './link-popover.model';
 import {
   PlaygroundMentionController,
   createPlaygroundMentionSource,
@@ -84,7 +84,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     ...BrnToggleGroupImports,
     QalmaContent,
     QalmaEditor,
-    PlaygroundLinkPopover,
+    QalmaLinkPopover,
     PlaygroundContextualToolbar,
     QalmaDragHandle,
     QalmaDragHandleDirective,
@@ -176,7 +176,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
       />
     }
 
-    <app-playground-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"

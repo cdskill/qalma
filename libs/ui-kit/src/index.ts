@@ -15,3 +15,6 @@ export * from './lib/flip-above-placement';
 export * from './lib/suggestion-menu-base';
 export * from './lib/mention-menu';
 export * from './lib/slash-command-menu';
+export * from './lib/link-popover.model';
+export * from './lib/link-popover-controller';
+export * from './lib/link-popover';

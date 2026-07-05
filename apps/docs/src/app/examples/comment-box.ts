@@ -25,7 +25,12 @@ import {
   TextFormattingKit,
   createQalmaEditor,
 } from '@qalma/editor';
-import { QalmaMentionMenu, QalmaMentionOption } from '@qalma/kit';
+import {
+  LinkPopoverController,
+  QalmaLinkPopover,
+  QalmaMentionMenu,
+  QalmaMentionOption,
+} from '@qalma/kit';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBold,
@@ -35,8 +40,6 @@ import {
   lucideList,
 } from '@ng-icons/lucide';
 
-import { LinkPopoverController } from '../playground/link-popover-controller';
-import { PlaygroundLinkPopover } from '../playground/link-popover';
 import {
   PlaygroundMentionController,
   PlaygroundMentionSource,
@@ -102,7 +105,7 @@ const SEED_COMMENTS: readonly {
     QalmaContent,
     QalmaEditor,
     QalmaToolbar,
-    PlaygroundLinkPopover,
+    QalmaLinkPopover,
     QalmaMentionMenu,
   ],
   providers: [
@@ -266,7 +269,7 @@ const SEED_COMMENTS: readonly {
       />
     }
 
-    <app-playground-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"

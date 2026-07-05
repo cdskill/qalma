@@ -15,7 +15,7 @@ import {
 } from '@ng-icons/lucide';
 
 import { LinkPopover } from './link-popover.model';
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from './button';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,11 +30,11 @@ import { QalmaButton } from '@qalma/kit';
       lucideX,
     }),
   ],
-  selector: 'app-playground-link-popover',
+  selector: 'qalma-link-popover',
   template: `
     @if (popover(); as popover) {
       <div
-        data-link-popover
+        data-qalma-link-popover
         role="dialog"
         aria-label="Link preview"
         class="fixed z-20 w-[min(360px,calc(100vw-32px))] rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg outline-none"
@@ -133,7 +133,7 @@ import { QalmaButton } from '@qalma/kit';
     }
   `,
 })
-export class PlaygroundLinkPopover {
+export class QalmaLinkPopover {
   readonly popover = input<LinkPopover | null>(null);
   readonly href = input.required<string>();
 

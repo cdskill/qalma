@@ -115,7 +115,15 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       clic-dehors du menu — enfin un vrai consommateur. Menu d'actions gardé
       hardcodé (5 actions standard = commandes du DragHandlePlugin). Branché
       dans les DEUX consommateurs docs : `playground` ET `examples/notion-doc`.
-- [ ] `LinkPopover` en composant `@qalma/kit` (positionnement déjà fixé).
+- [x] `LinkPopover` en composant `@qalma/kit`. Extraction propre des 3 fichiers
+      (modèle `LinkPopover`/`createLinkPopoverPlacement`/`findEditorLinkElement`,
+      controller entièrement générique, composant présentationnel) — comme le
+      drag-handle, aucune data app-spécifique. Renommé `QalmaLinkPopover`
+      (`qalma-link-popover`), attribut `data-qalma-link-popover`, thème shadcn
+      bit-perfect. Dismiss hover-delay (160ms) gardé tel quel (c'est un preview
+      au survol, pas un menu → PAS de `DismissibleOverlay`). Branché dans les
+      QUATRE consommateurs docs : `playground`, `comment-box`, `mail-box`,
+      `product-review`.
 - [ ] `ContextualToolbar` — garder son propre positionnement point-ancre +
       CSS self-centering (pas `anchorToRect`, voir log : largeur dynamique,
       mauvais candidat pour un size fixe).
@@ -426,3 +434,31 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Prochaine étape : en attente de feu vert. Reste Phase 4 : `LinkPopover`,
     `ContextualToolbar` ; puis Phase 5 (dogfooding sandbox — où la base/les
     menus/`flipAbovePlacement` serviront un 2e jeu de consommateurs).
+- 2026-07-05 — Phase 4, slice LinkPopover (PAS ENCORE COMMIT). Extraction
+  propre, sans fork de conception (le controller est entièrement générique,
+  comme le drag-handle — aucune data app-spécifique, contrairement à mention/
+  slash) : `git mv` des 3 fichiers `link-popover{.model,-controller,}.ts` vers
+  `libs/ui-kit/src/lib/`, `PlaygroundLinkPopover`→`QalmaLinkPopover`,
+  `app-playground-link-popover`→`qalma-link-popover`, `data-link-popover`→
+  `data-qalma-link-popover` (interne aux 2 fichiers qui bougent ensemble,
+  sandbox a ses copies séparées), imports `@qalma/kit`→relatifs. Dismiss
+  hover-delay 160ms conservé tel quel (preview au survol, pas un menu → pas de
+  `DismissibleOverlay`, cf. décision Phase 2). `LinkPopover`/`LinkPopoverPlacement`/
+  `LinkPopoverController` + composant exportés du barrel.
+  - QUATRE consommateurs rewire : `playground`, `examples/comment-box`,
+    `examples/mail-box`, `examples/product-review` (les 3 exemples ne
+    référençaient que le controller + le composant ; `playground` importe aussi
+    le type `LinkPopover` pour `onLinkSave`). Piège : le script de renommage a
+    changé les symboles mais pas les chemins d'import de mail-box/product-review
+    → `docs:build` cassé, corrigé en pointant leurs imports sur `@qalma/kit`
+    (placés dans le groupe des packages externes pour `import/order`).
+  - Pas de spec (aucun n'existait ; controller vérifié en live). `nx run-many
+    -t lint,test,build -p ui-kit,docs,editor` : tout vert. Zéro orphelin.
+  - Vérifié en live (viewport desktop forcé) via le vrai contrôleur : survol
+    d'un lien → preview `role="dialog"` positionné via `anchorToRect`
+    (left:528/top:518), href affiché + boutons edit/unlink ; clic Edit → mode
+    édition (input url + save) ; dismiss hover-delay (reste ouvert immédiatement,
+    fermé après 160ms) ; capture bit-perfect ; zéro erreur console.
+  - Prochaine étape : en attente de feu vert. Reste Phase 4 :
+    `ContextualToolbar` (garder son positionnement point-ancre + self-centering
+    CSS propre) ; puis Phase 5 (dogfooding sandbox).
