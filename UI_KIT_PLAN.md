@@ -149,9 +149,9 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       mail-box/product-review) consomment désormais toolbar/registry, menus,
       drag-handle, link-popover, contextual-toolbar du kit ; plus de duplication
       côté docs.
-- [ ] Migrer `apps/sandbox` sur `@qalma/kit` (supprime la seconde
+- [x] Migrer `apps/sandbox` sur `@qalma/kit` (supprime la seconde
       duplication, prouve l'indépendance vis-à-vis de spartan-ng/Tailwind
-      côté doc). **En cours :**
+      côté doc) :
       - [x] Thème : tokens shadcn (palette warm des docs) ajoutés à
             `apps/sandbox/src/styles.css` (`:root` + `@theme inline`, light-only,
             SANS spartan-ng) — c'est tout ce dont le kit a besoin pour se thémer.
@@ -159,7 +159,15 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
             fragments + `provideQalmaToolbarIcons`, contrôles custom (image/link,
             swatches couleur, select langage) en `<ng-template>` restylés shadcn
             (`TOOLBAR_BUTTON_CLASS` réutilisé). Ordre propre au sandbox préservé.
-      - [ ] Menus mention/slash + link-popover : à migrer (slices suivantes).
+      - [x] Menus mention/slash : controllers `sandbox-mention.ts`/
+            `sandbox-slash-command.ts` migrés sur les types kit +
+            `flipAbovePlacement`, composants `sandbox-*-menu.ts` supprimés au
+            profit de `QalmaMentionMenu`/`QalmaSlashCommandMenu`.
+      - [x] Link-popover : `sandbox-link-popover.ts` + `link-popover-controller.ts`
+            + `link-popover.model.ts` (copies sandbox) supprimés au profit de
+            `QalmaLinkPopover` + `LinkPopoverController` du kit ; au passage le
+            placement gagne le clamp vertical `anchorToRect` (le sandbox ne
+            clampait pas). `app.spec.ts` repointé sur `QalmaLinkPopover`.
 
 ### Phase 6 — Sortie
 - [ ] Ajouter `@qalma/kit` au bench `bench/bundle-size`.
@@ -544,3 +552,38 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     du sandbox (`sandbox-mention*.ts`, `sandbox-slash-command*.ts`) puis le
     link-popover (`sandbox-link-popover.ts` + controller/model locaux) sur le
     kit, et supprimer les copies. En attente de feu vert.
+- 2026-07-05 — Phase 5, slice 2 : menus + link-popover sandbox (PAS ENCORE
+  COMMIT). **Phase 5 finie.** Choix utilisateur : tout finir en une slice (les
+  deux sont des décalques mécaniques sans nouvelle décision) ; thème warm
+  cohérent. Les types d'option/placement sandbox étaient identiques aux versions
+  docs pré-migration → décalque exact.
+  - Controllers `sandbox-mention.ts`/`sandbox-slash-command.ts` : types locaux
+    (`Sandbox*Option`/`Sandbox*Placement`) remplacés par les types kit,
+    `createMentionPlacement`/`createSlashCommandPlacement` réécrits en un appel à
+    `flipAbovePlacement` (formule identique aux docs → bit-perfect). `handleEditorKeydown`
+    et la nav `moveActiveOption` propres au sandbox conservés (KeyboardNavigableList
+    non branché ici, hors scope). `SandboxMentionController`/`SandboxSlashCommandController`/
+    `createSandboxMentionSource` gardés (data + insertion).
+  - Composants copies supprimés (git rm) : `sandbox-mention-menu.ts`,
+    `sandbox-slash-command-menu.ts`, `sandbox-link-popover.ts`,
+    `link-popover-controller.ts`, `link-popover.model.ts`. Le controller
+    link-popover sandbox ne différait du kit QUE par `data-link-popover` ; le
+    modèle sandbox n'avait PAS de clamp vertical → passer au kit apporte le fix
+    `anchorToRect` (même correction qu'en Phase 2 docs).
+  - `sandbox-editor.ts` rewire sur `QalmaLinkPopover`/`QalmaMentionMenu`/
+    `QalmaSlashCommandMenu` + `LinkPopoverController` du kit ; `app.spec.ts`
+    (test du link-popover, 55 tests) repointé sur `QalmaLinkPopover` — mêmes
+    aria-labels (`Edit link`/`Unlink`, `Save link`/`Cancel`), test inchangé.
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor,sandbox --parallel=1` :
+    tout vert (55 tests sandbox). Zéro orphelin.
+  - Vérifié en live (sandbox servi) via le vrai contrôleur : slash `/` ouvre 10
+    options (composant kit, `bg-popover` = token warm blanc, flipAbovePlacement
+    en-dessous), pick "Text" exécute + ferme ; mention `@` ouvre 5 suggestions
+    (avatar-initiale), pick insère + ferme ; link-popover au survol =
+    `data-qalma-link-popover` (composant kit), `role=dialog`, fond warm,
+    positionné via `anchorToRect`, mode édition input+Save/Cancel ; zéro erreur
+    console.
+  - **Phase 5 finie** (playground de facto en Phases 3-4 ; sandbox : thème +
+    toolbar + menus + link-popover). Prochaine étape : Phase 6 (ajouter
+    `@qalma/kit` au bench `bench/bundle-size` ; page recipes Material/Kendo/
+    ng-zorro ; page comparative). En attente de feu vert.

@@ -1,28 +1,10 @@
 import { computed, signal } from '@angular/core';
+import { QalmaEditorController, SlashCommandState } from '@qalma/editor';
 import {
-  QalmaCommandValue,
-  QalmaEditorController,
-  SlashCommandState,
-} from '@qalma/editor';
-
-export interface SandboxSlashCommandOption {
-  id: string;
-  label: string;
-  description: string;
-  command: string;
-  value?: QalmaCommandValue;
-  placement?: 'block' | 'inline';
-  shortcut: string;
-  icon: string;
-  keywords: readonly string[];
-}
-
-export interface SandboxSlashCommandPlacement {
-  left: number;
-  top: number | null;
-  bottom: number | null;
-  maxHeight: number;
-}
+  QalmaSlashCommandOption,
+  SuggestionMenuPlacement,
+  flipAbovePlacement,
+} from '@qalma/kit';
 
 const SLASH_COMMAND_MENU_WIDTH = 376;
 const SLASH_COMMAND_MENU_MAX_HEIGHT = 372;
@@ -31,7 +13,7 @@ const SLASH_COMMAND_MENU_GAP = 8;
 const SLASH_COMMAND_MENU_OPTION_HEIGHT = 40;
 const SLASH_COMMAND_MENU_VERTICAL_PADDING = 88;
 
-export const SANDBOX_SLASH_COMMAND_OPTIONS: readonly SandboxSlashCommandOption[] =
+export const SANDBOX_SLASH_COMMAND_OPTIONS: readonly QalmaSlashCommandOption[] =
   [
     {
       id: 'paragraph',
@@ -128,8 +110,8 @@ export const SANDBOX_SLASH_COMMAND_OPTIONS: readonly SandboxSlashCommandOption[]
 
 export class SandboxSlashCommandController {
   readonly slashCommand = signal<SlashCommandState | null>(null);
-  readonly placement = signal<SandboxSlashCommandPlacement | null>(null);
-  readonly options = signal<readonly SandboxSlashCommandOption[]>([]);
+  readonly placement = signal<SuggestionMenuPlacement | null>(null);
+  readonly options = signal<readonly QalmaSlashCommandOption[]>([]);
   readonly activeIndex = signal(0);
   readonly open = computed(
     () =>
@@ -197,7 +179,7 @@ export class SandboxSlashCommandController {
     }
   }
 
-  insert(option: SandboxSlashCommandOption): void {
+  insert(option: QalmaSlashCommandOption): void {
     if (!this.editor.execute('deleteSlashCommand')) {
       return;
     }
@@ -293,7 +275,7 @@ export class SandboxSlashCommandController {
 
 function filterSlashCommandOptions(
   query: string,
-): readonly SandboxSlashCommandOption[] {
+): readonly QalmaSlashCommandOption[] {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
@@ -326,42 +308,20 @@ function createSlashCommandPlacement(
   editor: QalmaEditorController,
   position: number,
   optionCount: number,
-): SandboxSlashCommandPlacement | null {
+): SuggestionMenuPlacement | null {
   const rect = editor.getCoordinatesAtPosition(position);
 
   if (!rect) {
     return null;
   }
 
-  const desiredHeight = getSlashCommandMenuHeight(optionCount);
-  const availableBelow =
-    window.innerHeight - rect.bottom - SLASH_COMMAND_MENU_MARGIN;
-  const availableAbove = rect.top - SLASH_COMMAND_MENU_MARGIN;
-  const openAbove =
-    availableBelow < desiredHeight && availableAbove > availableBelow;
-  const availableHeight = Math.max(
-    SLASH_COMMAND_MENU_OPTION_HEIGHT,
-    openAbove
-      ? availableAbove - SLASH_COMMAND_MENU_GAP
-      : availableBelow - SLASH_COMMAND_MENU_GAP,
-  );
-  const maxHeight = Math.min(desiredHeight, availableHeight);
-  const leftBoundary = Math.max(
-    SLASH_COMMAND_MENU_MARGIN,
-    window.innerWidth - SLASH_COMMAND_MENU_WIDTH - SLASH_COMMAND_MENU_MARGIN,
-  );
-
-  return {
-    left: Math.min(
-      Math.max(rect.left, SLASH_COMMAND_MENU_MARGIN),
-      leftBoundary,
-    ),
-    top: openAbove ? null : rect.bottom + SLASH_COMMAND_MENU_GAP,
-    bottom: openAbove
-      ? window.innerHeight - rect.top + SLASH_COMMAND_MENU_GAP
-      : null,
-    maxHeight,
-  };
+  return flipAbovePlacement(rect, {
+    width: SLASH_COMMAND_MENU_WIDTH,
+    desiredHeight: getSlashCommandMenuHeight(optionCount),
+    minHeight: SLASH_COMMAND_MENU_OPTION_HEIGHT,
+    margin: SLASH_COMMAND_MENU_MARGIN,
+    gap: SLASH_COMMAND_MENU_GAP,
+  });
 }
 
 function getSlashCommandMenuHeight(optionCount: number): number {
