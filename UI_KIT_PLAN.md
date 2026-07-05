@@ -124,9 +124,14 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       au survol, pas un menu → PAS de `DismissibleOverlay`). Branché dans les
       QUATRE consommateurs docs : `playground`, `comment-box`, `mail-box`,
       `product-review`.
-- [ ] `ContextualToolbar` — garder son propre positionnement point-ancre +
-      CSS self-centering (pas `anchorToRect`, voir log : largeur dynamique,
-      mauvais candidat pour un size fixe).
+- [x] `ContextualToolbar` en composant `@qalma/kit`. Extraction fidèle des 3
+      fichiers (composant `QalmaContextualToolbar` + controller
+      `QalmaSelectionToolbarController` + directive `QalmaSelectionToolbarDirective`)
+      — entièrement générique comme le drag-handle/link-popover. Positionnement
+      point-ancre + CSS `translate(-50%,-100%)` self-centering **conservé tel
+      quel** (pas `anchorToRect`, largeur dynamique). Boutons de formatage
+      hardcodés gardés (bold/italic/inline-code/monospace/link). Un seul
+      consommateur : `playground`.
 - [x] `MentionMenu` / `SlashCommandMenu` en composants `@qalma/kit`, avec base
       partagée `QalmaSuggestionMenu` (placement + nav clavier + highlighting +
       scroll) et primitive `flipAbovePlacement` extraite (géométrie flip-above
@@ -462,3 +467,31 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Prochaine étape : en attente de feu vert. Reste Phase 4 :
     `ContextualToolbar` (garder son positionnement point-ancre + self-centering
     CSS propre) ; puis Phase 5 (dogfooding sandbox).
+- 2026-07-05 — Phase 4, slice ContextualToolbar (PAS ENCORE COMMIT).
+  **Phase 4 désormais complète.** Extraction fidèle, sans fork (controller
+  entièrement générique comme drag-handle/link-popover) : `git mv` des 3
+  fichiers `contextual-toolbar.ts` + `selection-toolbar-{controller,directive}.ts`
+  vers `libs/ui-kit/src/lib/`, blanket `Playground`→`Qalma`, sélecteurs
+  `app-playground-contextual-toolbar`→`qalma-contextual-toolbar` et
+  `appPlaygroundSelectionToolbar`→`qalmaSelectionToolbar`, import `QalmaButton`
+  →`./button`. Noms d'origine gardés (composant "Contextual", controller/
+  directive "Selection" — léger décalage historique, préservé). Positionnement
+  point-ancre + `translate(-50%,-100%)` self-centering conservé (le seul des 4
+  qui n'utilise PAS `anchorToRect`, décision Phase 2 : largeur dynamique).
+  Boutons hardcodés (bold/italic/inline-code/monospace/link). Un seul
+  consommateur : `playground`. Pas de spec (aucun n'existait).
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor` : tout vert. Zéro
+    orphelin repo-wide.
+  - Vérifié en live via le vrai contrôleur : sélection de texte → toolbar
+    `role="toolbar"` apparaît, positionnée via le transform point-ancre
+    (`translate3d(298px,281px,0) translate(-50%,-100%)`), 5 boutons ; clic Bold
+    exécute (strong 6→7, classe `qalma-command-active` reflète l'état) ; capture
+    bit-perfect ; zéro erreur console.
+  - Piège d'env : un `nx serve docs` résiduel bloquait le port 4200 (dev server
+    d'une session preview précédente non tué par preview_stop) → tué via `kill`
+    avant de relancer.
+  - **Phase 4 finie** (DragHandle, LinkPopover, Mention/SlashCommand, Contextual
+    Toolbar). Prochaine étape : Phase 5 (dogfooding — migrer `apps/sandbox` sur
+    tous les composants `@qalma/kit` ; c'est le 2e jeu de consommateurs qui
+    prouve l'indépendance vis-à-vis de spartan-ng/Tailwind côté docs) ; puis
+    Phase 6 (bench bundle-size + page recipes + page comparative).

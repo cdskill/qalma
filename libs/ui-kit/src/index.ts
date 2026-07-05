@@ -18,3 +18,6 @@ export * from './lib/slash-command-menu';
 export * from './lib/link-popover.model';
 export * from './lib/link-popover-controller';
 export * from './lib/link-popover';
+export * from './lib/contextual-toolbar';
+export * from './lib/selection-toolbar-controller';
+export * from './lib/selection-toolbar-directive';

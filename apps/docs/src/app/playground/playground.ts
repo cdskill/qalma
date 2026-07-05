@@ -45,11 +45,13 @@ import { TablePlugin } from '@qalma/editor/table';
 import {
   LinkPopover,
   LinkPopoverController,
+  QalmaContextualToolbar,
   QalmaDragHandle,
   QalmaDragHandleDirective,
   QalmaLinkPopover,
   QalmaMentionMenu,
   QalmaMentionOption,
+  QalmaSelectionToolbarDirective,
   QalmaSlashCommandMenu,
   QalmaSlashCommandOption,
 } from '@qalma/kit';
@@ -61,7 +63,6 @@ import {
 } from './code-block';
 import { PlaygroundCodeHighlightPlugin } from './code-highlight-plugin';
 import { PLAYGROUND_DEMO_CONTENT } from './demo-content';
-import { PlaygroundContextualToolbar } from './contextual-toolbar';
 import {
   PLAYGROUND_EXAMPLE_IMAGE_ALT,
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
@@ -72,7 +73,6 @@ import {
   createPlaygroundMentionSource,
 } from './mention';
 import { PlaygroundSlashCommandController } from './slash-command';
-import { PlaygroundSelectionToolbarDirective } from './selection-toolbar-directive';
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
 
@@ -85,11 +85,11 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     QalmaContent,
     QalmaEditor,
     QalmaLinkPopover,
-    PlaygroundContextualToolbar,
+    QalmaContextualToolbar,
     QalmaDragHandle,
     QalmaDragHandleDirective,
     QalmaMentionMenu,
-    PlaygroundSelectionToolbarDirective,
+    QalmaSelectionToolbarDirective,
     QalmaSlashCommandMenu,
     PlaygroundToolbar,
   ],
@@ -118,10 +118,10 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
       <qalma-content
         #mentionSurface
         #dragHandle="qalmaDragHandle"
-        #selectionToolbar="appPlaygroundSelectionToolbar"
+        #selectionToolbar="qalmaSelectionToolbar"
         class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:mx-auto [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:max-w-[61.5rem] [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
         [qalmaDragHandle]="editor"
-        [appPlaygroundSelectionToolbar]="editor"
+        [qalmaSelectionToolbar]="editor"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="
@@ -136,7 +136,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
         (click)="mentionController.refresh()"
       />
 
-      <app-playground-contextual-toolbar
+      <qalma-contextual-toolbar
         [editor]="editor"
         [placement]="selectionToolbar.placement()"
         (dismiss)="selectionToolbar.hide()"
@@ -440,7 +440,7 @@ export class Playground {
 
   protected showContextualLinkEditor(
     event: MouseEvent,
-    selectionToolbar: PlaygroundSelectionToolbarDirective,
+    selectionToolbar: QalmaSelectionToolbarDirective,
   ): void {
     selectionToolbar.hide();
     this.linkPopover.showToolbarEditor(event);

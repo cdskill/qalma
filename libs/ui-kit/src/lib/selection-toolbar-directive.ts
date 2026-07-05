@@ -8,20 +8,20 @@ import {
 } from '@angular/core';
 import { QalmaEditorController } from '@qalma/editor';
 
-import { PlaygroundSelectionToolbarController } from './selection-toolbar-controller';
+import { QalmaSelectionToolbarController } from './selection-toolbar-controller';
 
 @Directive({
-  exportAs: 'appPlaygroundSelectionToolbar',
-  selector: '[appPlaygroundSelectionToolbar]',
+  exportAs: 'qalmaSelectionToolbar',
+  selector: '[qalmaSelectionToolbar]',
 })
-export class PlaygroundSelectionToolbarDirective {
+export class QalmaSelectionToolbarDirective {
   readonly editor = input.required<QalmaEditorController>({
-    alias: 'appPlaygroundSelectionToolbar',
+    alias: 'qalmaSelectionToolbar',
   });
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly controller = new PlaygroundSelectionToolbarController(() =>
+  private readonly controller = new QalmaSelectionToolbarController(() =>
     this.editor(),
   );
 

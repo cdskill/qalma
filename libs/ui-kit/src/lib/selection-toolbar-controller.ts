@@ -4,14 +4,14 @@ import {
   SelectionState,
 } from '@qalma/editor';
 
-import { PlaygroundContextualToolbarPlacement } from './contextual-toolbar';
+import { QalmaContextualToolbarPlacement } from './contextual-toolbar';
 
 const TOOLBAR_EDGE_MARGIN = 16;
 const TOOLBAR_GAP = 8;
 
-export class PlaygroundSelectionToolbarController {
+export class QalmaSelectionToolbarController {
   private readonly placementState =
-    signal<PlaygroundContextualToolbarPlacement | null>(null);
+    signal<QalmaContextualToolbarPlacement | null>(null);
   readonly placement = this.placementState.asReadonly();
 
   private surface: HTMLElement | null = null;
@@ -143,7 +143,7 @@ export class PlaygroundSelectionToolbarController {
   }
 
   private setPlacement(
-    placement: PlaygroundContextualToolbarPlacement | null,
+    placement: QalmaContextualToolbarPlacement | null,
   ): void {
     const nextKey = placement?.transform ?? null;
 

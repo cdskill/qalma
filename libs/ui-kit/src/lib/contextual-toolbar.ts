@@ -19,9 +19,9 @@ import {
   lucideLink,
 } from '@ng-icons/lucide';
 
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from './button';
 
-export interface PlaygroundContextualToolbarPlacement {
+export interface QalmaContextualToolbarPlacement {
   transform: string;
 }
 
@@ -37,7 +37,7 @@ export interface PlaygroundContextualToolbarPlacement {
       lucideLink,
     }),
   ],
-  selector: 'app-playground-contextual-toolbar',
+  selector: 'qalma-contextual-toolbar',
   template: `
     @if (placement(); as placement) {
       <qalma-toolbar
@@ -136,9 +136,9 @@ export interface PlaygroundContextualToolbarPlacement {
     }
   `,
 })
-export class PlaygroundContextualToolbar {
+export class QalmaContextualToolbar {
   readonly editor = input.required<QalmaEditorController>();
-  readonly placement = input<PlaygroundContextualToolbarPlacement | null>(
+  readonly placement = input<QalmaContextualToolbarPlacement | null>(
     null,
   );
   readonly requestLink = output<MouseEvent>();
