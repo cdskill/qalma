@@ -1,11 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   effect,
-  inject,
   input,
-  output,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -22,12 +19,31 @@ import {
   lucideTable,
   lucideTextQuote,
 } from '@ng-icons/lucide';
+import { QalmaCommandValue } from '@qalma/editor';
 
-import {
-  PlaygroundSlashCommandOption,
-  PlaygroundSlashCommandPlacement,
-} from './slash-command';
+import { QalmaSuggestionMenu } from './suggestion-menu-base';
 
+export interface QalmaSlashCommandOption {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly shortcut: string;
+  /** Editor command to run when the option is picked. */
+  readonly command: string;
+  readonly value?: QalmaCommandValue;
+  readonly placement?: 'block' | 'inline';
+  /** Extra terms the consumer can match against when filtering. */
+  readonly keywords: readonly string[];
+}
+
+/**
+ * Caret-anchored slash-command menu: an icon + shortcut list with a "Commands"
+ * header and an Escape hint footer, scrolling the active option into view.
+ * Positioning, keyboard handling and active highlighting come from
+ * {@link QalmaSuggestionMenu}; feed it a `placement` (see `flipAbovePlacement`)
+ * and the filtered `options`. Ships the default block-command icon set.
+ */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgIcon],
@@ -47,7 +63,7 @@ import {
       lucideTextQuote,
     }),
   ],
-  selector: 'app-playground-slash-command-menu',
+  selector: 'qalma-slash-command-menu',
   template: `
     @if (placement(); as placement) {
       <div
@@ -64,12 +80,12 @@ import {
         >
           Commands
         </div>
-        <div data-slash-command-options class="min-h-0 flex-1 overflow-y-auto">
+        <div data-suggestion-options class="min-h-0 flex-1 overflow-y-auto">
           @for (option of options(); track option.id; let index = $index) {
             <button
               type="button"
               role="option"
-              [attr.data-slash-command-index]="index"
+              [attr.data-suggestion-index]="index"
               class="group grid h-11 w-full min-w-0 cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-2 rounded-sm px-2 text-left text-sm transition-colors hover:bg-accent-subtle hover:text-foreground focus:bg-accent-subtle focus:text-foreground focus:outline-none"
               [class.bg-accent-subtle]="index === activeIndex()"
               [class.text-foreground]="index === activeIndex()"
@@ -130,108 +146,19 @@ import {
     }
   `,
 })
-export class PlaygroundSlashCommandMenu {
-  readonly placement = input<PlaygroundSlashCommandPlacement | null>(null);
-  readonly options = input<readonly PlaygroundSlashCommandOption[]>([]);
-  readonly activeIndex = input(0);
+export class QalmaSlashCommandMenu extends QalmaSuggestionMenu<QalmaSlashCommandOption> {
+  readonly options = input<readonly QalmaSlashCommandOption[]>([]);
 
-  readonly activate = output<number>();
-  readonly pick = output<PlaygroundSlashCommandOption>();
-  readonly dismiss = output<void>();
-
-  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly optionList = this.options;
 
   constructor() {
+    super();
+
     effect(() => {
       const activeIndex = this.activeIndex();
 
       this.options();
       queueMicrotask(() => this.scrollOptionIntoView(activeIndex));
     });
-  }
-
-  protected preserveSelection(event: MouseEvent): void {
-    event.preventDefault();
-  }
-
-  protected handleOptionKeydown(
-    event: KeyboardEvent,
-    option: PlaygroundSlashCommandOption,
-    index: number,
-  ): void {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.dismiss.emit();
-
-      return;
-    }
-
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-
-      const nextIndex = this.getNextIndex(
-        index,
-        event.key === 'ArrowDown' ? 1 : -1,
-      );
-
-      this.activate.emit(nextIndex);
-      queueMicrotask(() => this.focusOption(nextIndex));
-
-      return;
-    }
-
-    if (
-      event.key === 'Enter' ||
-      event.key === ' ' ||
-      event.key === 'Spacebar'
-    ) {
-      event.preventDefault();
-      this.pick.emit(option);
-    }
-  }
-
-  private getNextIndex(index: number, delta: number): number {
-    const length = this.options().length;
-
-    return length > 0 ? (index + delta + length) % length : index;
-  }
-
-  private focusOption(index: number): void {
-    const option = this.getOptionElement(index);
-
-    option?.focus();
-    this.scrollOptionIntoView(index);
-  }
-
-  private scrollOptionIntoView(index: number): void {
-    const scroller = this.getOptionsScroller();
-    const option = this.getOptionElement(index);
-
-    if (!scroller || !option) {
-      return;
-    }
-
-    const optionTop = option.offsetTop - scroller.offsetTop;
-    const optionBottom = optionTop + option.offsetHeight;
-    const visibleTop = scroller.scrollTop;
-    const visibleBottom = visibleTop + scroller.clientHeight;
-
-    if (optionTop < visibleTop) {
-      scroller.scrollTop = optionTop;
-    } else if (optionBottom > visibleBottom) {
-      scroller.scrollTop = optionBottom - scroller.clientHeight;
-    }
-  }
-
-  private getOptionElement(index: number): HTMLButtonElement | null {
-    return this.elementRef.nativeElement.querySelector<HTMLButtonElement>(
-      `[data-slash-command-index="${index}"]`,
-    );
-  }
-
-  private getOptionsScroller(): HTMLElement | null {
-    return this.elementRef.nativeElement.querySelector<HTMLElement>(
-      '[data-slash-command-options]',
-    );
   }
 }

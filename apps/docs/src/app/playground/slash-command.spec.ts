@@ -9,14 +9,12 @@ import {
   SlashCommandState,
   createQalmaEditor,
 } from '@qalma/editor';
+import { QalmaSlashCommandOption } from '@qalma/kit';
 import { TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { describe, expect, it } from 'vitest';
 
-import {
-  PlaygroundSlashCommandController,
-  PlaygroundSlashCommandOption,
-} from './slash-command';
+import { PlaygroundSlashCommandController } from './slash-command';
 
 describe('PlaygroundSlashCommandController.refresh', () => {
   it('keeps the menu closed when the cursor coordinates cannot be measured', () => {
@@ -217,8 +215,8 @@ function createQueryOnlyEditor(
 
 function option(
   command: string,
-  placement: PlaygroundSlashCommandOption['placement'] = 'block',
-): PlaygroundSlashCommandOption {
+  placement: QalmaSlashCommandOption['placement'] = 'block',
+): QalmaSlashCommandOption {
   return {
     id: command,
     label: command,

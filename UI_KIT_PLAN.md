@@ -119,9 +119,16 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
 - [ ] `ContextualToolbar` — garder son propre positionnement point-ancre +
       CSS self-centering (pas `anchorToRect`, voir log : largeur dynamique,
       mauvais candidat pour un size fixe).
-- [ ] `MentionMenu` / `SlashCommandMenu` en composants `@qalma/kit` (garder
-      LEUR positionnement flip-above existant, qui est plus avancé que
-      `anchorToRect` aujourd'hui ; `KeyboardNavigableList` déjà branché).
+- [x] `MentionMenu` / `SlashCommandMenu` en composants `@qalma/kit`, avec base
+      partagée `QalmaSuggestionMenu` (placement + nav clavier + highlighting +
+      scroll) et primitive `flipAbovePlacement` extraite (géométrie flip-above
+      dédupliquée des deux `createPlacement`, parallèle à `anchorToRect`).
+      `QalmaMentionMenu` (avatar + loading) et `QalmaSlashCommandMenu` (icône +
+      shortcut + header/footer, icônes auto-fournies) rendent chacun leur item ;
+      types d'option kit (`QalmaMentionOption`, `QalmaSlashCommandOption`).
+      Controllers restés dans l'app (data + insertion) mais consommant les types
+      kit + `flipAbovePlacement`. Branché dans les TROIS consommateurs docs :
+      `playground`, `examples/notion-doc`, `examples/comment-box`.
 
 ### Phase 5 — Dogfooding
 - [ ] Migrer `apps/docs/playground` sur `@qalma/kit` (supprime une
@@ -372,3 +379,50 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Prochaine étape : en attente de feu vert. Reste Phase 4 : `LinkPopover`,
     `MentionMenu`/`SlashCommandMenu` (garder leur positionnement flip-above),
     `ContextualToolbar` (garder son positionnement propre) ; puis Phase 5.
+- 2026-07-05 — Phase 4, slice Mention/SlashCommand menus (PAS ENCORE COMMIT).
+  Trois choix tranchés avec l'utilisateur : (a) **deux composants + base
+  partagée** (pas un menu générique à template, pas non plus deux copies
+  fidèles) ; (b) **extraire aussi la primitive `flipAbovePlacement`** ; (c)
+  **les deux menus** dans la même slice. Périmètre docs (sandbox = Phase 5).
+  - `flip-above-placement.ts` : `SuggestionMenuPlacement` (type unique,
+    remplace les deux `Playground*Placement` identiques) + `flipAbovePlacement`
+    (géométrie openAbove/maxHeight/clamp paramétrée width/desiredHeight/
+    minHeight/margin/gap). **Petite convergence de comportement assumée** : les
+    deux `createPlacement` différaient d'un `gap` près sur le seuil openAbove /
+    le plancher (LOADING_HEIGHT vs OPTION_HEIGHT) ; la primitive unifie sur une
+    formule cohérente (celle de mention). 4 tests dédiés.
+  - `suggestion-menu-base.ts` : `@Directive()` abstraite générique
+    `QalmaSuggestionMenu<TOption>` — inputs `placement`/`activeIndex`, outputs
+    `activate`/`pick`/`dismiss`, `handleOptionKeydown` (Escape/flèches+focus/
+    Enter·Espace, wrap), `focusOption`+`scrollOptionIntoView` via attributs
+    standardisés `data-suggestion-index`/`data-suggestion-options`. Le scroll
+    est un no-op pour un menu sans scroller marqué (mention garde son focus-
+    scroll natif ; slash marque son scroller). Les composants concrets ne
+    fournissent que leur template + exposent `optionList`.
+  - `mention-menu.ts` (`QalmaMentionMenu`, `QalmaMentionOption`) et
+    `slash-command-menu.ts` (`QalmaSlashCommandMenu`, `QalmaSlashCommandOption`,
+    icônes lucide auto-fournies + effet scroll-into-view sur activeIndex).
+    Type slash = rendu (icon/label/description/shortcut) + champs contrôleur
+    (command/value?/placement?/keywords) → non générique, l'app utilise le type
+    kit direct (évite un composant Angular générique, plus fragile en template).
+  - Controllers `mention.ts`/`slash-command.ts` restés dans l'app (data +
+    insertion + `KeyboardNavigableList` de surface) mais : types locaux
+    supprimés au profit des types kit, `createPlacement` réécrits en un appel à
+    `flipAbovePlacement` (les helpers de rect/desiredHeight restent locaux).
+  - Anciens `mention-menu.ts`/`slash-command-menu.ts` du playground supprimés
+    (git rm). `slash-command.spec.ts` (teste le controller, reste dans l'app)
+    repointé sur `QalmaSlashCommandOption`.
+  - TROIS consommateurs rewire : `playground`, `examples/notion-doc` (slash),
+    `examples/comment-box` (mention).
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor` : tout vert. Kit
+    32 tests (28 + 4 flip-above). Zéro référence orpheline repo-wide.
+  - Vérifié en live (viewport desktop forcé d'emblée → pas de piège @defer
+    cette fois) via le vrai contrôleur : slash `/` ouvre 12 options, flip
+    au-dessus près du bas (`top:null`/`bottom` set), filtrage `/h`→9, nav
+    clavier de la base (ArrowDown : activeIndex 0→1), pick→insert réel
+    (blockquote 1→2) + fermeture ; mention `@` ouvre 5 suggestions avec avatar-
+    initiale, flip-above, pick→insertion de la mention + fermeture ; capture du
+    menu slash rendu bit-perfect ; zéro erreur console.
+  - Prochaine étape : en attente de feu vert. Reste Phase 4 : `LinkPopover`,
+    `ContextualToolbar` ; puis Phase 5 (dogfooding sandbox — où la base/les
+    menus/`flipAbovePlacement` serviront un 2e jeu de consommateurs).

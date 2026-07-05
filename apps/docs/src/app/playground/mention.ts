@@ -4,34 +4,26 @@ import {
   MentionState,
   QalmaEditorController,
 } from '@qalma/editor';
-import { KeyboardNavigableList } from '@qalma/kit';
-
-export interface PlaygroundMentionOption {
-  id: string;
-  label: string;
-  description: string;
-}
+import {
+  KeyboardNavigableList,
+  QalmaMentionOption,
+  SuggestionMenuPlacement,
+  flipAbovePlacement,
+} from '@qalma/kit';
 
 export type PlaygroundMentionSource =
   | {
       kind: 'eager';
-      items: readonly PlaygroundMentionOption[];
+      items: readonly QalmaMentionOption[];
     }
   | {
       kind: 'lazy';
       load: (
         mention: MentionState,
       ) =>
-        | readonly PlaygroundMentionOption[]
-        | Promise<readonly PlaygroundMentionOption[]>;
+        | readonly QalmaMentionOption[]
+        | Promise<readonly QalmaMentionOption[]>;
     };
-
-export interface PlaygroundMentionPlacement {
-  left: number;
-  top: number | null;
-  bottom: number | null;
-  maxHeight: number;
-}
 
 const MENTION_MENU_WIDTH = 280;
 const MENTION_MENU_MAX_HEIGHT = 320;
@@ -41,7 +33,7 @@ const MENTION_MENU_OPTION_HEIGHT = 56;
 const MENTION_MENU_VERTICAL_PADDING = 12;
 const MENTION_MENU_LOADING_HEIGHT = 44;
 
-const PLAYGROUND_MENTION_OPTIONS: readonly PlaygroundMentionOption[] = [
+const PLAYGROUND_MENTION_OPTIONS: readonly QalmaMentionOption[] = [
   {
     id: 'ada-lovelace',
     label: 'Ada Lovelace',
@@ -86,8 +78,8 @@ export function createPlaygroundMentionSource(
 
 export class PlaygroundMentionController {
   readonly mention = signal<MentionState | null>(null);
-  readonly placement = signal<PlaygroundMentionPlacement | null>(null);
-  readonly suggestions = signal<readonly PlaygroundMentionOption[]>([]);
+  readonly placement = signal<SuggestionMenuPlacement | null>(null);
+  readonly suggestions = signal<readonly QalmaMentionOption[]>([]);
   readonly loading = signal(false);
   readonly activeIndex = signal(0);
   readonly open = computed(
@@ -97,7 +89,7 @@ export class PlaygroundMentionController {
   );
 
   private requestId = 0;
-  private readonly keyboardNav = new KeyboardNavigableList<PlaygroundMentionOption>(
+  private readonly keyboardNav = new KeyboardNavigableList<QalmaMentionOption>(
     {
       items: () => this.suggestions(),
       activeIndex: () => this.activeIndex(),
@@ -203,7 +195,7 @@ export class PlaygroundMentionController {
     }
   }
 
-  insert(option: PlaygroundMentionOption): void {
+  insert(option: QalmaMentionOption): void {
     const mention = this.mention();
     const value: MentionCommandValue = {
       id: option.id,
@@ -229,7 +221,7 @@ export class PlaygroundMentionController {
 function resolveMentionSource(
   source: PlaygroundMentionSource,
   mention: MentionState,
-): readonly PlaygroundMentionOption[] | Promise<readonly PlaygroundMentionOption[]> {
+): readonly QalmaMentionOption[] | Promise<readonly QalmaMentionOption[]> {
   if (source.kind === 'lazy') {
     const result = source.load(mention);
 
@@ -242,9 +234,9 @@ function resolveMentionSource(
 }
 
 function filterMentionOptions(
-  options: readonly PlaygroundMentionOption[],
+  options: readonly QalmaMentionOption[],
   query: string,
-): readonly PlaygroundMentionOption[] {
+): readonly QalmaMentionOption[] {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
@@ -275,7 +267,7 @@ function getNextActiveIndex(
 function createMentionPlacement(
   optionCount: number,
   loading = false,
-): PlaygroundMentionPlacement | null {
+): SuggestionMenuPlacement | null {
   const selection = window.getSelection();
 
   if (!selection || selection.rangeCount === 0) {
@@ -289,28 +281,13 @@ function createMentionPlacement(
     return null;
   }
 
-  const desiredHeight = getMentionMenuHeight(optionCount, loading);
-  const availableBelow =
-    window.innerHeight - rect.bottom - MENTION_MENU_MARGIN - MENTION_MENU_GAP;
-  const availableAbove = rect.top - MENTION_MENU_MARGIN - MENTION_MENU_GAP;
-  const openAbove =
-    availableBelow < desiredHeight && availableAbove > availableBelow;
-  const availableHeight = Math.max(
-    MENTION_MENU_LOADING_HEIGHT,
-    openAbove ? availableAbove : availableBelow,
-  );
-  const maxHeight = Math.min(desiredHeight, availableHeight);
-  const leftBoundary = Math.max(
-    MENTION_MENU_MARGIN,
-    window.innerWidth - MENTION_MENU_WIDTH - MENTION_MENU_MARGIN,
-  );
-
-  return {
-    left: Math.min(Math.max(rect.left, MENTION_MENU_MARGIN), leftBoundary),
-    top: openAbove ? null : rect.bottom + MENTION_MENU_GAP,
-    bottom: openAbove ? window.innerHeight - rect.top + MENTION_MENU_GAP : null,
-    maxHeight,
-  };
+  return flipAbovePlacement(rect, {
+    width: MENTION_MENU_WIDTH,
+    desiredHeight: getMentionMenuHeight(optionCount, loading),
+    minHeight: MENTION_MENU_LOADING_HEIGHT,
+    margin: MENTION_MENU_MARGIN,
+    gap: MENTION_MENU_GAP,
+  });
 }
 
 function getMentionMenuHeight(optionCount: number, loading: boolean): number {

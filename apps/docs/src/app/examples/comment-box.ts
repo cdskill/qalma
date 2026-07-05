@@ -25,6 +25,7 @@ import {
   TextFormattingKit,
   createQalmaEditor,
 } from '@qalma/editor';
+import { QalmaMentionMenu, QalmaMentionOption } from '@qalma/kit';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBold,
@@ -38,10 +39,8 @@ import { LinkPopoverController } from '../playground/link-popover-controller';
 import { PlaygroundLinkPopover } from '../playground/link-popover';
 import {
   PlaygroundMentionController,
-  PlaygroundMentionOption,
   PlaygroundMentionSource,
 } from '../playground/mention';
-import { PlaygroundMentionMenu } from '../playground/mention-menu';
 import { PosthogService } from '../services/posthog.service';
 
 interface CommentAuthor {
@@ -57,7 +56,7 @@ interface PostedComment {
 }
 
 /** Teammates the @-menu suggests — drives the mention plugin in this demo. */
-const COMMENT_TEAMMATES: readonly PlaygroundMentionOption[] = [
+const COMMENT_TEAMMATES: readonly QalmaMentionOption[] = [
   { id: 'lina', label: 'Lina Mansour', description: 'Frontend' },
   { id: 'yacine', label: 'Yacine Khaldi', description: 'Backend' },
   { id: 'sofia', label: 'Sofia Haddad', description: 'Design' },
@@ -104,7 +103,7 @@ const SEED_COMMENTS: readonly {
     QalmaEditor,
     QalmaToolbar,
     PlaygroundLinkPopover,
-    PlaygroundMentionMenu,
+    QalmaMentionMenu,
   ],
   providers: [
     provideIcons({
@@ -256,7 +255,7 @@ const SEED_COMMENTS: readonly {
     </div>
 
     @if (mentionController.open()) {
-      <app-playground-mention-menu
+      <qalma-mention-menu
         [placement]="mentionController.placement()"
         [suggestions]="mentionController.suggestions()"
         [loading]="mentionController.loading()"
@@ -381,7 +380,7 @@ export class CommentBox {
     this.posthogService.posthog.capture('example_comment_posted');
   }
 
-  protected onMentionPick(option: PlaygroundMentionOption): void {
+  protected onMentionPick(option: QalmaMentionOption): void {
     this.mentionController.insert(option);
   }
 

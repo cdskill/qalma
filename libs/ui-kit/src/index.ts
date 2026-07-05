@@ -11,3 +11,7 @@ export * from './lib/keyboard-navigable-list';
 export * from './lib/drag-handle-controller';
 export * from './lib/drag-handle-directive';
 export * from './lib/drag-handle';
+export * from './lib/flip-above-placement';
+export * from './lib/suggestion-menu-base';
+export * from './lib/mention-menu';
+export * from './lib/slash-command-menu';

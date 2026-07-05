@@ -42,7 +42,14 @@ import {
   createQalmaEditor,
 } from '@qalma/editor';
 import { TablePlugin } from '@qalma/editor/table';
-import { QalmaDragHandle, QalmaDragHandleDirective } from '@qalma/kit';
+import {
+  QalmaDragHandle,
+  QalmaDragHandleDirective,
+  QalmaMentionMenu,
+  QalmaMentionOption,
+  QalmaSlashCommandMenu,
+  QalmaSlashCommandOption,
+} from '@qalma/kit';
 import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
 import {
@@ -62,15 +69,9 @@ import { PlaygroundLinkPopover } from './link-popover';
 import { LinkPopover } from './link-popover.model';
 import {
   PlaygroundMentionController,
-  PlaygroundMentionOption,
   createPlaygroundMentionSource,
 } from './mention';
-import { PlaygroundMentionMenu } from './mention-menu';
-import {
-  PlaygroundSlashCommandController,
-  PlaygroundSlashCommandOption,
-} from './slash-command';
-import { PlaygroundSlashCommandMenu } from './slash-command-menu';
+import { PlaygroundSlashCommandController } from './slash-command';
 import { PlaygroundSelectionToolbarDirective } from './selection-toolbar-directive';
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
@@ -87,9 +88,9 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     PlaygroundContextualToolbar,
     QalmaDragHandle,
     QalmaDragHandleDirective,
-    PlaygroundMentionMenu,
+    QalmaMentionMenu,
     PlaygroundSelectionToolbarDirective,
-    PlaygroundSlashCommandMenu,
+    QalmaSlashCommandMenu,
     PlaygroundToolbar,
   ],
   selector: 'app-playground',
@@ -153,7 +154,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     </qalma-editor>
 
     @if (slashCommandController.open()) {
-      <app-playground-slash-command-menu
+      <qalma-slash-command-menu
         [placement]="slashCommandController.placement()"
         [options]="slashCommandController.options()"
         [activeIndex]="slashCommandController.activeIndex()"
@@ -164,7 +165,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     }
 
     @if (mentionController.open()) {
-      <app-playground-mention-menu
+      <qalma-mention-menu
         [placement]="mentionController.placement()"
         [suggestions]="mentionController.suggestions()"
         [loading]="mentionController.loading()"
@@ -445,12 +446,12 @@ export class Playground {
     this.linkPopover.showToolbarEditor(event);
   }
 
-  protected onMentionPick(option: PlaygroundMentionOption): void {
+  protected onMentionPick(option: QalmaMentionOption): void {
     this.mentionController.insert(option);
     this.posthogService.posthog.capture('playground_mention_inserted');
   }
 
-  protected onSlashCommandPick(option: PlaygroundSlashCommandOption): void {
+  protected onSlashCommandPick(option: QalmaSlashCommandOption): void {
     this.slashCommandController.insert(option);
     this.posthogService.posthog.capture('playground_slash_command_inserted', {
       command: option.command,

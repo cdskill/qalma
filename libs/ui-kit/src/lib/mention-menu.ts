@@ -1,17 +1,22 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { PlaygroundMentionOption, PlaygroundMentionPlacement } from './mention';
+import { QalmaSuggestionMenu } from './suggestion-menu-base';
 
+export interface QalmaMentionOption {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+}
+
+/**
+ * Caret-anchored mention suggestion menu: an avatar-initial list with a loading
+ * state. Positioning, keyboard handling and active highlighting come from
+ * {@link QalmaSuggestionMenu}; feed it a `placement` (see `flipAbovePlacement`)
+ * and the filtered `suggestions`.
+ */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-playground-mention-menu',
+  selector: 'qalma-mention-menu',
   template: `
     @if (placement(); as placement) {
       <div
@@ -43,7 +48,7 @@ import { PlaygroundMentionOption, PlaygroundMentionPlacement } from './mention';
               <button
                 type="button"
                 role="option"
-                [attr.data-mention-index]="index"
+                [attr.data-suggestion-index]="index"
                 class="group grid h-12 w-full min-w-0 cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-2 rounded-sm px-2 text-left transition-colors hover:bg-accent-subtle hover:text-foreground focus:bg-accent-subtle focus:text-foreground focus:outline-none"
                 [class.bg-accent-subtle]="index === activeIndex()"
                 [class.text-foreground]="index === activeIndex()"
@@ -89,67 +94,9 @@ import { PlaygroundMentionOption, PlaygroundMentionPlacement } from './mention';
     }
   `,
 })
-export class PlaygroundMentionMenu {
-  readonly placement = input<PlaygroundMentionPlacement | null>(null);
-  readonly suggestions = input<readonly PlaygroundMentionOption[]>([]);
+export class QalmaMentionMenu extends QalmaSuggestionMenu<QalmaMentionOption> {
+  readonly suggestions = input<readonly QalmaMentionOption[]>([]);
   readonly loading = input(false);
-  readonly activeIndex = input(0);
 
-  readonly activate = output<number>();
-  readonly pick = output<PlaygroundMentionOption>();
-  readonly dismiss = output<void>();
-
-  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-
-  protected preserveSelection(event: MouseEvent): void {
-    event.preventDefault();
-  }
-
-  protected handleOptionKeydown(
-    event: KeyboardEvent,
-    option: PlaygroundMentionOption,
-    index: number,
-  ): void {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      this.dismiss.emit();
-
-      return;
-    }
-
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-
-      const nextIndex = this.getNextIndex(
-        index,
-        event.key === 'ArrowDown' ? 1 : -1,
-      );
-
-      this.activate.emit(nextIndex);
-      queueMicrotask(() => this.focusOption(nextIndex));
-
-      return;
-    }
-
-    if (
-      event.key === 'Enter' ||
-      event.key === ' ' ||
-      event.key === 'Spacebar'
-    ) {
-      event.preventDefault();
-      this.pick.emit(option);
-    }
-  }
-
-  private getNextIndex(index: number, delta: number): number {
-    const length = this.suggestions().length;
-
-    return length > 0 ? (index + delta + length) % length : index;
-  }
-
-  private focusOption(index: number): void {
-    this.elementRef.nativeElement
-      .querySelector<HTMLButtonElement>(`[data-mention-index="${index}"]`)
-      ?.focus();
-  }
+  protected readonly optionList = this.suggestions;
 }
