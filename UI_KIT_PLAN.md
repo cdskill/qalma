@@ -144,11 +144,22 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       `playground`, `examples/notion-doc`, `examples/comment-box`.
 
 ### Phase 5 — Dogfooding
-- [ ] Migrer `apps/docs/playground` sur `@qalma/kit` (supprime une
-      duplication).
+- [x] Migrer `apps/docs/playground` sur `@qalma/kit` — fait de facto pendant
+      les Phases 3-4 : le playground (et les exemples notion-doc/comment-box/
+      mail-box/product-review) consomment désormais toolbar/registry, menus,
+      drag-handle, link-popover, contextual-toolbar du kit ; plus de duplication
+      côté docs.
 - [ ] Migrer `apps/sandbox` sur `@qalma/kit` (supprime la seconde
       duplication, prouve l'indépendance vis-à-vis de spartan-ng/Tailwind
-      côté doc).
+      côté doc). **En cours :**
+      - [x] Thème : tokens shadcn (palette warm des docs) ajoutés à
+            `apps/sandbox/src/styles.css` (`:root` + `@theme inline`, light-only,
+            SANS spartan-ng) — c'est tout ce dont le kit a besoin pour se thémer.
+      - [x] Toolbar : `sandbox-toolbar.ts` migré sur `QalmaToolbarRegistry` +
+            fragments + `provideQalmaToolbarIcons`, contrôles custom (image/link,
+            swatches couleur, select langage) en `<ng-template>` restylés shadcn
+            (`TOOLBAR_BUTTON_CLASS` réutilisé). Ordre propre au sandbox préservé.
+      - [ ] Menus mention/slash + link-popover : à migrer (slices suivantes).
 
 ### Phase 6 — Sortie
 - [ ] Ajouter `@qalma/kit` au bench `bench/bundle-size`.
@@ -495,3 +506,41 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     tous les composants `@qalma/kit` ; c'est le 2e jeu de consommateurs qui
     prouve l'indépendance vis-à-vis de spartan-ng/Tailwind côté docs) ; puis
     Phase 6 (bench bundle-size + page recipes + page comparative).
+- 2026-07-05 — Phase 5, slice 1 : thème + toolbar sandbox (PAS ENCORE COMMIT).
+  Choix utilisateur : réutiliser la palette warm des docs (pas d'identité
+  slate/sky propre) ; thème + toolbar d'abord (menus + link-popover ensuite).
+  - **Thème** : bloc `:root` (couleurs warm des docs) + `@theme inline`
+    (mapping `--color-*` + `--radius-*`) ajouté en tête de
+    `apps/sandbox/src/styles.css`. Light-only (le sandbox n'a pas de dark mode).
+    Fonts non copiées (le kit utilise `font-mono`/`font-medium` par défaut de
+    Tailwind v4). **Point clé : aucun import de spartan-ng** — définir les tokens
+    suffit à thémer tous les composants du kit. C'est la preuve d'indépendance.
+  - **Toolbar** : `sandbox-toolbar.ts` réécrit comme `PlaygroundToolbar` —
+    `<qalma-toolbar-registry [groups]>` piloté par les fragments + 5
+    `<ng-template>` pour les contrôles custom (image/upload, swatches highlight,
+    swatches text+bg + clears, select langage, link). `setHighlight`/
+    `unsetHighlight` en `ToolbarCommandItem` inline. `commandClass` des boutons
+    custom = `TOOLBAR_BUTTON_CLASS` importé du kit (cohérence visuelle) ;
+    `colorSwatchClass`/`languageSelectClass` restylés shadcn. `provideIcons`
+    local réduit aux 4 icônes custom (Highlighter/Image/ImageUp/Link) ; les
+    autres via `provideQalmaToolbarIcons`. Ordre propre au sandbox conservé
+    (headings → image → align → marks → highlight → colors → lists → link →
+    history).
+  - `.claude/launch.json` : entrée `sandbox` ajoutée (serve nx sandbox, 4200)
+    pour le preview.
+  - `nx run-many -t lint,test,build -p ui-kit,docs,editor,sandbox` : tout vert
+    **en `--parallel=1`** (le build ng-packagr du kit flake sous forte
+    parallélisation — échecs transitoires, pas des erreurs réelles ; confirmé en
+    isolé). 55 tests sandbox inchangés.
+  - Vérifié en live (app sandbox servie, viewport desktop) via le vrai
+    contrôleur : toolbar rendue avec la registry (29 boutons de commande +
+    icônes, 8 séparateurs/9 groupes, 15 swatches, `display:contents`), fond
+    `bg-secondary/40` résolu depuis le token warm ; clic Bold exécute
+    (`<strong>` +1) et le bouton actif affiche `bg-accent-subtle`
+    rgb(240,226,200) + `text-accent` rgb(140,90,43) (tokens warm, inspectés
+    stabilisés — les 1ères lectures capturaient la transition CSS) ; swatch
+    Yellow highlight appliqué (classe active) ; zéro erreur console.
+  - Prochaine étape : Phase 5 slices suivantes — migrer les menus mention/slash
+    du sandbox (`sandbox-mention*.ts`, `sandbox-slash-command*.ts`) puis le
+    link-popover (`sandbox-link-popover.ts` + controller/model locaux) sur le
+    kit, et supprimer les copies. En attente de feu vert.
