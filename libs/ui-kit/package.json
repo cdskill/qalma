@@ -34,19 +34,7 @@
     "@ng-icons/lucide": ">=33.0.0",
     "@qalma/editor": ">=0.1.0-beta.0"
   },
-  "peerDependenciesMeta": {
-    "@ng-icons/core": {
-      "optional": true
-    },
-    "@ng-icons/lucide": {
-      "optional": true
-    },
-    "@qalma/editor": {
-      "optional": true
-    }
-  },
   "dependencies": {
-    "@spartan-ng/brain": "0.0.1-alpha.711",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0",

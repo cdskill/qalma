@@ -1,6 +1,6 @@
 ---
 name: qalma
-description: Use when building with Qalma, the Angular-first headless rich text editor. Covers installing @qalma/editor, composing Angular UI around Qalma primitives, selecting and configuring first-party plugins, authoring custom Qalma plugins, migrating from another editor, debugging editor behavior, or contributing to the Qalma repository.
+description: Use when building with Qalma, the Angular-first headless rich text editor. Covers installing @qalma/editor, composing Angular UI around Qalma primitives (or adopting the optional @qalma/kit component layer for ready-made toolbar, menus, and popovers), selecting and configuring first-party plugins, authoring custom Qalma plugins, migrating from another editor, debugging editor behavior, or contributing to the Qalma repository.
 ---
 
 # Qalma
@@ -15,8 +15,10 @@ plugins selected explicitly in TypeScript.
 - **Use Qalma in an Angular app:** read
   [editor-integration.md](references/editor-integration.md).
 - **Build accessible toolbar, menus, popovers, upload UI, or other editor
-  chrome:** read [editor-integration.md](references/editor-integration.md) and
-  keep all presentation in the consuming app.
+  chrome:** read [editor-integration.md](references/editor-integration.md).
+  Presentation is consumer-owned by default; the optional first-party
+  `@qalma/kit` package offers ready-made, restylable versions of that chrome
+  when you would rather adopt than hand-roll it.
 - **Author or change a Qalma plugin:** read
   [plugin-authoring.md](references/plugin-authoring.md).
 - **Migrate from another editor or debug behavior:** read
@@ -35,7 +37,8 @@ plugins selected explicitly in TypeScript.
 - Compose UI explicitly in Angular templates with `<qalma-editor>`,
   `<qalma-toolbar>`, `<qalma-content>`, and `qalmaCommand`.
 - Keep toolbar labels, icons, popovers, upload flows, menus, layout, and styling
-  in the consuming application.
+  in the consuming application — or adopt the optional `@qalma/kit` package for
+  ready-made versions you can still restyle, reconfigure, and replace per piece.
 - Treat Qalma plugins as behavior providers: schema, commands, command state,
   queries, shortcuts, and ProseMirror plugins.
 - Prefer Qalma-owned options and command names over leaking raw ProseMirror or

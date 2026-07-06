@@ -264,6 +264,10 @@ export class DocsContent {
     );
 
     pres.forEach((pre) => {
+      if (pre.closest('.docs-example-code, .docs-pm')) {
+        return;
+      }
+
       pre.setAttribute('data-enhanced', '');
 
       const wrapper = document.createElement('div');

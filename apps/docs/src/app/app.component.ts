@@ -32,6 +32,12 @@ export class AppComponent implements OnInit {
       return;
     }
 
+    // Never track local development: analytics from localhost pollutes prod data.
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+      return;
+    }
+
     // Defer analytics out of the critical path: PostHog pulls several modules
     // (recorder, surveys, …) that compete with hydration. Wait until the
     // browser is idle so they never delay first paint or interactivity.

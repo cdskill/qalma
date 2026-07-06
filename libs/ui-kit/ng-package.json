@@ -2,7 +2,6 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/libs/ui-kit",
   "allowedNonPeerDependencies": [
-    "@spartan-ng/brain",
     "class-variance-authority",
     "clsx",
     "tailwind-merge",

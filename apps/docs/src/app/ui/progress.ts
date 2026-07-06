@@ -1,27 +1,21 @@
+/* eslint-disable @angular-eslint/directive-selector */
 import { Directionality } from '@angular/cdk/bidi';
-import {
-  computed,
-  Directive,
-  ElementRef,
-  inject,
-  input,
-} from '@angular/core';
+import { Directive, ElementRef, computed, inject, input } from '@angular/core';
 import {
   BrnProgress,
   BrnProgressIndicator,
   injectBrnProgress,
 } from '@spartan-ng/brain/progress';
-
-import { cn } from './cn';
+import { clsx } from 'clsx';
 
 const PROGRESS_BASE =
-  'qalma-progress relative inline-flex w-full overflow-hidden';
+  'spartan-progress relative inline-flex w-full overflow-hidden';
 
 const PROGRESS_INDICATOR_BASE =
-  'qalma-progress-indicator h-full w-full flex-1 transition-all';
+  'spartan-progress-indicator h-full w-full flex-1 transition-all';
 
 @Directive({
-  selector: '[qalmaProgress]',
+  selector: '[hlmProgress]',
   hostDirectives: [
     {
       directive: BrnProgress,
@@ -32,25 +26,25 @@ const PROGRESS_INDICATOR_BASE =
     '[class]': 'computedClass()',
   },
 })
-export class QalmaProgress {
+export class HlmProgress {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly initialClass =
     this.host.nativeElement.getAttribute('class') ?? '';
 
   protected readonly computedClass = computed(() =>
-    cn(PROGRESS_BASE, this.initialClass),
+    clsx(PROGRESS_BASE, this.initialClass),
   );
 }
 
 @Directive({
-  selector: '[qalmaProgressIndicator]',
+  selector: '[hlmProgressIndicator]',
   hostDirectives: [BrnProgressIndicator],
   host: {
     '[class]': 'computedClass()',
     '[style.transform]': 'transform()',
   },
 })
-export class QalmaProgressIndicator {
+export class HlmProgressIndicator {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly progress = injectBrnProgress();
   private readonly dir = inject(Directionality, { optional: true });
@@ -72,7 +66,7 @@ export class QalmaProgressIndicator {
   });
 
   protected readonly computedClass = computed(() =>
-    cn(
+    clsx(
       PROGRESS_INDICATOR_BASE,
       this.progressValue() === null && 'animate-indeterminate',
       this.initialClass,
@@ -95,7 +89,4 @@ export class QalmaProgressIndicator {
   });
 }
 
-export const QalmaProgressImports = [
-  QalmaProgress,
-  QalmaProgressIndicator,
-] as const;
+export const HlmProgressImports = [HlmProgress, HlmProgressIndicator] as const;

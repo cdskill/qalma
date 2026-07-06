@@ -4,11 +4,13 @@
   "sourceRoot": "libs/ui-kit/src",
   "prefix": "qalma",
   "projectType": "library",
+  "implicitDependencies": ["editor"],
   "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/libs/ui-kit"],
+      "dependsOn": ["^build"],
       "options": {
         "project": "libs/ui-kit/ng-package.json",
         "tsConfig": "libs/ui-kit/tsconfig.lib.json"
@@ -22,6 +24,11 @@
       "outputs": ["{workspaceRoot}/coverage/libs/ui-kit"],
       "options": {
         "configFile": "libs/ui-kit/vite.config.ts"
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/libs/ui-kit"
       }
     }
   }

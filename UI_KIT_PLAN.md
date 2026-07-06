@@ -1,7 +1,9 @@
 # Qalma UI Kit — plan & tracker
 
-Package cible : `@qalma/kit` (lib Nx `libs/ui-kit`), suit la même discipline
-d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
+Package cible : `@qalma/kit` (lib Nx `libs/ui-kit`). Cette slice garde un
+entrypoint public unique ; des entrypoints secondaires pourront être ajoutés
+plus tard si le bench bundle-size ou des consommateurs réels montrent que le
+barrel monolithique coûte trop cher.
 
 ## Décisions de cadrage (verrouillées)
 
@@ -28,9 +30,11 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
 ## Phases / slices
 
 ### Phase 0 — Cadrage
+
 - [x] Décisions de scope ci-dessus actées en conversation.
 
 ### Phase 1 — Fondations du package
+
 - [x] Scaffold `libs/ui-kit` (lib Nx, publishable, `importPath: @qalma/kit`,
       prefix `qalma`, structure calquée à la main sur `libs/editor` plutôt que
       le générateur Nx par défaut, pour éviter le scaffolding de composant/
@@ -40,18 +44,19 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
 - [x] Introduire `cn()` (clsx + tailwind-merge) — absent du repo aujourd'hui.
 - [x] Introduire une convention CVA pour les variants (remplace le
       `clsx(BASE, VARIANTS[x], SIZES[y])` codé à la main) — utilisée pour
-      `button` (qui a de vrais variants) ; `progress` garde un simple `cn()`
-      (pas de variants à exposer).
-- [x] Migrer `button` et `progress` depuis `apps/docs/src/app/ui/` vers
-      `libs/ui-kit` avec la nouvelle convention. Renommés `HlmButton`/
-      `HlmProgress*` → `QalmaButton`/`QalmaProgress*` (préfixe `qalma`,
-      cohérent avec le reste de la surface publique) ; tous les
-      consommateurs dans `apps/docs` rewire vers `@qalma/kit`.
+      `button` (qui a de vrais variants). `progress` reste local à
+      `apps/docs`, car la barre de navigation est du chrome d'application
+      docs, pas une primitive éditeur réutilisable.
+- [x] Migrer `button` depuis `apps/docs/src/app/ui/` vers `libs/ui-kit`
+      avec la nouvelle convention. Renommé `HlmButton` → `QalmaButton`
+      (préfixe `qalma`, cohérent avec le reste de la surface publique) ;
+      les consommateurs button dans `apps/docs` rewire vers `@qalma/kit`.
 - [x] Theming via variables CSS façon shadcn (`bg-background`,
       `text-foreground`, `border-input`...), pas de tokens `--qalma-*` maison
       — repris tel quel des classes Tailwind déjà utilisées par `apps/docs`.
 
 ### Phase 2 — Primitives de comportement partagées
+
 - [x] `anchorToRect(rect, options)` — positionnement + clamp horizontal ET
       vertical d'un élément flottant depuis un rect ProseMirror. Placement
       top/bottom/left/right + align `start`/`center`/`end`/nombre (pour
@@ -82,6 +87,7 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       slash-command sont uniquement dans `apps/docs/playground`).
 
 ### Phase 3 — Boutons de toolbar
+
 - [x] `QalmaToolbarButton` générique (`command`, `value`, `icon`, `label`) —
       composant élément `<qalma-toolbar-button>` (`display:contents`) qui rend
       un `<button>` interne câblé à la directive `QalmaCommand` de
@@ -103,10 +109,12 @@ d'entry points secondaires que `@qalma/editor/table` et `@qalma/editor/forms`.
       est géré en composant la liste de groupes (`...(inTable() ? OPS : [])`).
 
 ### Phase 4 — Wrappers de features (composants réutilisables dans `@qalma/kit`)
-Distinct de la Phase 2 : la Phase 2 a branché les *primitives* dans le code
+
+Distinct de la Phase 2 : la Phase 2 a branché les _primitives_ dans le code
 existant d'`apps/docs` (moins de duplication, bugs corrigés). Il reste à
 extraire ces features en vrais composants exportés par `@qalma/kit`, que
 `apps/docs` ET `apps/sandbox` pourraient tous les deux consommer :
+
 - [x] `DragHandle` + `BlockActionsMenu` en composant `@qalma/kit`. Extraction
       des 3 fichiers (controller pur + directive adaptateur + composant
       présentationnel) depuis `apps/docs/playground` vers `libs/ui-kit`,
@@ -144,6 +152,7 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       `playground`, `examples/notion-doc`, `examples/comment-box`.
 
 ### Phase 5 — Dogfooding
+
 - [x] Migrer `apps/docs/playground` sur `@qalma/kit` — fait de facto pendant
       les Phases 3-4 : le playground (et les exemples notion-doc/comment-box/
       mail-box/product-review) consomment désormais toolbar/registry, menus,
@@ -152,24 +161,34 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
 - [x] Migrer `apps/sandbox` sur `@qalma/kit` (supprime la seconde
       duplication, prouve l'indépendance vis-à-vis de spartan-ng/Tailwind
       côté doc) :
-      - [x] Thème : tokens shadcn (palette warm des docs) ajoutés à
-            `apps/sandbox/src/styles.css` (`:root` + `@theme inline`, light-only,
-            SANS spartan-ng) — c'est tout ce dont le kit a besoin pour se thémer.
-      - [x] Toolbar : `sandbox-toolbar.ts` migré sur `QalmaToolbarRegistry` +
-            fragments + `provideQalmaToolbarIcons`, contrôles custom (image/link,
-            swatches couleur, select langage) en `<ng-template>` restylés shadcn
-            (`TOOLBAR_BUTTON_CLASS` réutilisé). Ordre propre au sandbox préservé.
-      - [x] Menus mention/slash : controllers `sandbox-mention.ts`/
-            `sandbox-slash-command.ts` migrés sur les types kit +
-            `flipAbovePlacement`, composants `sandbox-*-menu.ts` supprimés au
-            profit de `QalmaMentionMenu`/`QalmaSlashCommandMenu`.
-      - [x] Link-popover : `sandbox-link-popover.ts` + `link-popover-controller.ts`
-            + `link-popover.model.ts` (copies sandbox) supprimés au profit de
-            `QalmaLinkPopover` + `LinkPopoverController` du kit ; au passage le
-            placement gagne le clamp vertical `anchorToRect` (le sandbox ne
-            clampait pas). `app.spec.ts` repointé sur `QalmaLinkPopover`.
+  - [x] Thème : tokens shadcn (palette warm des docs) ajoutés à
+        `apps/sandbox/src/styles.css` (`:root` + `@theme inline`, light-only,
+        SANS spartan-ng) — c'est tout ce dont le kit a besoin pour se thémer.
+  - [x] Toolbar : `sandbox-toolbar.ts` migré sur `QalmaToolbarRegistry` +
+        fragments + `provideQalmaToolbarIcons`, contrôles custom (image/link,
+        swatches couleur, select langage) en `<ng-template>` restylés shadcn
+        (`TOOLBAR_BUTTON_CLASS` réutilisé). Ordre propre au sandbox préservé.
+  - [x] Menus mention/slash : controllers `sandbox-mention.ts`/
+        `sandbox-slash-command.ts` migrés sur les types kit +
+        `flipAbovePlacement`, composants `sandbox-*-menu.ts` supprimés au
+        profit de `QalmaMentionMenu`/`QalmaSlashCommandMenu`.
+  - [x] Link-popover : `sandbox-link-popover.ts` +
+        `link-popover-controller.ts` + `link-popover.model.ts` (copies sandbox)
+        supprimés au profit de `QalmaLinkPopover` + `LinkPopoverController` du
+        kit ; au passage le placement gagne le clamp vertical `anchorToRect`
+        (le sandbox ne clampait pas). `app.spec.ts` repointé sur
+        `QalmaLinkPopover`.
 
 ### Phase 6 — Sortie
+
+- [x] Ajouter `ui-kit` à la configuration Nx release (`nx.json` +
+      `nx-release-publish` packageRoot projet).
+- [x] Ajouter la documentation `@qalma/kit` dans `apps/docs` : entrée header
+      "UI Kit", **section `/kit` autonome** (sidebar scopée propre, PAS un
+      groupe enfoui sous les docs éditeur), index `/kit`, pages dédiées
+      (`/kit/theming`, `/kit/button`, etc.) avec preview + snippet expansible.
+      Switcher `Docs | UI Kit` en tête de sidebar pour passer d'une section à
+      l'autre (voir log 2026-07-06).
 - [ ] Ajouter `@qalma/kit` au bench `bench/bundle-size`.
 - [ ] Page "recipes" Material / Kendo / ng-zorro dans `apps/docs`.
 - [ ] Mettre à jour la page comparative.
@@ -186,14 +205,16 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   créés ; `button`/`progress` migrés depuis `apps/docs/src/app/ui/` vers
   `libs/ui-kit/src/lib/` sous les noms `QalmaButton`/`QalmaProgress*`, 8
   fichiers consommateurs dans `apps/docs` rewire vers `@qalma/kit`, ancien
-  dossier `apps/docs/src/app/ui/` supprimé. Doc `theming.md` mise à jour.
+  dossier `apps/docs/src/app/ui/` supprimé. **Décision révisée le
+  2026-07-05 : `progress` est ressorti du kit et restauré dans `apps/docs`,
+  car c'est du chrome propre à l'application docs.** Doc `theming.md` mise à jour.
   `nx run-many -t lint,test,build -p ui-kit,docs,editor,sandbox` : tout vert.
   Vérifié en live dans le navigateur (page d'accueil, toggle thème, éditeur).
   Au passage : fix d'une régression pré-existante sur `main` — le check
   `event instanceof PointerEvent` ajouté dans une session précédente pour le
   fix du drag handle crashait sous vitest/jsdom (`PointerEvent` n'y est pas
-  défini) ; remplacé par `instanceof MouseEvent` (compatible navigateur réel
-  + jsdom), commit séparé `fix(docs)` avant le commit `feat(ui-kit)`.
+  défini) ; remplacé par `instanceof MouseEvent` (compatible navigateur réel et
+  jsdom), commit séparé `fix(docs)` avant le commit `feat(ui-kit)`.
   Commits : `e81d461` (fix), `0c1539b` (feat). Prochaine étape : Phase 2
   (primitives partagées anchor/dismiss/keyboard-nav).
 - 2026-07-04 — Phase 2 commitée. Ajout de trois primitives pures dans
@@ -278,8 +299,8 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   Composant `libs/ui-kit/src/lib/toolbar-button.ts` exporté par `@qalma/kit`.
   Décisions de conception prises en la construisant :
   - **Composant élément `<qalma-toolbar-button>`, pas directive sur `<button>`.**
-    Première tentative en `button[qalmaToolbarButton]` + `hostDirectives:
-    [QalmaCommand]` : rejetée par le lint. (1) `component-selector` du kit
+    Première tentative en `button[qalmaToolbarButton]` +
+    `hostDirectives: [QalmaCommand]` : rejetée par le lint. (1) `component-selector` du kit
     impose `type: element` / kebab-case → un sélecteur d'attribut camelCase ne
     passe pas ; (2) la règle a11y `@angular-eslint/template/elements-content`
     côté docs interdit un `<button>` vide (34 erreurs) puisque l'icône serait
@@ -291,12 +312,13 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     Bonus vs hostDirectives : `[disabled]` s'applique au vrai `<button>`, pas à
     un élément custom non-form.
   - **`@qalma/kit` dépend désormais de `@qalma/editor` et `@ng-icons/core`** —
-    ajoutés en `peerDependencies` **optionnelles** (`peerDependenciesMeta`).
-    Peer (externe, non-bundlé) et non `dependencies` : pas de régression
-    tree-shaking pour un consommateur qui n'importe que `cn`/`anchorToRect`
-    (cf. [[plugin-entry-point-treeshaking]] — le problème visait les deps
-    tierces *bundlées* dans le FESM, pas les peers externes). `nx build ui-kit`
-    OK sans toucher `allowedNonPeerDependencies` (réservé aux non-peers).
+    ajoutés en `peerDependencies`. Décision révisée le 2026-07-06 :
+    ces peers sont assumés comme obligatoires tant que `@qalma/kit` publie un
+    seul entrypoint/FESM, car les imports top-level doivent être résolus même
+    pour un consommateur qui n'importe que `cn`/`anchorToRect`. Des entrypoints
+    secondaires restent l'option de découpe si le coût réel le justifie.
+    `nx build ui-kit` OK sans toucher `allowedNonPeerDependencies` (réservé aux
+    non-peers).
     Tags Nx vides → aucune contrainte de module-boundary sur ui-kit→editor.
   - **Pas de spec unitaire** (aligné sur `command.ts`/`toolbar.ts` de l'editor,
     non testés) : `QALMA_EDITOR_CONTEXT` n'est pas public et le vrai
@@ -313,8 +335,8 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Vérifié en live (home / playground) en pilotant le vrai contrôleur via
     `ng.getComponent`/`ng.applyChanges` : rendu bit-perfect (28 boutons hors
     table, host `display:contents`, bouton 29.6px ≈ 1.85rem, icônes SVG),
-    exécution réelle d'une commande (clic Italic curseur replié : état actif
-    + `aria-pressed` false→true→false, `isCommandActive` suit), zéro erreur
+    exécution réelle d'une commande (clic Italic curseur replié : état actif ;
+    `aria-pressed` false→true→false, `isCommandActive` suit), zéro erreur
     console.
   - Prochaine étape : Phase 3 slice 2 (registry déclarative + `Toolbar`
     composite piloté par données, branché dans les DEUX toolbars) — en attente
@@ -323,12 +345,13 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   Trois choix de scope tranchés avec l'utilisateur avant de démarrer :
   (a) livrer **les deux** — fragments de données ET composite ; (b) icônes via
   **`provideQalmaToolbarIcons()`** dans le kit (`@ng-icons/lucide` en peer
-  optionnelle) ; (c) périmètre **docs (playground) uniquement** ce coup-ci, la
-  migration sandbox reste en Phase 5.
+  obligatoire tant que le kit reste en entrypoint unique) ; (c) périmètre
+  **docs (playground) uniquement** ce coup-ci, la migration sandbox reste en
+  Phase 5.
   - `libs/ui-kit/src/lib/toolbar-commands.ts` : types (`ToolbarCommandItem`,
     `ToolbarTemplateItem`, `ToolbarItem`, `ToolbarGroup`) + fragments exportés
     (source de vérité command/icon/label, réutilisables par sandbox en Phase 5)
-    + garde `isToolbarCommandItem`.
+    et garde `isToolbarCommandItem`.
   - `libs/ui-kit/src/lib/toolbar-registry.ts` : `QalmaToolbarRegistry`
     (`qalma-toolbar-registry`, `display:contents`). Décision clé : le composite
     rend **les items seulement**, pas de conteneur `role=toolbar` — c'est le
@@ -336,23 +359,23 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     va dedans. Content-projection Angular étant statique (impossible de
     sélectionner un `<ng-content>` par nom runtime dans un `@for`), les
     contrôles custom passent par un `ToolbarTemplateItem { template: TemplateRef }`
-    + `ngTemplateOutlet` — le consommateur déclare des `<ng-template>` et les
+    et `ngTemplateOutlet` — le consommateur déclare des `<ng-template>` et les
     référence dans le tableau de groupes. `visibleGroups` filtre les groupes
     vides (sinon séparateur orphelin quand un groupe conditionnel disparaît).
   - `libs/ui-kit/src/lib/toolbar-icons.ts` : `provideQalmaToolbarIcons()`.
-    `@ng-icons/lucide` ajouté en peer **optionnelle** (même logique que slice 1
-    — externe, tree-shakeable, seul ce module l'importe).
+    `@ng-icons/lucide` ajouté en peer obligatoire tant que le kit reste sur un
+    entrypoint public unique.
   - `PlaygroundToolbar` réécrit : la liste explicite de `<qalma-toolbar-button>`
     → `<qalma-toolbar-registry [groups]="toolbarGroups(color, codeLang, insert)">`
-    + 3 `<ng-template>` (color pickers / select langage / boutons image·upload·
-    link). `toolbarGroups(...)` est une **méthode** recevant les `TemplateRef`
-    en arguments de binding (pas un `computed` via `viewChild`) pour éviter le
-    problème de timing viewChild-dans-la-même-vue ; recrée le tableau à chaque
-    CD mais `@for track` stabilise le DOM. `provideIcons` local réduit de 40 à
-    6 icônes (les 34 du registry viennent du provider ; restent Baseline/
-    Highlighter/PaintBucket/Image/ImageUp/Link des contrôles custom).
-    `separatorClass` supprimé (géré par le composite) ; `commandClass`/
-    `iconClass`/`languageSelectClass` gardés (contrôles custom).
+    - 3 `<ng-template>` (color pickers / select langage / boutons image·upload·
+      link). `toolbarGroups(...)` est une **méthode** recevant les `TemplateRef`
+      en arguments de binding (pas un `computed` via `viewChild`) pour éviter le
+      problème de timing viewChild-dans-la-même-vue ; recrée le tableau à chaque
+      CD mais `@for track` stabilise le DOM. `provideIcons` local réduit de 40 à
+      6 icônes (les 34 du registry viennent du provider ; restent Baseline/
+      Highlighter/PaintBucket/Image/ImageUp/Link des contrôles custom).
+      `separatorClass` supprimé (géré par le composite) ; `commandClass`/
+      `iconClass`/`languageSelectClass` gardés (contrôles custom).
   - Pas de spec unitaire (même raison que slice 1 : rendre la registry monte
     des `QalmaToolbarButton` → `QalmaCommand` → `QALMA_EDITOR_CONTEXT` privé,
     non montable proprement sous JIT/vitest). Preuve en live.
@@ -373,8 +396,9 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   fidèle) ; **ajouter le clic-dehors via `DismissibleOverlay`** (retire une
   primitive Phase 2 sans consommateur + améliore l'UX) ; périmètre **docs
   uniquement** (sandbox n'a pas de drag-handle, ça reste Phase 5).
-  - `git mv` des 4 fichiers `apps/docs/playground/drag-handle{,-controller,
-    -directive}.ts` + `drag-handle.spec.ts` → `libs/ui-kit/src/lib/`
+  - `git mv` des 4 fichiers
+    `apps/docs/playground/drag-handle{,-controller,-directive}.ts` +
+    `drag-handle.spec.ts` → `libs/ui-kit/src/lib/`
     (spec renommé `drag-handle-controller.spec.ts`). Renommage `Playground`→
     `Qalma` (blanket sûr : ces fichiers ne contiennent que des symboles
     drag-handle), sélecteurs `app-playground-drag-handle`→`qalma-drag-handle`,
@@ -391,8 +415,8 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
   - Directive (`[qalmaDragHandle]`, exportAs `qalmaDragHandle`) et controller
     (`QalmaDragHandleController` + types `QalmaDragHandleView`/
     `QalmaDragDropIndicator`/`QalmaDragBlockHighlight` + `QalmaDragStart`)
-    exportés du barrel. Pas de nouvelle dep : `@ng-icons/lucide` (peer optionnelle
-    ajoutée slice 2) couvre les icônes du menu ; `@qalma/editor` (peer) fournit
+    exportés du barrel. Pas de nouvelle dep : `@ng-icons/lucide` (peer
+    obligatoire depuis la slice 2) couvre les icônes du menu ; `@qalma/editor` (peer) fournit
     `DragHandleCommandValue`/`DragHandleMoveCommandValue`.
   - Deux consommateurs docs rewire : `playground.ts` ET `examples/notion-doc.ts`
     (ce dernier découvert par grep repo-wide — pas seulement le playground).
@@ -477,7 +501,7 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     → `docs:build` cassé, corrigé en pointant leurs imports sur `@qalma/kit`
     (placés dans le groupe des packages externes pour `import/order`).
   - Pas de spec (aucun n'existait ; controller vérifié en live). `nx run-many
-    -t lint,test,build -p ui-kit,docs,editor` : tout vert. Zéro orphelin.
+-t lint,test,build -p ui-kit,docs,editor` : tout vert. Zéro orphelin.
   - Vérifié en live (viewport desktop forcé) via le vrai contrôleur : survol
     d'un lien → preview `role="dialog"` positionné via `anchorToRect`
     (left:528/top:518), href affiché + boutons edit/unlink ; clic Edit → mode
@@ -587,3 +611,94 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
     toolbar + menus + link-popover). Prochaine étape : Phase 6 (ajouter
     `@qalma/kit` au bench `bench/bundle-size` ; page recipes Material/Kendo/
     ng-zorro ; page comparative). En attente de feu vert.
+- 2026-07-05 — Ajustement post-revue : `QalmaProgress*` retiré de
+  `@qalma/kit`. La barre de progression de navigation reste une primitive
+  locale `apps/docs/src/app/ui/progress.ts` (`HlmProgress*`) parce qu'elle
+  appartient au chrome de l'application docs, pas à l'UI kit éditeur. Cela
+  retire aussi la dépendance `@spartan-ng/brain` du package `libs/ui-kit`.
+  Côté build, `ui-kit` déclare maintenant sa dépendance Nx implicite vers
+  `editor` et son `build` dépend de `^build`, pour que `nx build sandbox`
+  puisse ordonner `editor` avant `ui-kit` même en parallèle. `ui-kit` a aussi
+  été ajouté aux projets Nx release et son `nx-release-publish.packageRoot`
+  pointe vers `dist/libs/ui-kit`.
+- 2026-07-06 — Doc UI Kit sortie en **section autonome** (Option B, choix
+  utilisateur, PAS ENCORE COMMIT). Les 11 pages kit étaient enfouies comme
+  9e groupe dans la longue sidebar docs éditeur (`/docs/ui-kit*`) ; extraites
+  en section `/kit` avec sa propre navigation.
+  - Routes : `pages/docs/ui-kit*.page.ts` → `pages/kit/*` (préfixe `ui-kit-`
+    retiré ; `ui-kit.page.ts` → `pages/kit/(overview).page.ts` = index `/kit`,
+    convention groupe pathless Analog `(name)` déjà utilisée par `(home)`).
+    Layout `pages/kit.page.ts` (Analog : `kit.page.ts` + dossier `kit/` = layout
+    parent des enfants). Même profondeur → imports relatifs inchangés.
+  - Chrome partagé extrait : `docs/docs-shell.ts` (`DocsShell`) porte le header +
+    grille 3 colonnes + scan TOC (`ngAfterViewChecked`) ; `docs.page.ts` et
+    `kit.page.ts` deviennent des layouts fins qui passent `[groups]` + `section`
+    et projettent leur `<router-outlet>` dans son `<ng-content>`.
+  - `DocsSidebar` : `DOCS_NAV` hardcodé → inputs `groups`/`section` ; switcher
+    `role=tablist` `Docs | UI Kit` (via `DOCS_SECTIONS`) en tête. Data : groupe
+    UI Kit retiré de `DOCS_NAV` (docs-nav.ts) → nouveau `docs/kit-nav.ts`
+    (`KIT_NAV`, 3 groupes : Getting Started / Components / Primitives). Effet de
+    bord propre : `generate-llms-full.mjs` (scanne les `href:'/docs/…'` de
+    docs-nav) ne référence plus les pages kit (démos composant, pas de `.md`).
+  - **Bug attrapé en live** : la sidebar gatait le rendu `routerLink` sur
+    `isDocsRoute` (`startsWith('/docs/')`) → les liens `/kit/*` tombaient dans la
+    branche `<a href>` nue (reload full-page, pas de highlight actif).
+    Généralisé en `isRouterRoute` (`startsWith('/') && !includes('#')`, comme le
+    header). Vérifié : lien actif `bg-accent-subtle !text-accent` OK.
+  - `docs-header.ts` : liens "UI Kit" `/docs/ui-kit` → `/kit` (HEADER_NAV +
+    desktop nav) ; nav détaillée mobile rendue section-aware (`docsGroups`
+    computed depuis `router.url` : `/kit` → KIT_NAV, sinon DOCS_NAV, via
+    `toSignal(NavigationEnd)`). `vite.config` : seed prerender `/kit` ajouté
+    (discover crawle le reste depuis l'overview + header — [[docs-prerender-routes]]).
+  - `nx run-many -t lint,build,test -p docs --parallel=1` : tout vert (12 tests).
+    Prerender SSG : 11 pages `/kit/*` émises sous `analog/public/kit/**`, zéro
+    `docs/ui-kit*` résiduel, zéro lien `/docs/ui-kit` restant. Vérifié en live :
+    `/kit` sidebar = 3 groupes kit only (0 groupe éditeur), switcher UI Kit
+    sélectionné ; clic "Docs" → `/docs/introduction`, sidebar éditeur (10 groupes,
+    plus de groupe UI Kit), "Docs" sélectionné ; `/kit/button` rend le preview
+    live (8 boutons), `/kit/theming` la table de tokens ; capture prise.
+- 2026-07-06 — Revue qualité doc kit (6 retours utilisateur, PAS ENCORE COMMIT) :
+  - **Cursor pointer** : Tailwind v4 a retiré `button { cursor:pointer }` du
+    preflight → ajouté à `buttonVariants` (source, couvre tous les `qalmaBtn`) +
+    aux boutons bruts de `kit-example.ts`/`code-panel.ts`.
+  - **Le code ne reflétait pas le visuel** (grave) : preview (`<ng-content>`) et
+    snippet (`[code]` string) étaient 2 sources qui divergeaient (button : 6
+    variants affichés, 3 en code). Refonte **source unique via `?raw`** (choix
+    utilisateur) : 8 previews extraites en vrais composants
+    `apps/docs/src/app/kit/demos/*.demo.ts`, la page rend le composant ET envoie
+    `import src from './x.demo.ts?raw'` à `[code]`. Impossible de diverger.
+    Typage `?raw` déjà fourni par `vite/client` (vite-env.d.ts). 8 snippets morts
+    supprimés de `ui-kit-snippets.ts` (reste `install` + `theme`).
+  - **Drag handle cassé** (#3) : l'ancienne demo était un faux (`<qalma-content
+class="sr-only">` + handle épinglé sur pos 0 de l'éditeur caché → actions sur
+    contenu invisible). Réécrite avec le **vrai** `QalmaDragHandleDirective` sur
+    éditeur visible. Idem contextual-toolbar (vrai `QalmaSelectionToolbarDirective`,
+    plus de sr-only) et link-popover (vrai `LinkPopoverController`). Piège API : les
+    directives prennent l'éditeur via l'alias du sélecteur (`[qalmaDragHandle]=
+"editor"`), pas un `[editor]` séparé. `<qalma-drag-handle>` touche `document`
+    au constructeur → guard `browserReady`/`afterNextRender` (SSR prerender).
+    Vérifié live : hover→grip, menu 5 actions, Duplicate mute le contenu visible 3→4.
+  - **Doc icônes** (#4) : nouvelle page `/kit/icons` (+ entrée nav) + demo `?raw`.
+    Seam : `provideQalmaToolbarIcons()` = défauts lucide ; override par un
+    `provideIcons({ lucideBold: monSvg })` APRÈS (dernier gagne, vérifié live), ou
+    nom custom dans le `icon` d'un `ToolbarCommandItem`. Note honnête : icônes des
+    composants auto-fournis (drag handle, slash) pas surchargeables aujourd'hui.
+  - **Conflit tokens** (#5) : décision = garder les tokens shadcn non-préfixés
+    (pas de `--qalma-*`), documenter le **scoping** (définir les tokens sur un
+    conteneur `.qalma-surface` au lieu de `:root` pour isoler). Section ajoutée à
+    la page theming.
+  - **Skills** (#6) : `plugins/qalma/skills/qalma/SKILL.md` + `references/
+editor-integration.md` disaient encore "keep all UI in app" sans mentionner
+    `@qalma/kit` (écrits avant le package). Ajout : section "Optional UI Kit",
+    nuance des règles, description frontmatter. Repack `nx build skills` OK
+    (dist/libs/skills/pack/skills reflète le kit).
+  - `nx run-many -t lint,test,build -p docs,skills,ui-kit --parallel=1` : tout
+    vert. Les 11+1 pages `/kit/*` prerendent (nouvelle route `/kit/icons` : dev
+    server à redémarrer + `rm node_modules/.vite`, cf. [[analog-content-dev-cache]]).
+- 2026-07-06 — Fix : contextual-toolbar de la doc ne s'affichait pas (retour
+  utilisateur). Cause : la demo n'incluait pas `SelectionPlugin`, or
+  `QalmaSelectionToolbarController.refresh()` lit `query('selection')` → toujours
+  null → toolbar cachée. Le playground, lui, inclut `SelectionPlugin` (d'où le
+  décalage). Ajouté à `contextual-toolbar.demo.ts`. Vérifié live : sélection →
+  toolbar 5 boutons au-dessus, Bold exécute (`<strong>`). Link-popover revérifié
+  au passage (hover → popover href + Edit/Unlink) : OK, pas de plugin manquant.
