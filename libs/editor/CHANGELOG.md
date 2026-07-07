@@ -1,3 +1,9 @@
+## 0.3.0 (2026-07-07)
+
+### 🚀 Features
+
+- **kit:** publishing necessary stuff for kit ([ddc10f1](https://github.com/cdskill/qalma/commit/ddc10f1))
+
 ## 0.2.0 (2026-07-07)
 
 ### 🚀 Features
