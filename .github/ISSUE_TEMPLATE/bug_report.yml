@@ -1,11 +1,11 @@
 name: Bug report
 description: Report something that isn't working as expected in @qalma/editor.
-labels: ["bug"]
+labels: ['bug']
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for filing a bug! Qalma is in beta, so clear repros are gold.
+        Thanks for filing a bug! Qalma is pre-1.0, so clear repros are gold.
         Please search existing issues first to avoid duplicates.
   - type: textarea
     id: what-happened
@@ -29,15 +29,15 @@ body:
   - type: input
     id: editor-version
     attributes:
-      label: "@qalma/editor version"
-      placeholder: 0.1.0-beta.0
+      label: '@qalma/editor version'
+      placeholder: 0.2.0
     validations:
       required: true
   - type: input
     id: angular-version
     attributes:
       label: Angular version
-      placeholder: "21.2.x"
+      placeholder: '21.2.x'
     validations:
       required: true
   - type: textarea

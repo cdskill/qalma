@@ -74,7 +74,7 @@
   "release": {
     "projects": ["editor", "skills", "ui-kit"],
     "version": {
-      "preVersionCommand": "pnpm nx run-many -t build -p editor skills ui-kit",
+      "preVersionCommand": "./node_modules/.bin/nx run-many -t build -p editor skills ui-kit",
       "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/{projectName}"]
     },
     "changelog": {

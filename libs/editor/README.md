@@ -17,7 +17,7 @@ markup.
 
 **[Documentation & live demo → qalma.dev](https://qalma.dev)**
 
-> **Status:** beta (`0.1.x`). The public API is stabilizing but may still
+> **Status:** pre-1.0 (`0.x`). The public API is stabilizing but may still
 > change before `1.0`.
 
 ## Installation
@@ -64,21 +64,21 @@ const editor = createQalmaEditor({
 
 Builds a `QalmaEditorController`, the headless API your components bind to:
 
-| Member                        | Description                                                            |
-| ----------------------------- | ---------------------------------------------------------------------- |
-| `html: Signal<string>`        | Serialized HTML of the current document, kept in sync with every edit. |
-| `editable: Signal<boolean>`   | Whether the document can be edited.                                    |
-| `execute(command, value?)`    | Runs a registered command, e.g. `editor.execute('toggleBold')`.        |
-| `canExecute(command, value?)` | Whether a command would currently succeed.                             |
-| `isCommandActive(command)`    | Whether a toggleable command is active for the current selection.      |
-| `query<T>(name)`              | Reads plugin-provided state, e.g. the link or image under the cursor.  |
-| `getCoordinatesAtPosition(pos)` | Reads viewport coordinates for a document position, or `null`.       |
-| `setHtml(html)`               | Replaces the document content from an HTML string.                     |
-| `getJSON()`                   | Serializes the document to ProseMirror's native, lossless JSON.        |
-| `setJSON(doc)`                | Replaces the document content from a `QalmaDocument` JSON object.       |
-| `getMarkdown()`               | Serializes the document to Markdown (CommonMark + GFM).                |
-| `setEditable(editable)`       | Toggles editability at runtime.                                        |
-| `focus()`                     | Focuses the editor view.                                               |
+| Member                          | Description                                                            |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `html: Signal<string>`          | Serialized HTML of the current document, kept in sync with every edit. |
+| `editable: Signal<boolean>`     | Whether the document can be edited.                                    |
+| `execute(command, value?)`      | Runs a registered command, e.g. `editor.execute('toggleBold')`.        |
+| `canExecute(command, value?)`   | Whether a command would currently succeed.                             |
+| `isCommandActive(command)`      | Whether a toggleable command is active for the current selection.      |
+| `query<T>(name)`                | Reads plugin-provided state, e.g. the link or image under the cursor.  |
+| `getCoordinatesAtPosition(pos)` | Reads viewport coordinates for a document position, or `null`.         |
+| `setHtml(html)`                 | Replaces the document content from an HTML string.                     |
+| `getJSON()`                     | Serializes the document to ProseMirror's native, lossless JSON.        |
+| `setJSON(doc)`                  | Replaces the document content from a `QalmaDocument` JSON object.      |
+| `getMarkdown()`                 | Serializes the document to Markdown (CommonMark + GFM).                |
+| `setEditable(editable)`         | Toggles editability at runtime.                                        |
+| `focus()`                       | Focuses the editor view.                                               |
 
 `options.content` accepts an initial HTML string, and `options.plugins`
 accepts the list of `QalmaPlugin`s that define the schema, commands, and
@@ -141,7 +141,7 @@ plugin instance with merged options, e.g.
 | `SubscriptSuperscriptPlugin`                                                          | `toggleSubscript`, `toggleSuperscript`                                                                                     |
 | `HeadingsPlugin`                                                                      | `setParagraph`, `toggleHeading1`…`toggleHeading6` (configurable levels)                                                    |
 | `BlockquotePlugin`                                                                    | `toggleBlockquote`                                                                                                         |
-| `TablePlugin` from `@qalma/editor/table`                                             | `insertTable`, `addRow*`/`addColumn*`, `deleteRow`/`deleteColumn`/`deleteTable`, `mergeCells`/`splitCell`, `toggleHeader*` |
+| `TablePlugin` from `@qalma/editor/table`                                              | `insertTable`, `addRow*`/`addColumn*`, `deleteRow`/`deleteColumn`/`deleteTable`, `mergeCells`/`splitCell`, `toggleHeader*` |
 | `HorizontalRulePlugin`                                                                | `insertHorizontalRule`                                                                                                     |
 | `ListsPlugin`                                                                         | `toggleBulletList`, `toggleOrderedList`, `splitListItem`, `liftListItem`, `sinkListItem`                                   |
 | `TaskListPlugin`                                                                      | `toggleTaskList`, `toggleTaskItemChecked`, `setTaskItemChecked`, `splitTaskItem`, `liftTaskItem`, `sinkTaskItem`           |
@@ -151,7 +151,7 @@ plugin instance with merged options, e.g.
 | `MentionPlugin`                                                                       | `insertMention`                                                                                                            |
 | `SlashCommandPlugin`                                                                  | `deleteSlashCommand`, `dismissSlashCommand`                                                                                |
 | `DragHandlePlugin`                                                                    | `selectBlock`, `deleteBlock`, `duplicateBlock`, `moveBlockTo`, `moveBlockUp`, `moveBlockDown`                              |
-| `SelectionPlugin`                                                                     | None (`query('selection')`, `qalma-selection-update`)                                                                       |
+| `SelectionPlugin`                                                                     | None (`query('selection')`, `qalma-selection-update`)                                                                      |
 | `ColorPlugin`                                                                         | `setTextColor`, `unsetTextColor`, `setBackgroundColor`, `unsetBackgroundColor`                                             |
 | `HighlightPlugin`                                                                     | `setHighlight`, `unsetHighlight`                                                                                           |
 | `TextAlignPlugin`                                                                     | alignment commands for configured node types                                                                               |

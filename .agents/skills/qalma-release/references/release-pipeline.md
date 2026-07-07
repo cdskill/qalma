@@ -7,6 +7,9 @@
 - `@qalma/skills` — scoped, public npm package, built from `libs/skills` with
   `@nx/js:tsc`. It ships the `qalma-skills` CLI and bundles the public skill
   source from `plugins/qalma/skills` into `pack/skills/qalma`.
+- `@qalma/kit` — scoped, public npm package, built from `libs/ui-kit` with
+  `@nx/angular:package` (ng-packagr, partial Angular compilation). It ships the
+  optional, consumer-themeable Qalma UI component kit.
 - `libs/editor/package.json` carries the package metadata: public npm access,
   the `latest` publish tag, `repository`, `bugs`, `homepage`, `keywords`, and
   the `@angular/core` peer range. This file is the manifest that ships to npm.
@@ -16,14 +19,17 @@
 - `libs/skills/package.json` carries the package metadata, public npm access,
   the `latest` publish tag, `bin`, `main`, `types`, and `files` list for the
   skill installer package.
+- `libs/ui-kit/package.json` carries the package metadata, public npm access,
+  the `latest` publish tag, Angular and icon peer dependencies, and utility
+  dependencies for the optional component kit.
 
 ## Nx Release Configuration (`nx.json`)
 
 ```jsonc
 "release": {
-  "projects": ["editor", "skills"],
+  "projects": ["editor", "skills", "ui-kit"],
   "version": {
-    "preVersionCommand": "pnpm nx run-many -t build -p editor skills",
+    "preVersionCommand": "./node_modules/.bin/nx run-many -t build -p editor skills ui-kit",
     "manifestRootsToUpdate": ["{projectRoot}", "dist/libs/{projectName}"]
   },
   "changelog": {
@@ -38,18 +44,20 @@
 }
 ```
 
-- `editor` and `skills` share Nx's default `fixed` release relationship, so
-  both packages receive the same version and the release tag pattern remains
-  `v{version}` (matches the `on: push: tags: 'v*'` trigger in the workflow).
-- `preVersionCommand` rebuilds both packages so `dist/libs/editor/package.json`
-  and `dist/libs/skills/package.json` exist before their versions are
+- `editor`, `skills`, and `ui-kit` share Nx's default `fixed` release
+  relationship, so all packages receive the same version and the release tag
+  pattern remains `v{version}` (matches the `on: push: tags: 'v*'` trigger in
+  the workflow).
+- `preVersionCommand` rebuilds all packages so `dist/libs/editor/package.json`,
+  `dist/libs/skills/package.json`, and `dist/libs/ui-kit/package.json` exist
+  before their versions are
   rewritten.
 - `projectChangelogs` generates project changelogs from conventional commits
   and commits them alongside the version bump in the local
   `chore(release): publish {version}` commit. `workspaceChangelog` stays off
   because the GitHub release notes intentionally come from the editor changelog.
-  When `skills` has no matching code changes, Nx creates a version-bump-only
-  `libs/skills/CHANGELOG.md` entry to keep the fixed version aligned.
+  When `skills` or `ui-kit` has no matching code changes, Nx creates a
+  version-bump-only changelog entry to keep the fixed version aligned.
 - `renderOptions.authors: false` drops the "❤️ Thank You" contributor section
   (the only built-in toggle for it — the heart emoji is hardcoded in nx's
   default renderer, so disabling the section is the way to remove it). The
@@ -78,20 +86,16 @@ publish target options:
 }
 ```
 
-`libs/skills/project.json` overrides `packageRoot` to `dist/libs/skills`. CI
-publishes the explicit package roots directly with `npm publish`, but these Nx
-publish targets stay aligned for local dry-runs or future Nx-driven publishing.
+`libs/skills/project.json` and `libs/ui-kit/project.json` override
+`packageRoot` to `dist/libs/skills` and `dist/libs/ui-kit`. CI publishes the
+explicit package roots directly with `npm publish`, but these Nx publish targets
+stay aligned for local dry-runs or future Nx-driven publishing.
 
 ## Local Release Scripts (`package.json`)
 
 ```jsonc
-"release": "nx release --skip-publish && node tools/sync-changelog-doc.mjs",
-"prerelease": "nx release prerelease --skip-publish && node tools/sync-changelog-doc.mjs",
-"prerelease:dry-run": "nx release prerelease --skip-publish --dry-run",
-"release:beta:init": "nx release preminor --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
-"release:beta:init:dry-run": "nx release preminor --preid beta --skip-publish --dry-run",
-"release:beta": "nx release prerelease --preid beta --skip-publish && node tools/sync-changelog-doc.mjs",
-"release:beta:dry-run": "nx release prerelease --preid beta --skip-publish --dry-run"
+"release": "nx release minor --skip-publish && node tools/sync-changelog-doc.mjs",
+"release:dry-run": "nx release minor --skip-publish --dry-run"
 ```
 
 `nx release <specifier> --skip-publish` defaults (confirmed via
@@ -104,17 +108,23 @@ publish targets stay aligned for local dry-runs or future Nx-driven publishing.
   (no GitHub release locally — `createRelease` is unset).
 - Publish step is skipped (auto-answers "no" to the publish prompt).
 
-The beta scripts are the public prerelease path:
+The public release path now uses normal semver without prerelease suffixes. The
+scripted path always bumps to the next minor version. From the historical beta
+line, bootstrap the first normal semver release explicitly:
 
-- `release:beta:init` starts the beta line with `preminor --preid beta`
-  (for example, from the alpha line to `0.1.0-beta.0`).
-- `release:beta` advances the beta line with `prerelease --preid beta`
-  (for example, `0.1.0-beta.1`).
-- The matching `*:dry-run` scripts preview those bumps without writing.
+```sh
+pnpm nx release 0.2.0 --skip-publish --dry-run
+pnpm nx release 0.2.0 --skip-publish
+node tools/sync-changelog-doc.mjs
+```
 
-The generic `release` script remains available for the default Nx release flow,
-but explicit stable or one-off versions should call Nx directly so the version
-argument is passed before the changelog-sync command:
+That one explicit version is needed because Nx's native `minor` bump from
+`0.1.0-beta.4` resolves to `0.1.0`. Once the manifests are on `0.2.0`, the
+normal `pnpm release:dry-run` and `pnpm release` scripts move to `0.3.0`,
+`0.4.0`, and so on.
+
+Explicit one-off versions should call Nx directly so the version argument is
+passed before the changelog-sync command:
 
 ```sh
 pnpm nx release <version> --skip-publish
@@ -131,7 +141,7 @@ creates a follow-up `docs(changelog): sync docs changelog from release` commit
 when the docs page changes. This intentionally keeps the release tag pointing at
 the release commit while still pushing docs changelog drift in the same branch.
 
-The actual `npm publish` calls for both packages and the GitHub release are
+The actual `npm publish` calls for all packages and the GitHub release are
 left to CI.
 
 ## GitHub Actions Workflow (`.github/workflows/release.yml`)
@@ -162,43 +172,43 @@ left to CI.
        --stage-changes=false
      ```
 
-     This rewrites both package manifests under `libs/*/package.json` and
+     This rewrites all package manifests under `libs/*/package.json` and
      `dist/libs/*/package.json` inside the CI checkout, independent of whatever
      was committed locally.
 
-  8. Check that `@qalma/editor@<version>` and `@qalma/skills@<version>` are not
-     already published. This happens before any publish command so the workflow
-     does not partially publish one package when the other version already
-     exists.
-  9. Publish both package roots sequentially, with `skills` first because it is
-     the newer package and therefore the more likely place for a Trusted
-     Publisher setup issue:
+  8. Check that `@qalma/editor@<version>`, `@qalma/skills@<version>`, and
+     `@qalma/kit@<version>` are not already published. This happens before any
+     publish command so the workflow does not partially publish one package when
+     another package version already exists.
+  9. Publish package roots sequentially, with the newer packages first because
+     they are the more likely place for a Trusted Publisher setup issue:
 
      ```sh
+     npm publish dist/libs/ui-kit --access public --tag latest --provenance
      npm publish dist/libs/skills --access public --tag latest --provenance
      npm publish dist/libs/editor --access public --tag latest --provenance
      ```
 
-     The packages are pre-1.0 with no stable release yet, so `latest` tracks the
-     newest beta (it is what npmjs features and what plain installs resolve).
-     Publishing under `latest` keeps this inside the OIDC-authenticated publish
-     calls — separate `npm dist-tag add` steps would not be authenticated by the
+     The packages are pre-1.0 and publish normal semver versions under
+     `latest`. Publishing under `latest` keeps this inside the
+     OIDC-authenticated publish calls — separate `npm dist-tag add` steps would
+     not be authenticated by the
      trusted-publishing token and would need a long-lived npm token secret.
-     Once `1.0.0` is published, keep stable on `latest` and move later
-     prereleases to a separate `next`/`beta` dist-tag.
+
   10. Create the GitHub release with the `gh` CLI (pre-installed on the runner,
-     authenticated via `GITHUB_TOKEN`): an `awk` step extracts the current
-     version's section from the committed `libs/editor/CHANGELOG.md` into
-     `release-notes.md`, then `gh release create` creates `v<version>` from
-     those notes, adding `--prerelease` when the version contains a `-` (i.e. a
-     `beta`/`rc` preid). The committed changelog is the source of truth; nx's
-     `createRelease` is not used (it has no CLI flag and would fire during the
-     local release too).
+      authenticated via `GITHUB_TOKEN`): an `awk` step extracts the current
+      version's section from the committed `libs/editor/CHANGELOG.md` into
+      `release-notes.md`, then `gh release create` creates `v<version>` from
+      those notes. The committed changelog is the source of truth; nx's
+      `createRelease` is not used (it has no CLI flag and would fire during the
+      local release too). The workflow still marks GitHub releases as prereleases
+      if an explicit one-off tag contains a `-`, but the scripted path no longer
+      creates prerelease tags.
 
 ## npm Trusted Publisher (OIDC)
 
-Configured on the npm package settings pages for both `@qalma/editor` and
-`@qalma/skills`:
+Configured on the npm package settings pages for `@qalma/editor`,
+`@qalma/skills`, and `@qalma/kit`:
 
 - Publisher: GitHub Actions
 - Organization or user / Repository: `cdskill` / `qalma`
@@ -208,7 +218,7 @@ Configured on the npm package settings pages for both `@qalma/editor` and
 - Allowed actions: "Allow npm publish" only ("Allow npm stage publish" is
   unused by this workflow)
 
-With Trusted Publishing configured for both packages, CI needs no npm
+With Trusted Publishing configured for all packages, CI needs no npm
 token/secret — each `npm publish --provenance` authenticates via the GitHub
 Actions OIDC token.
 
@@ -226,13 +236,13 @@ publish; the account has 2FA required for publishing, hence `--otp`). That
 bootstrap token should be revoked once a CI-driven release via Trusted
 Publishing has succeeded.
 
-Before the first coupled tag publish, make sure `@qalma/skills` exists on npm
-and has the same Trusted Publisher configuration as `@qalma/editor`; otherwise
-the second publish will fail even though the workflow code is correct. If npm
-package settings are not available yet for `@qalma/skills`, bootstrap the
-package once manually from `dist/libs/skills` with
-`npm publish dist/libs/skills --access public --otp=<TOTP>`, configure the
-Trusted Publisher, then let tag-driven CI publish both packages going forward.
+Before the first coupled tag publish, make sure `@qalma/skills` and
+`@qalma/kit` exist on npm and have the same Trusted Publisher configuration as
+`@qalma/editor`; otherwise publishing will fail even though the workflow code is
+correct. If npm package settings are not available yet for a package, bootstrap
+it once manually from its `dist/libs/<package>` folder with
+`npm publish dist/libs/<package> --access public --otp=<TOTP>`, configure the
+Trusted Publisher, then let tag-driven CI publish all packages going forward.
 
 ## Troubleshooting
 
@@ -241,8 +251,8 @@ Trusted Publisher, then let tag-driven CI publish both packages going forward.
   publish, pass `--otp=<TOTP>`. CI publishes avoid this entirely via Trusted
   Publishing.
 - If the workflow's "Verify package versions are unpublished" step reports that
-  either package version already exists on npm, delete the tag and re-tag with
-  the next version instead.
-- If `npm publish dist/libs/skills` fails with Trusted Publishing/OIDC errors,
-  check the `@qalma/skills` npm package settings and mirror the
-  `@qalma/editor` Trusted Publisher configuration.
+  any package version already exists on npm, delete the tag and re-tag with the
+  next version instead.
+- If `npm publish dist/libs/skills` or `npm publish dist/libs/ui-kit` fails
+  with Trusted Publishing/OIDC errors, check the npm package settings and mirror
+  the `@qalma/editor` Trusted Publisher configuration.

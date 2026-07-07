@@ -98,7 +98,7 @@ jobs:
       - name: Verify package versions are unpublished
         shell: bash
         run: |
-          for PACKAGE_ROOT in dist/libs/editor dist/libs/skills; do
+          for PACKAGE_ROOT in dist/libs/editor dist/libs/skills dist/libs/ui-kit; do
             PACKAGE_NAME="$(node -p "require('./${PACKAGE_ROOT}/package.json').name")"
             PACKAGE_VERSION="$(node -p "require('./${PACKAGE_ROOT}/package.json').version")"
 
@@ -111,7 +111,7 @@ jobs:
       - name: Publish packages with trusted publishing
         shell: bash
         run: |
-          for PACKAGE_ROOT in dist/libs/skills dist/libs/editor; do
+          for PACKAGE_ROOT in dist/libs/ui-kit dist/libs/skills dist/libs/editor; do
             npm publish "$PACKAGE_ROOT" --access public --tag latest --provenance
           done
 

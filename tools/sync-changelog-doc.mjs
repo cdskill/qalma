@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Regenerates the docs changelog page from the canonical package changelog so
 // the docs site never drifts from libs/editor/CHANGELOG.md. Wired into the
-// `release` / `prerelease` npm scripts; nx release generates the canonical
-// changelog first, then this runs as a follow-up commit (never an amend, so the
-// release tag keeps pointing at the release commit).
+// `release` npm script; nx release generates the canonical changelog first,
+// then this runs as a follow-up commit (never an amend, so the release tag
+// keeps pointing at the release commit).
 //
 // Usage:
 //   node tools/sync-changelog-doc.mjs            regenerate + commit if changed
@@ -60,7 +60,13 @@ if (process.argv.includes('--no-commit')) {
 execFileSync('git', ['add', DOCS_REL], { cwd: repoRoot, stdio: 'inherit' });
 execFileSync(
   'git',
-  ['commit', '-m', 'docs(changelog): sync docs changelog from release', '--', DOCS_REL],
+  [
+    'commit',
+    '-m',
+    'docs(changelog): sync docs changelog from release',
+    '--',
+    DOCS_REL,
+  ],
   { cwd: repoRoot, stdio: 'inherit' },
 );
 console.log('[sync-changelog-doc] committed docs changelog.');
