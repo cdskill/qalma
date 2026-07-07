@@ -8,6 +8,24 @@ export interface DocsNavGroup {
   readonly items: readonly DocsNavItem[];
 }
 
+/** Top-level documentation section, used by the sidebar section switcher. */
+export interface DocsSection {
+  readonly id: 'docs' | 'kit';
+  readonly label: string;
+  /** Landing route the switcher links to. */
+  readonly href: string;
+}
+
+/**
+ * The two peer documentation sections. `docs` covers the headless
+ * `@qalma/editor`; `kit` covers the optional `@qalma/kit` component layer.
+ * Each renders its own scoped sidebar tree ({@link DOCS_NAV} / `KIT_NAV`).
+ */
+export const DOCS_SECTIONS: readonly DocsSection[] = [
+  { id: 'docs', label: 'Docs', href: '/docs/introduction' },
+  { id: 'kit', label: 'UI Kit', href: '/kit' },
+];
+
 /**
  * Left-nav structure for the docs site. Each item with an `/docs/...` href
  * is backed by a markdown file at `src/content/docs/<slug>.md` (see

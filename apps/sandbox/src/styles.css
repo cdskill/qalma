@@ -1,5 +1,68 @@
 @import 'tailwindcss';
 
+/* ------------------------------------------------------------------ *
+ * shadcn design tokens consumed by the @qalma/kit components.
+ * ------------------------------------------------------------------ *
+ * The kit's chrome (toolbar, menus, popovers) reads from the shadcn
+ * token contract via Tailwind utilities (`bg-popover`, `text-foreground`,
+ * `border-border`…). Defining these tokens — and NOTHING from spartan-ng —
+ * is all the kit needs to theme itself here. Palette reused from the docs
+ * ("ink on paper" warm off-white + sepia accent); light mode only.
+ * ------------------------------------------------------------------ */
+:root {
+  --radius: 0.625rem;
+
+  --background: #faf7f1;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  --primary: #1c1917;
+  --primary-foreground: #faf7f1;
+  --secondary: #f3eadb;
+  --secondary-foreground: #44403c;
+  --muted: #f1ece2;
+  --muted-foreground: #78716c;
+
+  --accent: #8c5a2b;
+  --accent-foreground: #ffffff;
+  --accent-subtle: #f0e2c8;
+
+  --destructive: #b91c1c;
+  --border: #e6dfd3;
+  --input: #e6dfd3;
+  --ring: #8c5a2b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
 qalma-content .ProseMirror a {
   color: #0000ee;
   text-decoration: underline;

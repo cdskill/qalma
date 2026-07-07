@@ -1,12 +1,6 @@
 /* eslint-disable @angular-eslint/directive-selector */
 import { Directionality } from '@angular/cdk/bidi';
-import {
-  computed,
-  Directive,
-  ElementRef,
-  inject,
-  input,
-} from '@angular/core';
+import { Directive, ElementRef, computed, inject, input } from '@angular/core';
 import {
   BrnProgress,
   BrnProgressIndicator,
@@ -95,7 +89,4 @@ export class HlmProgressIndicator {
   });
 }
 
-export const HlmProgressImports = [
-  HlmProgress,
-  HlmProgressIndicator,
-] as const;
+export const HlmProgressImports = [HlmProgress, HlmProgressIndicator] as const;

@@ -203,8 +203,8 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   const codeBlock = toolbar.getByRole('button', { name: 'Code block' });
   const imageUrl = toolbar.getByRole('button', { name: 'Image URL' });
   const uploadImage = toolbar.getByRole('button', { name: 'Upload image' });
-  const liftListItem = toolbar.getByRole('button', { name: 'Lift list item' });
-  const sinkListItem = toolbar.getByRole('button', { name: 'Sink list item' });
+  const outdent = toolbar.getByRole('button', { name: 'Outdent' });
+  const indent = toolbar.getByRole('button', { name: 'Indent' });
   const link = toolbar.getByRole('button', { name: 'Link', exact: true });
   const unlink = toolbar.getByRole('button', { name: 'Unlink' });
   const undo = toolbar.getByRole('button', { name: 'Undo' });
@@ -277,10 +277,10 @@ test('renders the configured plugin toolbar', async ({ page }) => {
   await expect(imageUrl).toBeEnabled();
   await expect(uploadImage).toHaveAttribute('title', 'Upload image');
   await expect(uploadImage).toBeEnabled();
-  await expect(liftListItem).toHaveAttribute('title', 'Lift list item');
-  await expect(liftListItem).toBeDisabled();
-  await expect(sinkListItem).toHaveAttribute('title', 'Sink list item');
-  await expect(sinkListItem).toBeDisabled();
+  await expect(outdent).toHaveAttribute('title', 'Outdent');
+  await expect(outdent).toBeDisabled();
+  await expect(indent).toHaveAttribute('title', 'Indent');
+  await expect(indent).toBeDisabled();
   await expect(link).toHaveAttribute('title', 'Link');
   await expect(link).toBeEnabled();
   await expect(unlink).toHaveAttribute('title', 'Unlink');

@@ -31,19 +31,19 @@ import {
   createQalmaEditor,
 } from '@qalma/editor';
 import { TablePlugin } from '@qalma/editor/table';
+import {
+  QalmaDragHandle,
+  QalmaDragHandleDirective,
+  QalmaSlashCommandMenu,
+  QalmaSlashCommandOption,
+} from '@qalma/kit';
 
 import {
   PLAYGROUND_CODE_BLOCK_LANGUAGE_VALUES,
   PLAYGROUND_DEFAULT_CODE_BLOCK_LANGUAGE,
 } from '../playground/code-block';
 import { PlaygroundCodeHighlightPlugin } from '../playground/code-highlight-plugin';
-import { PlaygroundDragHandle } from '../playground/drag-handle';
-import { PlaygroundDragHandleDirective } from '../playground/drag-handle-directive';
-import {
-  PlaygroundSlashCommandController,
-  PlaygroundSlashCommandOption,
-} from '../playground/slash-command';
-import { PlaygroundSlashCommandMenu } from '../playground/slash-command-menu';
+import { PlaygroundSlashCommandController } from '../playground/slash-command';
 import { PosthogService } from '../services/posthog.service';
 
 const SEED = `<h2>Product brief</h2>
@@ -63,9 +63,9 @@ const SEED = `<h2>Product brief</h2>
   imports: [
     QalmaContent,
     QalmaEditor,
-    PlaygroundDragHandle,
-    PlaygroundDragHandleDirective,
-    PlaygroundSlashCommandMenu,
+    QalmaDragHandle,
+    QalmaDragHandleDirective,
+    QalmaSlashCommandMenu,
   ],
   template: `
     @let slashMenuOpen = slashCommandController.open();
@@ -85,14 +85,14 @@ const SEED = `<h2>Product brief</h2>
       <qalma-editor [editor]="editor">
         <qalma-content
           #surface
-          #dragHandle="appPlaygroundDragHandle"
+          #dragHandle="qalmaDragHandle"
           class="block max-h-[26rem] overflow-y-auto px-6 py-4 [&_.ProseMirror]:min-h-64 [&_.ProseMirror]:break-words [&_.ProseMirror]:outline-none"
-          [appPlaygroundDragHandle]="editor"
+          [qalmaDragHandle]="editor"
           (focus)="slashCommandController.refresh()"
           (click)="slashCommandController.refresh()"
         />
 
-        <app-playground-drag-handle
+        <qalma-drag-handle
           [editor]="editor"
           [handle]="dragHandle.handle()"
           [dropIndicator]="dragHandle.dropIndicator()"
@@ -104,7 +104,7 @@ const SEED = `<h2>Product brief</h2>
     </div>
 
     @if (slashMenuOpen) {
-      <app-playground-slash-command-menu
+      <qalma-slash-command-menu
         [placement]="slashCommandController.placement()"
         [options]="slashCommandController.options()"
         [activeIndex]="slashCommandController.activeIndex()"
@@ -178,7 +178,7 @@ export class NotionDoc {
     });
   }
 
-  protected onSlashCommandPick(option: PlaygroundSlashCommandOption): void {
+  protected onSlashCommandPick(option: QalmaSlashCommandOption): void {
     this.slashCommandController.insert(option);
     this.posthogService.posthog.capture('example_slash_command_inserted', {
       command: option.command,

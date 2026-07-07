@@ -6,6 +6,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["nx", "serve", "docs"],
       "port": 4200
+    },
+    {
+      "name": "sandbox",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["nx", "serve", "sandbox"],
+      "port": 4200
     }
   ]
 }

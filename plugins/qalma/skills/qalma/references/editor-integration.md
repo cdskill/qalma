@@ -22,10 +22,7 @@ import { createQalmaEditor, HistoryPlugin, TextFormattingKit } from '@qalma/edit
 
 const editor = createQalmaEditor({
   content: '<p>Hello world</p>',
-  plugins: [
-    ...TextFormattingKit,
-    HistoryPlugin.configure({ depth: 200, newGroupDelay: 750 }),
-  ],
+  plugins: [...TextFormattingKit, HistoryPlugin.configure({ depth: 200, newGroupDelay: 750 })],
 });
 ```
 
@@ -75,8 +72,50 @@ Build the product UI in the app:
 - Make controls keyboard reachable and use native buttons unless a custom
   component provides equivalent semantics.
 
-Do not ask Qalma to render a toolbar from a plugin array. That is intentionally
-outside the core library.
+Do not ask the core `@qalma/editor` library to render a toolbar from a plugin
+array. That is intentionally outside the core; the optional `@qalma/kit` package
+below is the opt-in for data-driven chrome.
+
+## Optional UI Kit (@qalma/kit)
+
+`@qalma/editor` stays headless. `@qalma/kit` is a separate, optional package that
+provides ready-made, Tailwind-first chrome for teams that would rather adopt than
+hand-roll it. It never becomes required: install it only for the pieces you want,
+restyle them through your token contract, and replace any piece with your own
+component at any time. Default to consumer-owned UI; reach for the kit when its
+defaults match the surface you are building.
+
+Install it alongside the editor:
+
+```sh
+npm install @qalma/kit @ng-icons/core @ng-icons/lucide
+```
+
+What it offers:
+
+- `QalmaButton` — a token-driven directive for native `<button>`/`<a>` hosts.
+- `QalmaToolbarButton` and `QalmaToolbarRegistry` — icon command buttons and a
+  data-driven toolbar composed from `QALMA_TOOLBAR_*` fragments. This is the
+  opt-in that renders a toolbar from data.
+- `QalmaMentionMenu`, `QalmaSlashCommandMenu` — presentational suggestion
+  surfaces; your controller still owns filtering and insertion.
+- `QalmaLinkPopover` (with `LinkPopoverController`), `QalmaContextualToolbar`
+  (with `QalmaSelectionToolbarDirective`), and `QalmaDragHandle` (with
+  `QalmaDragHandleDirective`) — editor overlays wired to the headless API.
+- Behavior primitives — `anchorToRect`, `flipAbovePlacement`,
+  `DismissibleOverlay`, `KeyboardNavigableList`, `cn` — for building your own
+  chrome with the same placement, dismissal, and keyboard logic.
+
+Theming: the kit reads shadcn-style Tailwind tokens (`bg-popover`,
+`text-muted-foreground`, `border-border`, …). Provide that token contract once;
+there is no `--qalma-*` prefix. Icons resolve by name through `@ng-icons`; use
+`provideQalmaToolbarIcons()` for the defaults and your own `provideIcons()` to
+override or extend them.
+
+When the app already owns controls through PrimeNG, Material, Kendo, ng-zorro, or
+a private design system, keep binding them to `editor.execute()` and skip the
+kit, or use only the pieces that fit. See `https://qalma.dev/kit` for the full
+component reference.
 
 ## Kits And Plugins
 

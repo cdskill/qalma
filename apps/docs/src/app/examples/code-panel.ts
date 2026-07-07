@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   ElementRef,
   computed,
   afterRenderEffect,
@@ -12,16 +11,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {
-  lucideCheck,
-  lucideChevronDown,
-  lucideChevronUp,
-  lucideCopy,
-} from '@ng-icons/lucide';
+import { lucideChevronDown, lucideChevronUp } from '@ng-icons/lucide';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
 import { createLowlight } from 'lowlight';
 
+import { DocsCopyButton } from '../components/docs-copy-button';
 import { PosthogService } from '../services/posthog.service';
 
 /** Collapsed height (px) before the fade + "show all" control kicks in. */
@@ -37,18 +32,15 @@ const lowlight = createLowlight({ javascript, typescript });
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-code-panel',
-  imports: [NgIcon],
+  imports: [DocsCopyButton, NgIcon],
   providers: [
     provideIcons({
-      lucideCheck,
       lucideChevronDown,
       lucideChevronUp,
-      lucideCopy,
     }),
   ],
   host: { class: 'block' },
   template: `
-    @let isCopied = copied();
     @let isExpanded = expanded();
     @let canCollapse = collapsible();
 
@@ -63,20 +55,11 @@ const lowlight = createLowlight({ javascript, typescript });
         >
           {{ language() }}
         </span>
-        <button
-          type="button"
-          class="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-          [attr.aria-label]="isCopied ? 'Copied' : 'Copy code'"
-          (click)="copy()"
-        >
-          <ng-icon
-            [name]="isCopied ? 'lucideCheck' : 'lucideCopy'"
-            class="text-sm"
-            [class.text-accent]="isCopied"
-            aria-hidden="true"
-          />
-          {{ isCopied ? 'Copied' : 'Copy' }}
-        </button>
+        <app-docs-copy-button
+          [text]="code()"
+          label="Copy code"
+          (copied)="trackCopied()"
+        />
       </figcaption>
 
       <div class="relative min-h-0 flex-1">
@@ -96,7 +79,7 @@ const lowlight = createLowlight({ javascript, typescript });
           >
             <button
               type="button"
-              class="pointer-events-auto mb-3 inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground shadow-sm transition-colors hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+              class="pointer-events-auto mb-3 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground shadow-sm transition-colors hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
               (click)="expanded.set(true)"
             >
               <ng-icon
@@ -113,7 +96,7 @@ const lowlight = createLowlight({ javascript, typescript });
       @if (canCollapse && isExpanded) {
         <button
           type="button"
-          class="flex items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          class="flex cursor-pointer items-center justify-center gap-1.5 border-t border-border py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           (click)="expanded.set(false)"
         >
           <ng-icon name="lucideChevronUp" class="text-sm" aria-hidden="true" />
@@ -125,7 +108,6 @@ const lowlight = createLowlight({ javascript, typescript });
 })
 export class CodePanel {
   private readonly posthogService = inject(PosthogService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly code = input.required<string>();
   readonly language = input('TypeScript');
@@ -135,15 +117,12 @@ export class CodePanel {
   protected readonly CLAMP_PX = CLAMP_PX;
   protected readonly expanded = signal(false);
   protected readonly collapsible = signal(false);
-  protected readonly copied = signal(false);
   protected readonly highlightedCode = computed(() =>
     renderHighlightedCode(this.code(), this.language()),
   );
 
   private readonly codeRef =
     viewChild.required<ElementRef<HTMLElement>>('codeEl');
-
-  private resetTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
     // New snippet (e.g. after switching example) → start collapsed again.
@@ -158,19 +137,9 @@ export class CodePanel {
       const element = this.codeRef().nativeElement;
       this.collapsible.set(element.scrollHeight > CLAMP_PX + 8);
     });
-
-    this.destroyRef.onDestroy(() => {
-      clearTimeout(this.resetTimer);
-    });
   }
 
-  protected copy(): void {
-    void navigator.clipboard?.writeText(this.code()).then(() => {
-      this.copied.set(true);
-      clearTimeout(this.resetTimer);
-      this.resetTimer = setTimeout(() => this.copied.set(false), 1600);
-    });
-
+  protected trackCopied(): void {
     this.posthogService.posthog.capture('example_recipe_copied', {
       example: this.exampleId(),
     });

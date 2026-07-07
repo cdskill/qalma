@@ -42,6 +42,19 @@ import {
   createQalmaEditor,
 } from '@qalma/editor';
 import { TablePlugin } from '@qalma/editor/table';
+import {
+  LinkPopover,
+  LinkPopoverController,
+  QalmaContextualToolbar,
+  QalmaDragHandle,
+  QalmaDragHandleDirective,
+  QalmaLinkPopover,
+  QalmaMentionMenu,
+  QalmaMentionOption,
+  QalmaSelectionToolbarDirective,
+  QalmaSlashCommandMenu,
+  QalmaSlashCommandOption,
+} from '@qalma/kit';
 import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
 import {
@@ -50,29 +63,16 @@ import {
 } from './code-block';
 import { PlaygroundCodeHighlightPlugin } from './code-highlight-plugin';
 import { PLAYGROUND_DEMO_CONTENT } from './demo-content';
-import { PlaygroundContextualToolbar } from './contextual-toolbar';
-import { PlaygroundDragHandle } from './drag-handle';
-import { PlaygroundDragHandleDirective } from './drag-handle-directive';
 import {
   PLAYGROUND_EXAMPLE_IMAGE_ALT,
   PLAYGROUND_EXAMPLE_IMAGE_SRC,
   PLAYGROUND_EXAMPLE_IMAGE_TITLE,
 } from './image';
-import { LinkPopoverController } from './link-popover-controller';
-import { PlaygroundLinkPopover } from './link-popover';
-import { LinkPopover } from './link-popover.model';
 import {
   PlaygroundMentionController,
-  PlaygroundMentionOption,
   createPlaygroundMentionSource,
 } from './mention';
-import { PlaygroundMentionMenu } from './mention-menu';
-import {
-  PlaygroundSlashCommandController,
-  PlaygroundSlashCommandOption,
-} from './slash-command';
-import { PlaygroundSlashCommandMenu } from './slash-command-menu';
-import { PlaygroundSelectionToolbarDirective } from './selection-toolbar-directive';
+import { PlaygroundSlashCommandController } from './slash-command';
 import { PlaygroundToolbar } from './toolbar';
 import { PosthogService } from '../services/posthog.service';
 
@@ -84,13 +84,13 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     ...BrnToggleGroupImports,
     QalmaContent,
     QalmaEditor,
-    PlaygroundLinkPopover,
-    PlaygroundContextualToolbar,
-    PlaygroundDragHandle,
-    PlaygroundDragHandleDirective,
-    PlaygroundMentionMenu,
-    PlaygroundSelectionToolbarDirective,
-    PlaygroundSlashCommandMenu,
+    QalmaLinkPopover,
+    QalmaContextualToolbar,
+    QalmaDragHandle,
+    QalmaDragHandleDirective,
+    QalmaMentionMenu,
+    QalmaSelectionToolbarDirective,
+    QalmaSlashCommandMenu,
     PlaygroundToolbar,
   ],
   selector: 'app-playground',
@@ -117,11 +117,11 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
 
       <qalma-content
         #mentionSurface
-        #dragHandle="appPlaygroundDragHandle"
-        #selectionToolbar="appPlaygroundSelectionToolbar"
+        #dragHandle="qalmaDragHandle"
+        #selectionToolbar="qalmaSelectionToolbar"
         class="block max-h-[56vh] overflow-y-auto p-5 [&_.ProseMirror]:mx-auto [&_.ProseMirror]:min-h-72 [&_.ProseMirror]:max-w-[61.5rem] [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none"
-        [appPlaygroundDragHandle]="editor"
-        [appPlaygroundSelectionToolbar]="editor"
+        [qalmaDragHandle]="editor"
+        [qalmaSelectionToolbar]="editor"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="
@@ -136,14 +136,14 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
         (click)="mentionController.refresh()"
       />
 
-      <app-playground-contextual-toolbar
+      <qalma-contextual-toolbar
         [editor]="editor"
         [placement]="selectionToolbar.placement()"
         (dismiss)="selectionToolbar.hide()"
         (requestLink)="showContextualLinkEditor($event, selectionToolbar)"
       />
 
-      <app-playground-drag-handle
+      <qalma-drag-handle
         [editor]="editor"
         [handle]="dragHandle.handle()"
         [dropIndicator]="dragHandle.dropIndicator()"
@@ -154,7 +154,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     </qalma-editor>
 
     @if (slashCommandController.open()) {
-      <app-playground-slash-command-menu
+      <qalma-slash-command-menu
         [placement]="slashCommandController.placement()"
         [options]="slashCommandController.options()"
         [activeIndex]="slashCommandController.activeIndex()"
@@ -165,7 +165,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     }
 
     @if (mentionController.open()) {
-      <app-playground-mention-menu
+      <qalma-mention-menu
         [placement]="mentionController.placement()"
         [suggestions]="mentionController.suggestions()"
         [loading]="mentionController.loading()"
@@ -176,7 +176,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
       />
     }
 
-    <app-playground-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"
@@ -440,18 +440,18 @@ export class Playground {
 
   protected showContextualLinkEditor(
     event: MouseEvent,
-    selectionToolbar: PlaygroundSelectionToolbarDirective,
+    selectionToolbar: QalmaSelectionToolbarDirective,
   ): void {
     selectionToolbar.hide();
     this.linkPopover.showToolbarEditor(event);
   }
 
-  protected onMentionPick(option: PlaygroundMentionOption): void {
+  protected onMentionPick(option: QalmaMentionOption): void {
     this.mentionController.insert(option);
     this.posthogService.posthog.capture('playground_mention_inserted');
   }
 
-  protected onSlashCommandPick(option: PlaygroundSlashCommandOption): void {
+  protected onSlashCommandPick(option: QalmaSlashCommandOption): void {
     this.slashCommandController.insert(option);
     this.posthogService.posthog.capture('playground_slash_command_inserted', {
       command: option.command,

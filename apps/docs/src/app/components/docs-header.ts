@@ -6,7 +6,13 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+} from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideGithub,
@@ -14,11 +20,13 @@ import {
   lucideSearch,
   lucideX,
 } from '@ng-icons/lucide';
+import { filter, map } from 'rxjs';
 
-import { HlmButton } from '../ui/button';
+import { QalmaButton } from '@qalma/kit';
 import { ThemeToggle } from './theme-toggle';
 import { PosthogService } from '../services/posthog.service';
 import { DOCS_NAV } from '../docs/docs-nav';
+import { KIT_NAV } from '../docs/kit-nav';
 
 interface HeaderNavItem {
   readonly title: string;
@@ -28,6 +36,7 @@ interface HeaderNavItem {
 const HEADER_NAV: readonly HeaderNavItem[] = [
   { title: 'Home', href: '/' },
   { title: 'Docs', href: '/docs/introduction' },
+  { title: 'UI Kit', href: '/kit' },
   { title: 'Examples', href: '/examples' },
   { title: 'Playground', href: '/#playground' },
 ];
@@ -39,7 +48,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-docs-header',
-  imports: [RouterLink, RouterLinkActive, NgIcon, HlmButton, ThemeToggle],
+  imports: [RouterLink, RouterLinkActive, NgIcon, QalmaButton, ThemeToggle],
   providers: [
     provideIcons({
       lucideGithub,
@@ -105,10 +114,18 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           class="hidden items-center gap-5 text-sm text-muted-foreground md:flex"
         >
           <a
+            routerLink="/docs/introduction"
+            routerLinkActive="text-foreground"
             class="transition-colors hover:text-foreground"
-            href="/#playground"
           >
-            Playground
+            Docs
+          </a>
+          <a
+            routerLink="/kit"
+            routerLinkActive="text-foreground"
+            class="transition-colors hover:text-foreground"
+          >
+            UI Kit
           </a>
           <a
             routerLink="/examples"
@@ -118,11 +135,10 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
             Examples
           </a>
           <a
-            routerLink="/docs/introduction"
-            routerLinkActive="text-foreground"
             class="transition-colors hover:text-foreground"
+            href="/#playground"
           >
-            Docs
+            Playground
           </a>
         </nav>
 
@@ -141,7 +157,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </button>
 
           <a
-            appBtn
+            qalmaBtn
             variant="ghost"
             size="icon"
             href="https://www.npmjs.com/package/@qalma/editor"
@@ -163,7 +179,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </a>
 
           <a
-            appBtn
+            qalmaBtn
             variant="ghost"
             size="icon"
             href="https://github.com/cdskill/qalma"
@@ -203,7 +219,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
                         [routerLink]="item.href"
                         routerLinkActive="!text-accent"
                         [routerLinkActiveOptions]="{
-                          exact: item.href === '/'
+                          exact: item.href === '/',
                         }"
                         class="block rounded-sm py-0.5 text-2xl font-semibold leading-8 text-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card"
                         (click)="
@@ -228,7 +244,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
               </ul>
             </section>
 
-            @for (group of docsGroups; track group.title) {
+            @for (group of docsGroups(); track group.title) {
               <section [attr.aria-labelledby]="'mobile-docs-' + $index">
                 <h2
                   [id]="'mobile-docs-' + $index"
@@ -323,10 +339,24 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
 })
 export class DocsHeader {
   private readonly posthogService = inject(PosthogService);
+  private readonly router = inject(Router);
 
   protected readonly mobileNavOpen = signal(false);
   protected readonly headerNav = HEADER_NAV;
-  protected readonly docsGroups = DOCS_NAV;
+
+  /** Current URL, tracked so the mobile detail nav can scope to its section. */
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map(() => this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  /** Detailed groups shown on mobile — the current section's own tree. */
+  protected readonly docsGroups = computed(() =>
+    this.url().startsWith('/kit') ? KIT_NAV : DOCS_NAV,
+  );
   protected readonly menuIconClass = computed(() =>
     this.mobileNavOpen()
       ? 'absolute inset-0 text-xl opacity-0 rotate-90 scale-75 transition-all duration-200 ease-out'

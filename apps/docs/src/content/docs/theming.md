@@ -70,16 +70,17 @@ Keep Tailwind in the app. Do not move product styling into editor plugins.
 ## Design tokens and component systems
 
 The docs app uses a shadcn/spartan-ng token contract in `apps/docs/src/styles.css`
-and a local `HlmButton` directive in `apps/docs/src/app/ui/button.ts`. That is
-application code. It can wrap native `&lt;button&gt;` and `&lt;a&gt;` elements while Qalma's
-library primitives stay independent.
+and the `QalmaButton` directive from `@qalma/kit`, an optional, separately
+published Tailwind-styled UI kit. `@qalma/editor` itself does not depend on it —
+you can wrap native `&lt;button&gt;` and `&lt;a&gt;` elements with your own component
+system just as easily.
 
 The same pattern works for any component system:
 
 ```html
 <button
   type="button"
-  appBtn
+  qalmaBtn
   variant="ghost"
   size="icon"
   qalmaCommand="toggleBold"

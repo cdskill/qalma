@@ -39,14 +39,18 @@ import {
   TextFormattingKit,
   TrailingParagraphPlugin,
 } from '@qalma/editor';
+import {
+  LinkPopoverController,
+  QalmaLinkPopover,
+  QalmaMentionMenu,
+  QalmaSlashCommandMenu,
+} from '@qalma/kit';
 
-import { LinkPopoverController } from './link-popover-controller';
 import {
   SANDBOX_CODE_BLOCK_LANGUAGE_VALUES,
   SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
 } from './sandbox-code-block';
 import { SandboxCodeHighlightPlugin } from './sandbox-code-highlight-plugin';
-import { SandboxLinkPopover } from './sandbox-link-popover';
 import {
   createSandboxMentionSource,
   SandboxMentionController,
@@ -56,18 +60,16 @@ import {
   SANDBOX_EXAMPLE_IMAGE_SRC,
   SANDBOX_EXAMPLE_IMAGE_TITLE,
 } from './sandbox-image';
-import { SandboxMentionMenu } from './sandbox-mention-menu';
 import { SandboxSlashCommandController } from './sandbox-slash-command';
-import { SandboxSlashCommandMenu } from './sandbox-slash-command-menu';
 import { SandboxToolbar } from './sandbox-toolbar';
 
 @Component({
   imports: [
     QalmaContent,
     QalmaEditor,
-    SandboxLinkPopover,
-    SandboxMentionMenu,
-    SandboxSlashCommandMenu,
+    QalmaLinkPopover,
+    QalmaMentionMenu,
+    QalmaSlashCommandMenu,
     SandboxToolbar,
   ],
   selector: 'app-sandbox-editor',
@@ -111,7 +113,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
     </qalma-editor>
 
     @if (slashCommandController.open()) {
-      <app-sandbox-slash-command-menu
+      <qalma-slash-command-menu
         [placement]="slashCommandController.placement()"
         [options]="slashCommandController.options()"
         [activeIndex]="slashCommandController.activeIndex()"
@@ -122,7 +124,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
     }
 
     @if (mentionController.open()) {
-      <app-sandbox-mention-menu
+      <qalma-mention-menu
         [placement]="mentionController.placement()"
         [suggestions]="mentionController.suggestions()"
         [loading]="mentionController.loading()"
@@ -133,7 +135,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
       />
     }
 
-    <app-sandbox-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"

@@ -537,7 +537,9 @@ qalma-content .ProseMirror blockquote[style*='text-align: right'] {
   border-top: 1px solid var(--color-border);
 }
 
-:where(.qalma-prose, .analog-markdown-route) :not(pre) > code {
+:where(.qalma-prose, .analog-markdown-route, .qalma-docs-content)
+  :not(pre)
+  > code {
   border-radius: 0.25rem;
   background: var(--color-muted);
   padding: 0.15rem 0.35rem;
@@ -666,7 +668,7 @@ qalma-content .ProseMirror :not(pre) > code {
   border-top: 1px solid var(--color-border);
 }
 
-:where(.qalma-prose, .analog-markdown-route) td > code {
+:where(.qalma-prose, .analog-markdown-route, .qalma-docs-content) td > code {
   white-space: nowrap;
 }
 

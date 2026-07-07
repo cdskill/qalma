@@ -1,0 +1,43 @@
+{
+  "name": "@qalma/kit",
+  "version": "0.1.0-beta.0",
+  "description": "Tailwind-first, themeable UI components for the Qalma editor.",
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdskill/qalma.git",
+    "directory": "libs/ui-kit"
+  },
+  "bugs": {
+    "url": "https://github.com/cdskill/qalma/issues"
+  },
+  "homepage": "https://qalma.dev/",
+  "keywords": [
+    "angular",
+    "angular-editor",
+    "editor",
+    "qalma",
+    "rich-text",
+    "rich-text-editor",
+    "tailwind",
+    "ui-kit"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=21.0.0 <22.0.0",
+    "@angular/common": ">=21.0.0 <22.0.0",
+    "@ng-icons/core": ">=33.0.0",
+    "@ng-icons/lucide": ">=33.0.0",
+    "@qalma/editor": ">=0.1.0-beta.0"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "tslib": "^2.3.0"
+  }
+}

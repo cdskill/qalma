@@ -50,6 +50,7 @@ export default defineConfig(() => {
             '/docs/introduction',
             '/docs/installation',
             '/docs/quick-start',
+            '/kit',
           ],
           discover: true,
           // Sitemap pour le SEO. ⚠️ Remplace `host` par ton vrai domaine Route 53.

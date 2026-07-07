@@ -3,7 +3,7 @@ import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
 
 // For CI or local verification against an existing server, set BASE_URL.
-const baseURL = process.env['BASE_URL'] || 'http://localhost:4200';
+const baseURL = process.env['BASE_URL'] || 'http://localhost:4201';
 const shouldStartWebServer = !process.env['BASE_URL'];
 
 /**
@@ -30,7 +30,7 @@ export default defineConfig({
     ? {
         /* Run your local dev server before starting the tests */
         webServer: {
-          command: 'pnpm exec nx run sandbox:serve',
+          command: 'pnpm exec nx run sandbox:serve-e2e',
           url: baseURL,
           reuseExistingServer: true,
           cwd: workspaceRoot,

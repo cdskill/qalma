@@ -42,6 +42,7 @@ import {
   createQalmaEditor,
   createQalmaPlugin,
 } from '@qalma/editor';
+import { QalmaLinkPopover } from '@qalma/kit';
 import { TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
@@ -51,12 +52,11 @@ import {
   SANDBOX_EXAMPLE_IMAGE_SRC,
   SANDBOX_EXAMPLE_IMAGE_TITLE,
 } from './sandbox-image';
-import { SandboxLinkPopover } from './sandbox-link-popover';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App, SandboxLinkPopover],
+      imports: [App, QalmaLinkPopover],
     }).compileComponents();
   });
 
@@ -183,7 +183,7 @@ describe('App', () => {
   });
 
   it('should render icon-only actions in the link popover', async () => {
-    const fixture = TestBed.createComponent(SandboxLinkPopover);
+    const fixture = TestBed.createComponent(QalmaLinkPopover);
     const popover = {
       editing: false,
       element: null,

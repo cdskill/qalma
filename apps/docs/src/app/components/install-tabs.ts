@@ -3,15 +3,24 @@ import {
   Component,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 
+import { DocsCopyButton } from './docs-copy-button';
 import { PosthogService } from '../services/posthog.service';
 
-interface PackageManager {
+export interface InstallCommand {
   readonly id: string;
   readonly command: string;
 }
+
+const DEFAULT_INSTALL_COMMANDS: readonly InstallCommand[] = [
+  { id: 'pnpm', command: 'pnpm add @qalma/editor' },
+  { id: 'npm', command: 'npm install @qalma/editor' },
+  { id: 'yarn', command: 'yarn add @qalma/editor' },
+  { id: 'bun', command: 'bun add @qalma/editor' },
+];
 
 /**
  * The same package-manager picker the docs render (see DocsContent's `.docs-pm`
@@ -23,6 +32,7 @@ interface PackageManager {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-install-tabs',
+  imports: [DocsCopyButton],
   template: `
     <div class="docs-pm">
       <div class="docs-pm-head">
@@ -44,7 +54,7 @@ interface PackageManager {
         </span>
 
         <div class="docs-pm-tabs" role="tablist" aria-label="Package manager">
-          @for (pm of packages; track pm.id; let i = $index) {
+          @for (pm of packages(); track pm.id; let i = $index) {
             <button
               type="button"
               class="docs-pm-tab"
@@ -58,45 +68,11 @@ interface PackageManager {
           }
         </div>
 
-        <button
-          type="button"
-          class="docs-copy docs-pm-copy"
-          [class.is-copied]="copied()"
-          [attr.aria-label]="copied() ? 'Copied' : 'Copy to clipboard'"
-          (click)="copy()"
-        >
-          <span class="docs-copy-idle" aria-hidden="true">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          </span>
-          <span class="docs-copy-done" aria-hidden="true">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          </span>
-        </button>
+        <app-docs-copy-button
+          [text]="command()"
+          buttonClass="docs-pm-copy"
+          (copied)="trackCopied()"
+        />
       </div>
 
       <div class="docs-pm-body">
@@ -131,31 +107,27 @@ interface PackageManager {
 export class InstallTabs {
   private readonly posthogService = inject(PosthogService);
 
-  protected readonly packages: readonly PackageManager[] = [
-    { id: 'pnpm', command: 'pnpm add @qalma/editor' },
-    { id: 'npm', command: 'npm install @qalma/editor' },
-    { id: 'yarn', command: 'yarn add @qalma/editor' },
-    { id: 'bun', command: 'bun add @qalma/editor' },
-  ];
-
+  readonly packages = input<readonly InstallCommand[]>(
+    DEFAULT_INSTALL_COMMANDS,
+  );
+  readonly installTarget = input('editor');
   protected readonly active = signal(0);
-  protected readonly copied = signal(false);
-  protected readonly command = computed(() => this.packages[this.active()].command);
+  protected readonly activePackage = computed(
+    () => this.packages()[this.active()] ?? this.packages()[0],
+  );
+  protected readonly command = computed(
+    () => this.activePackage()?.command ?? '',
+  );
 
-  private resetTimer?: ReturnType<typeof setTimeout>;
-
-  protected copy(): void {
-    const pm = this.packages[this.active()];
-
-    void navigator.clipboard?.writeText(pm.command).then(() => {
-      this.copied.set(true);
-      clearTimeout(this.resetTimer);
-      this.resetTimer = setTimeout(() => this.copied.set(false), 1600);
-    });
-
+  protected trackCopied(): void {
+    const pm = this.activePackage();
+    if (!pm) {
+      return;
+    }
     this.posthogService.posthog.capture('install_command_copied', {
       command: pm.command,
       package_manager: pm.id,
+      target: this.installTarget(),
     });
   }
 }

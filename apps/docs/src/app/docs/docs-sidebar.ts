@@ -5,6 +5,7 @@ import {
   ElementRef,
   HostListener,
   inject,
+  input,
   output,
   signal,
   viewChild,
@@ -13,7 +14,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMouse } from '@ng-icons/lucide';
 
-import { DOCS_NAV } from './docs-nav';
+import { DocsNavGroup, DocsSection, DOCS_SECTIONS } from './docs-nav';
 import { PosthogService } from '../services/posthog.service';
 
 /**
@@ -35,7 +36,30 @@ import { PosthogService } from '../services/posthog.service';
       aria-label="Documentation"
       class="scrollbar-hide h-full space-y-6 overflow-y-auto overscroll-none py-8 pr-1"
     >
-      @for (group of groups; track group.title) {
+      <div
+        role="tablist"
+        aria-label="Documentation section"
+        class="flex gap-1 rounded-lg bg-secondary p-1"
+      >
+        @for (item of sections; track item.id) {
+          <a
+            [routerLink]="item.href"
+            role="tab"
+            [attr.aria-selected]="item.id === section()"
+            (click)="onSectionClick(item)"
+            class="flex-1 rounded-md px-2 py-1 text-center text-xs font-medium transition-colors"
+            [class]="
+              item.id === section()
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+          >
+            {{ item.label }}
+          </a>
+        }
+      </div>
+
+      @for (group of groups(); track group.title) {
         <div>
           <h3
             class="mb-2 px-2 font-sans text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground"
@@ -45,7 +69,7 @@ import { PosthogService } from '../services/posthog.service';
           <ul class="space-y-0.5">
             @for (item of group.items; track item.href) {
               <li>
-                @if (isDocsRoute(item.href)) {
+                @if (isRouterRoute(item.href)) {
                   <a
                     [routerLink]="item.href"
                     routerLinkActive="bg-accent-subtle !text-accent font-medium"
@@ -92,7 +116,12 @@ import { PosthogService } from '../services/posthog.service';
 export class DocsSidebar implements AfterViewInit {
   private readonly posthogService = inject(PosthogService);
 
-  protected readonly groups = DOCS_NAV;
+  /** Nav tree to render — the active section's groups. */
+  readonly groups = input.required<readonly DocsNavGroup[]>();
+  /** Active section id, used to highlight the section switcher. */
+  readonly section = input.required<DocsSection['id']>();
+
+  protected readonly sections = DOCS_SECTIONS;
 
   private readonly scrollEl =
     viewChild.required<ElementRef<HTMLElement>>('scrollEl');
@@ -125,7 +154,16 @@ export class DocsSidebar implements AfterViewInit {
     });
   }
 
-  protected isDocsRoute(href: string): boolean {
-    return href.startsWith('/docs/');
+  protected onSectionClick(item: DocsSection): void {
+    this.linkClick.emit();
+    this.posthogService.posthog.capture('docs_section_switched', {
+      section: item.id,
+      href: item.href,
+    });
+  }
+
+  /** Internal SPA route (docs or kit) vs. a hash/external link. */
+  protected isRouterRoute(href: string): boolean {
+    return href.startsWith('/') && !href.includes('#');
   }
 }

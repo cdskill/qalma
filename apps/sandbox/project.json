@@ -59,6 +59,22 @@
       },
       "defaultConfiguration": "development"
     },
+    "serve-e2e": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "options": {
+        "port": 4201
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "sandbox:build:production"
+        },
+        "development": {
+          "buildTarget": "sandbox:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
     "lint": {
       "executor": "@nx/eslint:lint"
     },

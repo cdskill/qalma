@@ -25,6 +25,7 @@ import {
   TextFormattingKit,
   createQalmaEditor,
 } from '@qalma/editor';
+import { LinkPopoverController, QalmaLinkPopover } from '@qalma/kit';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBold,
@@ -33,8 +34,6 @@ import {
   lucideList,
 } from '@ng-icons/lucide';
 
-import { LinkPopoverController } from '../playground/link-popover-controller';
-import { PlaygroundLinkPopover } from '../playground/link-popover';
 import { PosthogService } from '../services/posthog.service';
 
 interface PostedReview {
@@ -93,7 +92,7 @@ const SEED: readonly {
     QalmaContent,
     QalmaEditor,
     QalmaToolbar,
-    PlaygroundLinkPopover,
+    QalmaLinkPopover,
   ],
   providers: [provideIcons({ lucideBold, lucideItalic, lucideLink, lucideList })],
   template: `
@@ -262,7 +261,7 @@ const SEED: readonly {
       </form>
     </div>
 
-    <app-playground-link-popover
+    <qalma-link-popover
       [popover]="linkPopover.popover()"
       [href]="linkPopover.href()"
       (hrefChange)="linkPopover.href.set($event)"

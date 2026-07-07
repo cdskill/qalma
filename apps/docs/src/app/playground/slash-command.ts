@@ -1,28 +1,11 @@
 import { computed, signal } from '@angular/core';
+import { QalmaEditorController, SlashCommandState } from '@qalma/editor';
 import {
-  QalmaCommandValue,
-  QalmaEditorController,
-  SlashCommandState,
-} from '@qalma/editor';
-
-export interface PlaygroundSlashCommandOption {
-  id: string;
-  label: string;
-  description: string;
-  command: string;
-  value?: QalmaCommandValue;
-  placement?: 'block' | 'inline';
-  shortcut: string;
-  icon: string;
-  keywords: readonly string[];
-}
-
-export interface PlaygroundSlashCommandPlacement {
-  left: number;
-  top: number | null;
-  bottom: number | null;
-  maxHeight: number;
-}
+  KeyboardNavigableList,
+  QalmaSlashCommandOption,
+  SuggestionMenuPlacement,
+  flipAbovePlacement,
+} from '@qalma/kit';
 
 const SLASH_COMMAND_MENU_WIDTH = 320;
 const SLASH_COMMAND_MENU_MAX_HEIGHT = 360;
@@ -31,7 +14,7 @@ const SLASH_COMMAND_MENU_GAP = 8;
 const SLASH_COMMAND_MENU_OPTION_HEIGHT = 44;
 const SLASH_COMMAND_MENU_VERTICAL_PADDING = 76;
 
-export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly PlaygroundSlashCommandOption[] =
+export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly QalmaSlashCommandOption[] =
   [
     {
       id: 'paragraph',
@@ -146,14 +129,22 @@ export const PLAYGROUND_SLASH_COMMAND_OPTIONS: readonly PlaygroundSlashCommandOp
 
 export class PlaygroundSlashCommandController {
   readonly slashCommand = signal<SlashCommandState | null>(null);
-  readonly placement = signal<PlaygroundSlashCommandPlacement | null>(null);
-  readonly options = signal<readonly PlaygroundSlashCommandOption[]>([]);
+  readonly placement = signal<SuggestionMenuPlacement | null>(null);
+  readonly options = signal<readonly QalmaSlashCommandOption[]>([]);
   readonly activeIndex = signal(0);
   readonly open = computed(
     () =>
       Boolean(this.slashCommand() && this.placement()) &&
       this.options().length > 0,
   );
+
+  private readonly keyboardNav =
+    new KeyboardNavigableList<QalmaSlashCommandOption>({
+      items: () => this.options(),
+      activeIndex: () => this.activeIndex(),
+      setActiveIndex: (index) => this.activeIndex.set(index),
+      onSelect: (option) => this.insert(option),
+    });
 
   constructor(private readonly editor: QalmaEditorController) {}
 
@@ -209,7 +200,7 @@ export class PlaygroundSlashCommandController {
     }
   }
 
-  insert(option: PlaygroundSlashCommandOption): void {
+  insert(option: QalmaSlashCommandOption): void {
     if (!this.editor.execute('deleteSlashCommand')) {
       return;
     }
@@ -267,19 +258,7 @@ export class PlaygroundSlashCommandController {
       return true;
     }
 
-    if (key === 'ArrowDown') {
-      this.moveActiveOption(1);
-
-      return true;
-    }
-
-    if (key === 'ArrowUp') {
-      this.moveActiveOption(-1);
-
-      return true;
-    }
-
-    if (key === 'Enter' || key === 'Tab') {
+    if (key === 'Tab') {
       const option = this.options()[this.activeIndex()];
 
       if (option) {
@@ -287,25 +266,17 @@ export class PlaygroundSlashCommandController {
 
         return true;
       }
+
+      return false;
     }
 
-    return false;
-  }
-
-  private moveActiveOption(delta: number): void {
-    const length = this.options().length;
-
-    if (length === 0) {
-      return;
-    }
-
-    this.activeIndex.update((index) => (index + delta + length) % length);
+    return this.keyboardNav.handleKey(key);
   }
 }
 
 function filterSlashCommandOptions(
   query: string,
-): readonly PlaygroundSlashCommandOption[] {
+): readonly QalmaSlashCommandOption[] {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
@@ -338,42 +309,20 @@ function createSlashCommandPlacement(
   editor: QalmaEditorController,
   position: number,
   optionCount: number,
-): PlaygroundSlashCommandPlacement | null {
+): SuggestionMenuPlacement | null {
   const rect = editor.getCoordinatesAtPosition(position);
 
   if (!rect) {
     return null;
   }
 
-  const desiredHeight = getSlashCommandMenuHeight(optionCount);
-  const availableBelow =
-    window.innerHeight - rect.bottom - SLASH_COMMAND_MENU_MARGIN;
-  const availableAbove = rect.top - SLASH_COMMAND_MENU_MARGIN;
-  const openAbove =
-    availableBelow < desiredHeight && availableAbove > availableBelow;
-  const availableHeight = Math.max(
-    SLASH_COMMAND_MENU_OPTION_HEIGHT,
-    openAbove
-      ? availableAbove - SLASH_COMMAND_MENU_GAP
-      : availableBelow - SLASH_COMMAND_MENU_GAP,
-  );
-  const maxHeight = Math.min(desiredHeight, availableHeight);
-  const leftBoundary = Math.max(
-    SLASH_COMMAND_MENU_MARGIN,
-    window.innerWidth - SLASH_COMMAND_MENU_WIDTH - SLASH_COMMAND_MENU_MARGIN,
-  );
-
-  return {
-    left: Math.min(
-      Math.max(rect.left, SLASH_COMMAND_MENU_MARGIN),
-      leftBoundary,
-    ),
-    top: openAbove ? null : rect.bottom + SLASH_COMMAND_MENU_GAP,
-    bottom: openAbove
-      ? window.innerHeight - rect.top + SLASH_COMMAND_MENU_GAP
-      : null,
-    maxHeight,
-  };
+  return flipAbovePlacement(rect, {
+    width: SLASH_COMMAND_MENU_WIDTH,
+    desiredHeight: getSlashCommandMenuHeight(optionCount),
+    minHeight: SLASH_COMMAND_MENU_OPTION_HEIGHT,
+    margin: SLASH_COMMAND_MENU_MARGIN,
+    gap: SLASH_COMMAND_MENU_GAP,
+  });
 }
 
 function getSlashCommandMenuHeight(optionCount: number): number {
