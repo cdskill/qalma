@@ -9,6 +9,12 @@ This page mirrors the canonical package changelog at
 `libs/editor/CHANGELOG.md`. It is regenerated from that file on every release —
 do not edit it by hand.
 
+## 0.3.0 (2026-07-07)
+
+### 🚀 Features
+
+- **kit:** publishing necessary stuff for kit ([ddc10f1](https://github.com/cdskill/qalma/commit/ddc10f1))
+
 ## 0.2.0 (2026-07-07)
 
 ### 🚀 Features
