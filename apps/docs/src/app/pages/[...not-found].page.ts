@@ -67,11 +67,11 @@ export const routeMeta: RouteMeta = {
           </p>
 
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a qalmaBtn routerLink="/" variant="accent" size="lg">
+            <a appBtn routerLink="/" variant="accent" size="lg">
               <ng-icon name="lucideArrowLeft" aria-hidden="true" />
               Back home
             </a>
-            <a qalmaBtn routerLink="/docs/introduction" variant="outline" size="lg">
+            <a appBtn routerLink="/docs/introduction" variant="outline" size="lg">
               <ng-icon name="lucideBookOpen" aria-hidden="true" />
               Read the docs
             </a>

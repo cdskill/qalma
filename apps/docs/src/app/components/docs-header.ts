@@ -157,7 +157,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </button>
 
           <a
-            qalmaBtn
+            appBtn
             variant="ghost"
             size="icon"
             href="https://www.npmjs.com/package/@qalma/editor"
@@ -179,7 +179,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
           </a>
 
           <a
-            qalmaBtn
+            appBtn
             variant="ghost"
             size="icon"
             href="https://github.com/cdskill/qalma"

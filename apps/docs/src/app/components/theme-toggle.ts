@@ -18,7 +18,7 @@ import { PosthogService } from '../services/posthog.service';
   providers: [provideIcons({ lucideMoon, lucideSun })],
   template: `
     <button
-      qalmaBtn
+      appBtn
       variant="ghost"
       size="icon"
       type="button"

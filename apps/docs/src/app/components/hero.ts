@@ -61,7 +61,7 @@ import { PosthogService } from '../services/posthog.service';
 
       <div class="mt-7 flex justify-center">
         <a
-          qalmaBtn
+          appBtn
           size="lg"
           routerLink="/docs/introduction"
           (click)="trackGetStarted()"

@@ -48,7 +48,7 @@ export type ButtonSize = NonNullable<
  * `<a>` elements while reading from the host's Tailwind design tokens.
  */
 @Directive({
-  selector: 'button[qalmaBtn], a[qalmaBtn]',
+  selector: 'button[appBtn], a[appBtn]',
   host: {
     '[class]': 'computedClass()',
   },
