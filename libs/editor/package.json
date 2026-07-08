@@ -1,6 +1,6 @@
 {
   "name": "@qalma/editor",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Angular-first headless rich text editor toolkit built on ProseMirror.",
   "license": "MIT",
   "sideEffects": false,
