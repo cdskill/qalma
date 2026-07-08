@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 import { SuggestionMenuPlacement } from './flip-above-placement';
+import { wrapIndex } from './keyboard-navigable-list';
 
 /** Option buttons carry this attribute so the base can focus/scroll to one by index. */
 export const SUGGESTION_OPTION_INDEX_ATTR = 'data-suggestion-index';
@@ -98,9 +99,7 @@ export abstract class QalmaSuggestionMenu<TOption extends { readonly id: string 
   }
 
   private getNextIndex(index: number, delta: number): number {
-    const length = this.optionList().length;
-
-    return length > 0 ? (index + delta + length) % length : index;
+    return wrapIndex(index, delta, this.optionList().length);
   }
 
   private optionElement(index: number): HTMLElement | null {

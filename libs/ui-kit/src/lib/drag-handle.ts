@@ -18,13 +18,14 @@ import {
   lucideTrash2,
 } from '@ng-icons/lucide';
 
-import { QalmaButton } from './button';
-import { DismissibleOverlay } from './dismissible-overlay';
 import {
+  DismissibleOverlay,
   QalmaDragBlockHighlight,
   QalmaDragDropIndicator,
   QalmaDragHandleView,
-} from './drag-handle-controller';
+} from '@qalma/kit/headless';
+
+import { QalmaButton } from './button';
 
 export interface QalmaDragStart {
   event: PointerEvent;

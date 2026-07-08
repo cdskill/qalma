@@ -22,7 +22,7 @@ import {
 } from '@ng-icons/lucide';
 import { filter, map } from 'rxjs';
 
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from '../ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { PosthogService } from '../services/posthog.service';
 import { DOCS_NAV } from '../docs/docs-nav';

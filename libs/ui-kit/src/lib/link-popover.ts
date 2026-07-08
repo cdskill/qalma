@@ -14,7 +14,8 @@ import {
   lucideX,
 } from '@ng-icons/lucide';
 
-import { LinkPopover } from './link-popover.model';
+import { LinkPopover } from '@qalma/kit/headless';
+
 import { QalmaButton } from './button';
 
 @Component({

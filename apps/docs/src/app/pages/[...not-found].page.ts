@@ -9,7 +9,7 @@ import {
 } from '@ng-icons/lucide';
 
 import { DocsHeader } from '../components/docs-header';
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from '../ui/button';
 
 export const routeMeta: RouteMeta = {
   title: 'Page not found',

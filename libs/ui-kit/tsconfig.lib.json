@@ -10,6 +10,6 @@
   "angularCompilerOptions": {
     "compilationMode": "partial"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "headless/**/*.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

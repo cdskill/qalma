@@ -21,7 +21,7 @@ import {
 } from '@ng-icons/lucide';
 import { QalmaCommandValue } from '@qalma/editor';
 
-import { QalmaSuggestionMenu } from './suggestion-menu-base';
+import { QalmaSuggestionMenu } from '@qalma/kit/headless';
 
 export interface QalmaSlashCommandOption {
   readonly id: string;

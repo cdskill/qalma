@@ -19,7 +19,8 @@
       "@qalma/editor": ["./libs/editor/src/index.ts"],
       "@qalma/editor/forms": ["./libs/editor/forms/src/index.ts"],
       "@qalma/editor/table": ["./libs/editor/table/src/index.ts"],
-      "@qalma/kit": ["./libs/ui-kit/src/index.ts"]
+      "@qalma/kit": ["./libs/ui-kit/src/index.ts"],
+      "@qalma/kit/headless": ["./libs/ui-kit/headless/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowRight, lucideSparkles } from '@ng-icons/lucide';
 
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from '../ui/button';
 import { InstallTabs } from './install-tabs';
 import { PosthogService } from '../services/posthog.service';
 

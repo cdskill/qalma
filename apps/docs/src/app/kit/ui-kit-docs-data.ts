@@ -1,10 +1,5 @@
 export const UI_KIT_COMPONENT_DOCS = [
   {
-    title: 'Button',
-    href: '/kit/button',
-    description: 'Token-driven directive for native button and anchor hosts.',
-  },
-  {
     title: 'Toolbar Button',
     href: '/kit/toolbar-button',
     description: 'Icon command button wired to the headless QalmaCommand API.',
@@ -106,11 +101,6 @@ export const UI_KIT_CSS_TOKENS = [
 
 export const UI_KIT_OVERRIDE_HOOKS = [
   {
-    name: 'button[qalmaBtn], a[qalmaBtn]',
-    description:
-      'Receives variant and size classes from QalmaButton; add app classes directly on the host element.',
-  },
-  {
     name: '.qalma-command-active',
     description:
       'Added by QalmaCommand when a toolbar command is active; toolbar buttons style this class.',
@@ -144,16 +134,6 @@ export const UI_KIT_OVERRIDE_HOOKS = [
 ] as const;
 
 export const UI_KIT_BEHAVIOR_PRIMITIVES = [
-  {
-    name: 'cn',
-    description:
-      'clsx + tailwind-merge helper for composing consumer classes with kit defaults.',
-  },
-  {
-    name: 'buttonVariants',
-    description:
-      'CVA variant map used by QalmaButton; useful when wrapping another component.',
-  },
   {
     name: 'anchorToRect',
     description:

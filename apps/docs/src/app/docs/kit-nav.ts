@@ -19,7 +19,6 @@ export const KIT_NAV: readonly DocsNavGroup[] = [
   {
     title: 'Components',
     items: [
-      { title: 'Button', href: '/kit/button' },
       { title: 'Toolbar Button', href: '/kit/toolbar-button' },
       { title: 'Toolbar Registry', href: '/kit/toolbar-registry' },
       { title: 'Mention Menu', href: '/kit/mention-menu' },

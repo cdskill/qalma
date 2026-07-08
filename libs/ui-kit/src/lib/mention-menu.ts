@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { QalmaSuggestionMenu } from './suggestion-menu-base';
+import { QalmaSuggestionMenu } from '@qalma/kit/headless';
 
 export interface QalmaMentionOption {
   readonly id: string;

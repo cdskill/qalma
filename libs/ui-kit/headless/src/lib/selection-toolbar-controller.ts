@@ -4,7 +4,15 @@ import {
   SelectionState,
 } from '@qalma/editor';
 
-import { QalmaContextualToolbarPlacement } from './contextual-toolbar';
+/**
+ * Fixed-position placement for a selection/contextual toolbar: a ready-to-apply
+ * CSS `transform` that pins the toolbar above the current selection rect.
+ * Produced by {@link QalmaSelectionToolbarController}; consumed by the styled
+ * `QalmaContextualToolbar` (or any custom bubble toolbar).
+ */
+export interface QalmaContextualToolbarPlacement {
+  transform: string;
+}
 
 const TOOLBAR_EDGE_MARGIN = 16;
 const TOOLBAR_GAP = 8;

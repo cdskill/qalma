@@ -8,7 +8,7 @@ import {
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMoon, lucideSun } from '@ng-icons/lucide';
 
-import { QalmaButton } from '@qalma/kit';
+import { QalmaButton } from '../ui/button';
 import { PosthogService } from '../services/posthog.service';
 
 @Component({

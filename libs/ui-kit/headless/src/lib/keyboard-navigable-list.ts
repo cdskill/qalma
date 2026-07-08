@@ -6,6 +6,17 @@ export interface KeyboardNavigableListOptions<T> {
 }
 
 /**
+ * Circular index step: move `index` by `delta` within `[0, length)`, wrapping
+ * around both ends; returns `index` unchanged for an empty list. This is the
+ * single source of truth for wrap-around list navigation — both
+ * `KeyboardNavigableList` (BYO-markup lists) and `QalmaSuggestionMenu` (the
+ * shipped mention/slash menus) delegate their arrow-key math to it.
+ */
+export function wrapIndex(index: number, delta: number, length: number): number {
+  return length > 0 ? (index + delta + length) % length : index;
+}
+
+/**
  * Arrow-key navigation + Enter-to-select for autocomplete-style popovers
  * (mention menu, slash command menu). Shared so both features stop
  * reimplementing the same wrap-around index math.
@@ -28,13 +39,13 @@ export class KeyboardNavigableList<T> {
     switch (key) {
       case 'ArrowDown':
         this.options.setActiveIndex(
-          (this.options.activeIndex() + 1) % items.length,
+          wrapIndex(this.options.activeIndex(), 1, items.length),
         );
 
         return true;
       case 'ArrowUp':
         this.options.setActiveIndex(
-          (this.options.activeIndex() - 1 + items.length) % items.length,
+          wrapIndex(this.options.activeIndex(), -1, items.length),
         );
 
         return true;
