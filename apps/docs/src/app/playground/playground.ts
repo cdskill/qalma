@@ -10,6 +10,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLink } from '@ng-icons/lucide';
 import {
   BlockquotePlugin,
   ClearFormattingPlugin,
@@ -54,6 +56,9 @@ import {
   QalmaSelectionToolbarDirective,
   QalmaSlashCommandMenu,
   QalmaSlashCommandOption,
+  QalmaToolbarButton,
+  TOOLBAR_BUTTON_CLASS,
+  provideQalmaToolbarIcons,
 } from '@qalma/kit';
 import { BrnToggleGroupImports } from '@spartan-ng/brain/toggle-group';
 
@@ -82,6 +87,7 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ...BrnToggleGroupImports,
+    NgIcon,
     QalmaContent,
     QalmaEditor,
     QalmaLinkPopover,
@@ -91,8 +97,10 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
     QalmaMentionMenu,
     QalmaSelectionToolbarDirective,
     QalmaSlashCommandMenu,
+    QalmaToolbarButton,
     PlaygroundToolbar,
   ],
+  providers: [provideQalmaToolbarIcons(), provideIcons({ lucideLink })],
   selector: 'app-playground',
   template: `
     <qalma-editor
@@ -137,11 +145,42 @@ type PlaygroundOutputFormat = 'html' | 'json' | 'markdown';
       />
 
       <qalma-contextual-toolbar
-        [editor]="editor"
         [placement]="selectionToolbar.placement()"
         (dismiss)="selectionToolbar.hide()"
-        (requestLink)="showContextualLinkEditor($event, selectionToolbar)"
-      />
+      >
+        <qalma-toolbar-button command="toggleBold" icon="lucideBold" label="Bold" />
+        <qalma-toolbar-button
+          command="toggleItalic"
+          icon="lucideItalic"
+          label="Italic"
+        />
+        <qalma-toolbar-button
+          command="toggleInlineCode"
+          icon="lucideCode"
+          label="Inline code"
+        />
+        <qalma-toolbar-button
+          command="toggleMonospace"
+          icon="lucideLetterText"
+          label="Monospace"
+        />
+        <span
+          class="mx-0.5 h-5 w-px shrink-0 self-center bg-border"
+          aria-hidden="true"
+        ></span>
+        <button
+          type="button"
+          [class]="toolbarButtonClass"
+          [class.qalma-command-active]="linkActive()"
+          [attr.aria-pressed]="linkActive()"
+          [disabled]="!canSetLink()"
+          (click)="showContextualLinkEditor($event, selectionToolbar)"
+          title="Link"
+          aria-label="Link"
+        >
+          <ng-icon class="text-[0.9rem]" name="lucideLink" aria-hidden="true" />
+        </button>
+      </qalma-contextual-toolbar>
 
       <qalma-drag-handle
         [editor]="editor"
@@ -302,6 +341,17 @@ export class Playground {
   });
 
   protected readonly linkPopover = new LinkPopoverController(this.editor);
+
+  // Contextual toolbar is a slot; the link control is app logic (opens the link
+  // popover) so its styling + editor-state reads live here, not in the kit.
+  protected readonly toolbarButtonClass = TOOLBAR_BUTTON_CLASS;
+  protected readonly canSetLink = computed(() =>
+    this.editor.canExecute('setLink', 'https://angular.dev'),
+  );
+  protected readonly linkActive = computed(() =>
+    this.editor.isCommandActive('setLink'),
+  );
+
   protected readonly mentionController = new PlaygroundMentionController(
     this.editor,
     createPlaygroundMentionSource('lazy'),

@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLink } from '@ng-icons/lucide';
 import {
   HistoryPlugin,
   InlineCodePlugin,
@@ -13,17 +15,24 @@ import {
 import {
   QalmaContextualToolbar,
   QalmaSelectionToolbarDirective,
+  QalmaToolbarButton,
+  TOOLBAR_BUTTON_CLASS,
+  provideQalmaToolbarIcons,
 } from '@qalma/kit';
 
 @Component({
   selector: 'app-kit-contextual-toolbar-demo',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    NgIcon,
     QalmaEditor,
     QalmaContent,
     QalmaContextualToolbar,
     QalmaSelectionToolbarDirective,
+    QalmaToolbarButton,
   ],
+  // The toolbar is a slot: you provide the icons for the controls you drop in.
+  providers: [provideQalmaToolbarIcons(), provideIcons({ lucideLink })],
   template: `
     <qalma-editor [editor]="editor">
       <div
@@ -36,12 +45,48 @@ import {
         />
       </div>
 
+      <!--
+        QalmaContextualToolbar only positions and dismisses. You compose the
+        controls: command buttons via <qalma-toolbar-button>, plus your own
+        buttons for app actions (here, opening a link editor).
+      -->
       <qalma-contextual-toolbar
-        [editor]="editor"
         [placement]="selection.placement()"
-        (requestLink)="onRequestLink()"
         (dismiss)="selection.hide()"
-      />
+      >
+        <qalma-toolbar-button command="toggleBold" icon="lucideBold" label="Bold" />
+        <qalma-toolbar-button
+          command="toggleItalic"
+          icon="lucideItalic"
+          label="Italic"
+        />
+        <qalma-toolbar-button
+          command="toggleInlineCode"
+          icon="lucideCode"
+          label="Inline code"
+        />
+        <qalma-toolbar-button
+          command="toggleMonospace"
+          icon="lucideLetterText"
+          label="Monospace"
+        />
+        <span
+          class="mx-0.5 h-5 w-px shrink-0 self-center bg-border"
+          aria-hidden="true"
+        ></span>
+        <button
+          type="button"
+          [class]="toolbarButtonClass"
+          [class.qalma-command-active]="linkActive()"
+          [attr.aria-pressed]="linkActive()"
+          [disabled]="!canSetLink()"
+          (click)="onRequestLink()"
+          title="Link"
+          aria-label="Link"
+        >
+          <ng-icon class="text-[0.9rem]" name="lucideLink" aria-hidden="true" />
+        </button>
+      </qalma-contextual-toolbar>
     </qalma-editor>
   `,
 })
@@ -61,8 +106,18 @@ export class KitContextualToolbarDemo {
     ],
   });
 
+  // Shared toolbar-button styling for the custom (non-command) link control.
+  protected readonly toolbarButtonClass = TOOLBAR_BUTTON_CLASS;
+
+  protected readonly canSetLink = computed(() =>
+    this.editor.canExecute('setLink', 'https://angular.dev'),
+  );
+  protected readonly linkActive = computed(() =>
+    this.editor.isCommandActive('setLink'),
+  );
+
   protected onRequestLink(): void {
-    // The toolbar's link button asks the app to open its own link editor.
-    // A real app would show an input; the other formatting buttons run inline.
+    // The link button asks the app to open its own link editor. A real app
+    // would show an input; the other formatting buttons run inline.
   }
 }

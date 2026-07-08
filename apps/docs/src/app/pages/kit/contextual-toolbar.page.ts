@@ -34,9 +34,11 @@ export const routeMeta: RouteMeta = {
           Contextual Toolbar
         </h1>
         <p class="text-base leading-7 text-muted-foreground">
-          <code>QalmaContextualToolbar</code> renders the inline formatting
-          surface. Pair it with <code>QalmaSelectionToolbarDirective</code> so
-          placement follows the browser selection in a real editor.
+          <code>QalmaContextualToolbar</code> is a floating container that
+          positions itself above the selection and dismisses on Escape — you
+          project the controls. Pair it with
+          <code>QalmaSelectionToolbarDirective</code> so placement follows the
+          browser selection in a real editor.
         </p>
       </header>
 
@@ -55,9 +57,10 @@ export const routeMeta: RouteMeta = {
       <section class="space-y-4">
         <h2 id="api">API</h2>
         <p class="leading-7 text-muted-foreground">
-          Inputs are <code>editor</code> and <code>placement</code>. Outputs are
-          <code>requestLink</code> and <code>dismiss</code>. The built-in
-          controls cover bold, italic, inline code, monospace, and link entry.
+          The only input is <code>placement</code> (plus an optional
+          <code>label</code>); the only output is <code>dismiss</code>. It ships
+          no buttons: drop <code>&lt;qalma-toolbar-button&gt;</code> for commands
+          and your own buttons for app actions (like link entry) inside it.
         </p>
       </section>
     </article>
