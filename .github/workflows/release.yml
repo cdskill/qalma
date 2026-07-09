@@ -37,8 +37,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
-      - name: Use npm with trusted publishing support
-        run: npm install --global npm@latest
+      # Node 24's bundled npm already supports OIDC trusted publishing and
+      # ships an intact provenance toolchain. We intentionally do NOT run
+      # `npm install -g npm@latest`: that self-upgrade prunes npm's bundled
+      # dependencies and drops `sigstore`, which breaks `npm publish
+      # --provenance` with "Cannot find module 'sigstore'".
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
