@@ -106,7 +106,16 @@ What it offers:
   `DismissibleOverlay`, `KeyboardNavigableList`, `cn` — for building your own
   chrome with the same placement, dismissal, and keyboard logic.
 
-Theming: the kit reads shadcn-style Tailwind tokens (`bg-popover`,
+Theming: the kit does not ship a compiled stylesheet. With Tailwind v4, the
+consumer must point Tailwind at the installed package, for example from a
+standard `src/styles.css`:
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@qalma/kit';
+```
+
+The kit reads shadcn-style Tailwind tokens (`bg-popover`,
 `text-muted-foreground`, `border-border`, …). Provide that token contract once;
 there is no `--qalma-*` prefix. Icons resolve by name through `@ng-icons`; use
 `provideQalmaToolbarIcons()` for the defaults and your own `provideIcons()` to

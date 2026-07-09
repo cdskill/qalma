@@ -2,9 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouteMeta } from '@analogjs/router';
 
+import { CodePanel } from '../../examples/code-panel';
 import { InstallTabs } from '../../components/install-tabs';
 import { UI_KIT_COMPONENT_DOCS } from '../../kit/ui-kit-docs-data';
-import { UI_KIT_INSTALL_COMMANDS } from '../../kit/ui-kit-snippets';
+import {
+  UI_KIT_INSTALL_COMMANDS,
+  UI_KIT_SNIPPETS,
+} from '../../kit/ui-kit-snippets';
 
 export const routeMeta: RouteMeta = {
   title: 'UI Kit',
@@ -20,7 +24,7 @@ export const routeMeta: RouteMeta = {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ui-kit-docs',
-  imports: [InstallTabs, RouterLink],
+  imports: [CodePanel, InstallTabs, RouterLink],
   template: `
     <article class="space-y-12">
       <header class="space-y-4">
@@ -75,6 +79,16 @@ export const routeMeta: RouteMeta = {
           class="block"
           [packages]="installCommands"
           installTarget="ui-kit"
+        />
+        <p class="leading-7 text-muted-foreground">
+          The kit does not ship a stylesheet to import. With Tailwind v4, point
+          Tailwind at the installed package so it generates the utilities used
+          inside kit components.
+        </p>
+        <app-code-panel
+          [code]="snippets.tailwindSource"
+          language="CSS"
+          exampleId="ui-kit-tailwind-source"
         />
       </section>
 
@@ -137,6 +151,7 @@ export const routeMeta: RouteMeta = {
 })
 export default class UiKitDocsPage {
   protected readonly installCommands = UI_KIT_INSTALL_COMMANDS;
+  protected readonly snippets = UI_KIT_SNIPPETS;
   protected readonly components = UI_KIT_COMPONENT_DOCS;
   protected readonly positioning = [
     {

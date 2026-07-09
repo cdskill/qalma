@@ -33,9 +33,19 @@ Peer dependencies:
 - `@ng-icons/core`
 - `@ng-icons/lucide`
 
-The kit expects your app to provide Tailwind utilities and the CSS token
-contract below. If you already use shadcn-style tokens, the defaults should feel
-familiar.
+The kit does not ship a compiled stylesheet. It expects your app to provide
+Tailwind utilities and the CSS token contract below. If you already use
+shadcn-style tokens, the defaults should feel familiar.
+
+With Tailwind v4, point Tailwind at the installed package so it generates the
+utilities used inside kit components:
+
+```css
+@import 'tailwindcss';
+
+/* Adjust the path if your global stylesheet is not src/styles.css. */
+@source '../node_modules/@qalma/kit';
+```
 
 ## Theming
 
@@ -43,10 +53,11 @@ The kit does not ship a fixed brand. Components read design tokens through
 Tailwind utility names such as `bg-popover`, `text-muted-foreground`,
 `border-border`, and `ring-ring`.
 
-With Tailwind v4, expose those tokens with `@theme`:
+Then expose those tokens with `@theme`:
 
 ```css
 @import 'tailwindcss';
+@source '../node_modules/@qalma/kit';
 
 @theme {
   --color-background: var(--background);

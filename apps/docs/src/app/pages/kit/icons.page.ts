@@ -56,7 +56,7 @@ export const routeMeta: RouteMeta = {
         </p>
         <app-kit-example
           title="Overriding and adding icons"
-          description="lucideBold is remapped to a custom SVG; appSparkle is a brand-new name — both render through the same toolbar button."
+          description="lucideBold is remapped to an app SVG; appUnderline is a brand-new name — both render through the same toolbar button."
           [code]="demoSource"
           exampleId="ui-kit-icons"
         >

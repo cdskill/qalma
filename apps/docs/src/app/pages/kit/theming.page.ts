@@ -44,6 +44,22 @@ export const routeMeta: RouteMeta = {
       </header>
 
       <section class="space-y-4">
+        <h2 id="tailwind-source">Tailwind source detection</h2>
+        <p class="leading-7 text-muted-foreground">
+          <code>@qalma/kit</code> does not ship a compiled stylesheet. Its
+          components render Tailwind utility classes, so your app's Tailwind
+          build must scan the installed package. Add this to your global
+          stylesheet, adjusting the relative path if your stylesheet lives
+          somewhere other than <code>src/styles.css</code>.
+        </p>
+        <app-code-panel
+          [code]="snippets.tailwindSource"
+          language="CSS"
+          exampleId="ui-kit-tailwind-source"
+        />
+      </section>
+
+      <section class="space-y-4">
         <h2 id="css-variables">CSS variables</h2>
         <p class="leading-7 text-muted-foreground">
           The kit reads shadcn-style variables through Tailwind classes. These

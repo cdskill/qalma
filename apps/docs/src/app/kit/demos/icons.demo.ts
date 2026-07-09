@@ -11,8 +11,10 @@ import {
 import { QalmaToolbarButton, provideQalmaToolbarIcons } from '@qalma/kit';
 
 // Any SVG string registers as a named icon; reuse that name in `icon="…"`.
-const sparkle =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.7L18.5 9l-4.6 2 L12 15l-1.9-4L5.5 9l4.6-1.3z"/></svg>';
+const customBold =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5v14"/><path d="M8 5h5.5a3.5 3.5 0 0 1 0 7H8"/><path d="M8 12h6a3.5 3.5 0 0 1 0 7H8"/></svg>';
+const customUnderline =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5v6a5 5 0 0 0 10 0V5"/><path d="M5 20h14"/></svg>';
 
 @Component({
   selector: 'app-kit-icons-demo',
@@ -22,7 +24,7 @@ const sparkle =
     // Kit defaults first, then override `lucideBold` and register a custom
     // name — later registrations win, so no fork of the toolbar is needed.
     provideQalmaToolbarIcons(),
-    provideIcons({ lucideBold: sparkle, appSparkle: sparkle }),
+    provideIcons({ lucideBold: customBold, appUnderline: customUnderline }),
   ],
   template: `
     <qalma-editor [editor]="editor">
@@ -30,7 +32,7 @@ const sparkle =
         <qalma-toolbar
           class="flex flex-wrap items-center gap-0.5 border-b border-border bg-secondary/40 px-1.5 py-1.5"
         >
-          <!-- Same command + name, but "lucideBold" now renders the sparkle. -->
+          <!-- Same command + name, but "lucideBold" now renders an app SVG. -->
           <qalma-toolbar-button
             command="toggleBold"
             icon="lucideBold"
@@ -44,7 +46,7 @@ const sparkle =
           <!-- A custom-named icon works exactly the same way. -->
           <qalma-toolbar-button
             command="toggleUnderline"
-            icon="appSparkle"
+            icon="appUnderline"
             label="Underline (custom name)"
           />
         </qalma-toolbar>
@@ -58,7 +60,7 @@ const sparkle =
 export class KitIconsDemo {
   protected readonly editor = createQalmaEditor({
     content:
-      '<p>The <strong>bold</strong> button uses a custom icon; italic keeps the kit default.</p>',
+      '<p>The <strong>bold</strong> and underline buttons use app-owned icons; italic keeps the kit default.</p>',
     plugins: [...TextFormattingKit, HistoryPlugin],
   });
 }

@@ -30,6 +30,10 @@ export const UI_KIT_INSTALL_COMMANDS = [
  * those snippets live with their demos instead of here.
  */
 export const UI_KIT_SNIPPETS = {
+  tailwindSource: `@import 'tailwindcss';
+
+/* Adjust the path if your global stylesheet is not src/styles.css. */
+@source '../node_modules/@qalma/kit';`,
   theme: `:root {
   --radius: 0.625rem;
   --background: #ffffff;
