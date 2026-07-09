@@ -1,6 +1,6 @@
 {
   "name": "@qalma/skills",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Install the Qalma agent skill pack into Claude Code, Codex, or any SKILL.md-aware agent.",
   "license": "MIT",
   "repository": {

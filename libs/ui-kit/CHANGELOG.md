@@ -1,3 +1,9 @@
+## 0.5.0 (2026-07-09)
+
+### 🩹 Fixes
+
+- **kit:** restore toolbar button styles in consumers ([46bb026](https://github.com/cdskill/qalma/commit/46bb026))
+
 ## 0.4.0 (2026-07-08)
 
 This was a version bump only for ui-kit to align it with other projects, there were no code changes.
