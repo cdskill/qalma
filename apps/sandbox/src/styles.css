@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@source '../../../libs/ui-kit/src';
+
 /* ------------------------------------------------------------------ *
  * shadcn design tokens consumed by the @qalma/kit components.
  * ------------------------------------------------------------------ *

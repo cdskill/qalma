@@ -2,6 +2,7 @@
 /* Spartan brain preset provides the shared Helm utilities used by local
  * wrappers, including CDK overlay positioning and progress animations. */
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
+@source '../../../libs/ui-kit/src';
 
 /* ------------------------------------------------------------------ *
  * Qalma design system

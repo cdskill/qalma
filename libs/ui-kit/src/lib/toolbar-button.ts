@@ -5,12 +5,13 @@ import { QalmaCommand } from '@qalma/editor';
 /**
  * Default styling for a toolbar command button. Icon-only, square, and driven
  * entirely by the host's shadcn-style design tokens (`text-muted-foreground`,
- * `bg-secondary`, `bg-accent-subtle`…) so it themes with the surrounding app.
+ * `bg-card`, `bg-secondary`, `bg-accent-subtle`…) so it themes with the
+ * surrounding app.
  * The `qalma-command-active` class is toggled by the `QalmaCommand` directive
  * when the underlying command is active.
  */
 export const TOOLBAR_BUTTON_CLASS =
-  'inline-flex h-[1.85rem] w-[1.85rem] cursor-pointer items-center justify-center rounded-[0.4rem] border border-transparent text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent/40 [&.qalma-command-active]:bg-accent-subtle [&.qalma-command-active]:text-accent';
+  'inline-flex h-[1.85rem] w-[1.85rem] cursor-pointer items-center justify-center rounded-[0.4rem] border border-border bg-card text-muted-foreground transition hover:border-accent/50 hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-45 [&.qalma-command-active]:border-accent/40 [&.qalma-command-active]:bg-accent-subtle [&.qalma-command-active]:text-accent';
 
 /**
  * Generic, declarative toolbar button for a single editor command.
