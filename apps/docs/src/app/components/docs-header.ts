@@ -14,12 +14,7 @@ import {
   RouterLinkActive,
 } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {
-  lucideGithub,
-  lucideMenu,
-  lucideSearch,
-  lucideX,
-} from '@ng-icons/lucide';
+import { lucideGithub, lucideMenu, lucideX } from '@ng-icons/lucide';
 import { filter, map } from 'rxjs';
 
 import { QalmaButton } from '../ui/button';
@@ -27,6 +22,7 @@ import { ThemeToggle } from './theme-toggle';
 import { PosthogService } from '../services/posthog.service';
 import { DOCS_NAV } from '../docs/docs-nav';
 import { KIT_NAV } from '../docs/kit-nav';
+import { DocsSearch } from './docs-search';
 
 interface HeaderNavItem {
   readonly title: string;
@@ -48,12 +44,18 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-docs-header',
-  imports: [RouterLink, RouterLinkActive, NgIcon, QalmaButton, ThemeToggle],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    NgIcon,
+    QalmaButton,
+    ThemeToggle,
+    DocsSearch,
+  ],
   providers: [
     provideIcons({
       lucideGithub,
       lucideMenu,
-      lucideSearch,
       lucideX,
     }),
   ],
@@ -143,18 +145,7 @@ const HEADER_NAV: readonly HeaderNavItem[] = [
         </nav>
 
         <div class="ml-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            class="hidden h-9 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:bg-secondary lg:inline-flex"
-          >
-            <ng-icon name="lucideSearch" class="text-sm" aria-hidden="true" />
-            <span>Search docs…</span>
-            <kbd
-              class="ml-2 rounded border border-border px-1.5 font-mono text-[10px]"
-            >
-              ⌘K
-            </kbd>
-          </button>
+          <app-docs-search (opened)="closeMobileNav()" />
 
           <a
             appBtn
