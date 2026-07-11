@@ -38,7 +38,18 @@ import { DocsHeader } from '../components/docs-header';
       </aside>
 
       <main class="min-w-0 flex-1 py-10">
-        <div appDocsContent class="qalma-docs-content mx-auto max-w-3xl">
+        <span
+          class="sr-only"
+          data-pagefind-meta="section"
+          data-pagefind-filter="section"
+        >
+          {{ section() === 'kit' ? 'UI Kit' : 'Docs' }}
+        </span>
+        <div
+          appDocsContent
+          data-pagefind-body
+          class="qalma-docs-content mx-auto max-w-3xl"
+        >
           <ng-content />
         </div>
       </main>

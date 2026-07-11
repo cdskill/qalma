@@ -84,6 +84,10 @@ jobs:
           VITE_POSTHOG_KEY: ${{ vars.POSTHOG_KEY }}
           VITE_POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
 
+      - name: Build docs search index
+        if: matrix.app == 'docs'
+        run: pnpm nx search-index docs
+
       - name: Resolve deploy target
         id: cfg
         shell: bash
@@ -109,11 +113,11 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       # Pass 1 — hashed, content-addressed assets: cache forever, prune removed.
-      # .txt (robots.txt, IndexNow key) is excluded so it isn't pinned immutable for a year.
+      # Pagefind contains stable bootstrap filenames and is uploaded separately.
       - name: Upload immutable assets
         run: |
           aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
-            --delete --exclude "*.html" --exclude "*.xml" --exclude "*.txt" \
+            --delete --exclude "*.html" --exclude "*.xml" --exclude "*.txt" --exclude "pagefind/*" \
             --cache-control "public, max-age=31536000, immutable"
 
       # Pass 2 — HTML, sitemap, robots.txt + IndexNow key: always revalidate so
@@ -123,6 +127,14 @@ jobs:
           aws s3 sync "${{ steps.cfg.outputs.dist }}" "s3://${{ steps.cfg.outputs.bucket }}" \
             --exclude "*" --include "*.html" --include "*.xml" --include "*.txt" \
             --cache-control "public, max-age=0, must-revalidate"
+
+      # Pass 3 — Pagefind bootstrap, WASM, and index chunks share one coherent
+      # deployment and revalidate together to avoid stale browser-side runtimes.
+      - name: Upload Pagefind search index (revalidate)
+        if: matrix.app == 'docs'
+        run: |
+          aws s3 sync "${{ steps.cfg.outputs.dist }}/pagefind" "s3://${{ steps.cfg.outputs.bucket }}/pagefind" \
+            --delete --cache-control "public, max-age=0, must-revalidate"
 
       # "/*" = one invalidation path (free up to 1000/month), fresh HTML at every edge.
       - name: Invalidate CloudFront

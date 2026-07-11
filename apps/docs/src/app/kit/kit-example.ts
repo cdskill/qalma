@@ -48,7 +48,7 @@ import { CodePanel } from '../examples/code-panel';
         </button>
       </header>
 
-      <div class="bg-background/70 p-4 sm:p-6">
+      <div data-pagefind-ignore class="bg-background/70 p-4 sm:p-6">
         <ng-content />
       </div>
 

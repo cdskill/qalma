@@ -26,6 +26,26 @@
       },
       "outputs": ["{workspaceRoot}/dist/apps/docs"]
     },
+    "search-index": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "outputs": ["{workspaceRoot}/dist/apps/docs/analog/public/pagefind"],
+      "options": {
+        "parallel": false,
+        "commands": [
+          "pnpm exec pagefind --site dist/apps/docs/analog/public --output-subdir pagefind --include-characters '<>@/_'",
+          "node apps/docs/scripts/verify-search-index.mjs"
+        ]
+      }
+    },
+    "preview-search": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": ["build"],
+      "options": {
+        "command": "pnpm exec pagefind --site dist/apps/docs/analog/public --output-subdir pagefind --include-characters '<>@/_' --serve"
+      }
+    },
     "serve": {
       "executor": "@analogjs/platform:vite-dev-server",
       "continuous": true,

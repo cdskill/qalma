@@ -79,14 +79,20 @@ jobs:
           pnpm exec tsc -p apps/sandbox/tsconfig.json --noEmit
           pnpm exec tsc -p apps/sandbox/tsconfig.spec.json --noEmit
           pnpm exec tsc -p apps/sandbox-e2e/tsconfig.json --noEmit
+          pnpm exec tsc -p apps/docs/tsconfig.app.json --noEmit
+          pnpm exec tsc -p apps/docs/tsconfig.spec.json --noEmit
 
       - name: Vitest
         run: |
           pnpm nx test editor -- --run
           pnpm nx test sandbox -- --run
+          pnpm nx test docs -- --run
 
       - name: Build sandbox
         run: pnpm nx build sandbox
+
+      - name: Build docs search index
+        run: pnpm nx search-index docs
 
       - name: Playwright sandbox
         run: pnpm nx e2e sandbox-e2e -- --project=chromium
