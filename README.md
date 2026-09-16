@@ -29,11 +29,14 @@
   <a href="https://www.npmjs.com/package/@qalma/editor">npm</a>
   ·
   <a href="https://github.com/cdskill/qalma/issues">Issues</a>
+  ·
+  <a href="SECURITY.md">Security</a>
 </p>
 
 ---
 
-> **Status:** alpha (`0.0.x`). The public API may still change between releases.
+> **Status:** pre-1.0 (`0.x`). The public API is stabilizing but may still
+> change before `1.0`.
 
 Qalma gives you a typed editor controller, signal-based state, and a small set
 of unstyled Angular primitives (`<qalma-editor>`, `<qalma-content>`,
@@ -57,17 +60,15 @@ menus, popovers — stays in your app. You choose the plugins, you own the marku
 npm install @qalma/editor
 ```
 
-`@angular/core` `>=21 <22` is a peer dependency.
+`@angular/core` `>=21 <23` is a peer dependency. Qalma compiles consumer
+fixtures against Angular 21 and Angular 22 in CI.
 
 ```ts
 import { createQalmaEditor, HistoryPlugin, TextFormattingKit } from '@qalma/editor';
 
 const editor = createQalmaEditor({
   content: '<p>Hello world</p>',
-  plugins: [
-    ...TextFormattingKit,
-    HistoryPlugin.configure({ depth: 200, newGroupDelay: 750 }),
-  ],
+  plugins: [...TextFormattingKit, HistoryPlugin.configure({ depth: 200, newGroupDelay: 750 })],
 });
 ```
 
@@ -91,11 +92,13 @@ API, components, and the list of available plugins.
 This is an [Nx](https://nx.dev) monorepo.
 
 | Path           | Description                                                          |
-| -------------- | ------------------------------------------------------------------- |
-| `libs/editor`  | `@qalma/editor` — the published, headless editor toolkit.           |
-| `apps/sandbox` | A real consumer app and executable documentation of the public API. |
+| -------------- | -------------------------------------------------------------------- |
+| `libs/editor`  | `@qalma/editor` — the published, headless editor toolkit.            |
+| `libs/ui-kit`  | `@qalma/kit` — the optional Tailwind-first component layer.          |
+| `libs/skills`  | `@qalma/skills` — the installable agent guidance package.            |
+| `apps/sandbox` | A real consumer app and executable documentation of the public API.  |
 | `apps/docs`    | The documentation site published to [qalma.dev](https://qalma.dev/). |
-| `infra`        | Infrastructure (S3 + CloudFront) for the docs site.                 |
+| `bench`        | Reproducible bundle-size measurements for the editor and UI kit.     |
 
 ## Development
 

@@ -8,6 +8,10 @@ import {
 export type QalmaStateQuery = (state: EditorState) => boolean;
 export type QalmaQuery<TValue = unknown> = (state: EditorState) => TValue;
 export type QalmaCommandValue = unknown;
+export interface QalmaParsedContent {
+  html: string;
+}
+export type QalmaContentParser = (content: string) => QalmaParsedContent;
 export type QalmaCommandHandler = (
   state: Parameters<Command>[0],
   dispatch?: Parameters<Command>[1],
@@ -25,6 +29,7 @@ export interface QalmaPlugin {
   commands?: (schema: Schema) => Record<string, QalmaCommandHandler>;
   commandStates?: (schema: Schema) => Record<string, QalmaStateQuery>;
   queries?: (schema: Schema) => Record<string, QalmaQuery>;
+  contentParsers?: Record<string, QalmaContentParser>;
   shortcuts?: (schema: Schema) => Record<string, Command>;
   prosemirrorPlugins?: (schema: Schema) => ProseMirrorPlugin[];
 }

@@ -101,7 +101,7 @@ describe('ImagePlugin', () => {
   it('parses serialized images and ignores unsafe sources', () => {
     const mounted = mountEditor({
       content:
-        '<img src="https://example.com/photo.png" alt="Example" title="Photo"><img src="javascript:alert(1)" alt="Bad">',
+        '<img src="https://example.com/photo.png" alt="Example" title="Photo"><img src="javascript:alert(1)" alt="Bad"><img src="java&#10;script:alert(1)" alt="Obfuscated"><img src="//evil.example/pixel.png" alt="Network path">',
       plugins: [ImagePlugin],
     });
 
@@ -109,6 +109,48 @@ describe('ImagePlugin', () => {
       expect(mounted.editor.html()).toBe(
         '<p><img src="https://example.com/photo.png" alt="Example" title="Photo"></p>',
       );
+    } finally {
+      mounted.unmount();
+    }
+  });
+
+  it('rejects parser bypasses and unsafe JSON image attributes', () => {
+    const mounted = mountEditor({
+      content: '<p>Before</p>',
+      plugins: [ImagePlugin],
+    });
+
+    try {
+      const { editor } = mounted;
+
+      placeCursorAfterText(editor, 'Before');
+
+      expect(editor.execute('insertImage', 'java\nscript:alert(1)')).toBe(
+        false,
+      );
+      expect(editor.execute('insertImage', '//evil.example/pixel.png')).toBe(
+        false,
+      );
+      expect(editor.execute('insertImage', 'data:image/svg+xml,unsafe')).toBe(
+        false,
+      );
+
+      expect(() =>
+        editor.setJSON({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'image',
+                  attrs: { src: 'javascript:alert(1)' },
+                },
+              ],
+            },
+          ],
+        }),
+      ).toThrow(/Invalid image src URL/);
     } finally {
       mounted.unmount();
     }

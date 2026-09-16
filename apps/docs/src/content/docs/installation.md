@@ -10,15 +10,16 @@ libraries it needs, so there is nothing else to add to your `package.json`.
 
 ## Requirements
 
-Qalma has a single peer dependency — Angular itself.
+Qalma's core peer dependency is Angular itself.
 
-| Package         | Required version   |
-| --------------- | ------------------ |
-| `@angular/core` | `&gt;=21.0.0 &lt;22.0.0` |
+| Package         | Required version         |
+| --------------- | ------------------------ |
+| `@angular/core` | `&gt;=21.0.0 &lt;23.0.0` |
 
-It relies on Angular's modern signal APIs, so 21 is the floor. There is nothing
-else to install: TypeScript comes with your Angular toolchain, and the
-ProseMirror packages ship inside `@qalma/editor`.
+Angular 21 and Angular 22 consumer fixtures compile in CI. Qalma relies on
+modern signal APIs, so 21 is the floor. There is nothing else to install:
+TypeScript comes with your Angular toolchain, and the ProseMirror packages ship
+inside `@qalma/editor`.
 
 ## Install the package
 
@@ -114,15 +115,7 @@ renders an editable surface with bold/italic and undo/redo:
 
 ```typescript
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {
-  createQalmaEditor,
-  HistoryPlugin,
-  QalmaCommand,
-  QalmaContent,
-  QalmaEditor,
-  QalmaToolbar,
-  TextFormattingKit,
-} from '@qalma/editor';
+import { createQalmaEditor, HistoryPlugin, QalmaCommand, QalmaContent, QalmaEditor, QalmaToolbar, TextFormattingKit } from '@qalma/editor';
 
 @Component({
   selector: 'app-editor-check',

@@ -44,9 +44,9 @@ export const MentionPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     const mentionNode: NodeSpec = {
       attrs: {
-        id: {},
-        label: {},
-        trigger: { default: options.trigger },
+        id: { validate: 'string' },
+        label: { validate: 'string' },
+        trigger: { default: options.trigger, validate: 'string' },
       },
       group: 'inline',
       inline: true,

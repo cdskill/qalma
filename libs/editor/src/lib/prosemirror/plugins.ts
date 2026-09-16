@@ -6,6 +6,7 @@ import { Command, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
 import {
   QalmaCommandHandler,
+  QalmaContentParser,
   QalmaPlugin,
   QalmaQuery,
   QalmaStateQuery,
@@ -25,6 +26,28 @@ export function createBasePlugins(
     keymap({ Backspace: undoInputRule }),
     keymap(baseKeymap),
   ];
+}
+
+export function createContentParserRegistry(
+  qalmaPlugins: readonly QalmaPlugin[],
+): Partial<Record<string, QalmaContentParser>> {
+  const parsers: Partial<Record<string, QalmaContentParser>> = {};
+
+  for (const plugin of qalmaPlugins) {
+    for (const [format, parser] of Object.entries(
+      plugin.contentParsers ?? {},
+    )) {
+      if (parsers[format]) {
+        throw new Error(
+          `QALMA plugin "${plugin.key}" defines duplicate content parser "${format}".`,
+        );
+      }
+
+      parsers[format] = parser;
+    }
+  }
+
+  return parsers;
 }
 
 export function createCommandRegistry(

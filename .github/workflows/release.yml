@@ -46,8 +46,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
 
       - name: Validate
         run: |
@@ -62,7 +62,13 @@ jobs:
           pnpm nx test sandbox -- --run
           pnpm nx test skills -- --run
           pnpm nx build sandbox
-          pnpm nx e2e sandbox-e2e -- --project=chromium
+          pnpm nx e2e sandbox-e2e
+
+      - name: Verify Angular 21 and 22 consumers
+        run: |
+          pnpm nx run-many -t build -p editor ui-kit
+          node tools/verify-angular-compatibility.mjs 21
+          node tools/verify-angular-compatibility.mjs 22
 
       - name: Resolve release version
         id: release

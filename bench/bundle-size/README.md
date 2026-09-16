@@ -27,6 +27,10 @@ npm run bench:published
 You should get the same numbers (± a few bytes across esbuild patch versions).
 Results are also written to `results.json`.
 
+The report also measures the optional styled `@qalma/kit` surface separately.
+`@qalma/editor` is external for that entry, so the result is the UI layer's
+incremental cost rather than a second copy of the editor.
+
 ## What is measured
 
 For each editor, [`entries/`](./entries) contains a tiny module that builds a
@@ -34,6 +38,9 @@ For each editor, [`entries/`](./entries) contains a tiny module that builds a
 
 > paragraph · bold · italic · underline · strike · headings · bullet & ordered
 > lists · blockquote · code block · link · history (undo/redo) · hard break
+
+The optional UI-kit entry imports the complete styled surface and default icon
+provider. It marks `@qalma/editor` external, so its number is incremental.
 
 `build.mjs` bundles each entry with [esbuild](https://esbuild.github.io/)
 (`bundle: true`, `minify: true`, `treeShaking: true`, `format: esm`), then
@@ -78,5 +85,5 @@ bundled) matches this benchmark's ~91 KB.
 
 ## Pinned versions
 
-See `package.json`. Current run: local `@qalma/editor@0.1.0-beta.2` candidate,
-`ngx-editor@18.0.0`, `@tiptap/*@3.26.1`, `quill@2.0.3`.
+See `package.json` for published pins. A workspace run reads the current
+`@qalma/editor` and `@qalma/kit` versions directly from their built packages.

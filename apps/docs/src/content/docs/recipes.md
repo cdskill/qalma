@@ -86,15 +86,7 @@ setTextColor(color: string): void {
 
 ```html
 @for (color of colors; track color) {
-  <button
-    type="button"
-    [class.qalma-command-active]="textColor() === color"
-    [disabled]="!editor.canExecute('setTextColor', color)"
-    (mousedown)="$event.preventDefault()"
-    (click)="setTextColor(color)"
-    [style.background-color]="color"
-    [attr.aria-label]="'Set text color ' + color"
-  ></button>
+<button type="button" [class.qalma-command-active]="textColor() === color" [disabled]="!editor.canExecute('setTextColor', color)" (mousedown)="$event.preventDefault()" (click)="setTextColor(color)" [style.background-color]="color" [attr.aria-label]="'Set text color ' + color"></button>
 }
 ```
 
@@ -128,3 +120,40 @@ pickUser(user: { id: string; label: string }): void {
 
 Listen to `qalma-mention-update` and read `query&lt;MentionState&gt;('mention')` to
 position and filter your own menu.
+
+## Angular Material toolbar
+
+Qalma commands are ordinary controller calls, so Material stays an app
+dependency:
+
+```html
+<mat-toolbar>
+  <button mat-icon-button type="button" aria-label="Bold" [class.is-active]="editor.isCommandActive('toggleBold')" [disabled]="!editor.canExecute('toggleBold')" (click)="editor.execute('toggleBold')">
+    <mat-icon>format_bold</mat-icon>
+  </button>
+</mat-toolbar>
+```
+
+## Kendo UI toolbar
+
+```html
+<kendo-toolbar aria-label="Editor toolbar">
+  <kendo-toolbar-button text="Bold" [togglable]="true" [selected]="editor.isCommandActive('toggleBold')" [disabled]="!editor.canExecute('toggleBold')" (click)="editor.execute('toggleBold')" />
+</kendo-toolbar>
+```
+
+## ng-zorro toolbar
+
+```html
+<div role="toolbar" aria-label="Editor toolbar">
+  <button nz-button type="button" [nzType]="editor.isCommandActive('toggleBold') ? 'primary' : 'default'" [disabled]="!editor.canExecute('toggleBold')" (click)="editor.execute('toggleBold')">
+    <span nz-icon nzType="bold" aria-hidden="true"></span>
+    <span class="sr-only">Bold</span>
+  </button>
+</div>
+```
+
+These snippets show the integration boundary, not a dependency promise for
+those design systems. Import the components/directives from the versions your
+application already uses. If you want Qalma's optional Tailwind-first
+components instead, use [`@qalma/kit`](/kit).

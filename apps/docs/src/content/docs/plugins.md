@@ -14,6 +14,13 @@ menus, and styling remain consumer-owned Angular code.
 
 ## Authoring Essentials
 
+`EssentialsKit` from `@qalma/editor/essentials` is a readonly, UI-free baseline
+containing headings, common
+marks, inline/code blocks, lists, blockquotes, links, history, paste rules,
+hard breaks, clear formatting, and a trailing paragraph. Spread it when that
+opinionated baseline fits; list plugins explicitly when your product needs a
+smaller or differently configured schema.
+
 | Plugin                  | What it adds                          | Commands                                                                                                         |
 | ----------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `TextFormattingKit`     | Bold, italic, underline, strike marks | `toggleBold`, `toggleItalic`, `toggleUnderline`, `toggleStrike`                                                  |
@@ -29,12 +36,12 @@ menus, and styling remain consumer-owned Angular code.
 
 ## Rich Content
 
-| Plugin               | What it adds                                         | Commands                                                              |
-| -------------------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
-| `LinkPlugin`         | Links with protocol validation                       | `setLink`, `selectLink`, `unsetLink`                                  |
-| `ImagePlugin`        | Inline images with alt/title metadata                | `insertImage`, `updateImage`, `removeImage`                           |
-| `MentionPlugin`      | Inline mention nodes and trigger state               | `insertMention`                                                       |
-| `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock` |
+| Plugin               | What it adds                                          | Commands                                                                                      |
+| -------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `LinkPlugin`         | Links with protocol validation                        | `setLink`, `selectLink`, `unsetLink`                                                          |
+| `ImagePlugin`        | Inline images with alt/title metadata                 | `insertImage`, `updateImage`, `removeImage`                                                   |
+| `MentionPlugin`      | Inline mention nodes and trigger state                | `insertMention`                                                                               |
+| `SlashCommandPlugin` | Slash trigger state for consumer-owned command menus  | `deleteSlashCommand`, `dismissSlashCommand`, `splitSlashCommandBlock`                         |
 | `DragHandlePlugin`   | Block metadata and action commands for custom handles | `selectBlock`, `deleteBlock`, `duplicateBlock`, `moveBlockTo`, `moveBlockUp`, `moveBlockDown` |
 
 ## Styling And Layout
@@ -48,13 +55,17 @@ menus, and styling remain consumer-owned Angular code.
 
 ## Editing Behavior
 
-| Plugin                    | What it adds                                             | Commands          |
-| ------------------------- | -------------------------------------------------------- | ----------------- |
-| `HardBreakPlugin`         | Inline hard breaks                                       | `insertHardBreak` |
-| `PasteRulesPlugin`        | Paste cleanup and autolink behavior                      | None              |
-| `PlaceholderPlugin`       | Placeholder decorations for empty documents              | None              |
-| `SelectionPlugin`         | Selection read model and update event for contextual UI  | None              |
-| `TrailingParagraphPlugin` | Ensures a final editable paragraph after terminal blocks | None              |
+| Plugin                    | What it adds                                             | Commands                                                                                |
+| ------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `HardBreakPlugin`         | Inline hard breaks                                       | `insertHardBreak`                                                                       |
+| `PasteRulesPlugin`        | Paste cleanup and autolink behavior                      | None                                                                                    |
+| `PlaceholderPlugin`       | Placeholder decorations for empty documents              | None                                                                                    |
+| `SelectionPlugin`         | Selection read model and update event for contextual UI  | None                                                                                    |
+| `TrailingParagraphPlugin` | Ensures a final editable paragraph after terminal blocks | None                                                                                    |
+| `CharacterCountPlugin`    | Character/word query and optional input limit            | None                                                                                    |
+| `FileHandlerPlugin`       | Typed pasted/dropped file callbacks                      | None                                                                                    |
+| `FindReplacePlugin`       | Headless search decorations and replacement              | `setFindQuery`, `findNext`, `findPrevious`, `replaceCurrent`, `replaceAll`, `clearFind` |
+| `UniqueIdPlugin`          | Stable IDs on configured schema nodes                    | None                                                                                    |
 
 ## Configurable Plugins
 

@@ -5,7 +5,7 @@ description: Current product direction and known documentation-facing priorities
 
 # Roadmap
 
-Qalma is an alpha editor toolkit. The current direction is defined by the code,
+Qalma is a pre-1.0 editor toolkit. The current direction is defined by the code,
 the public exports, and the repository mission: an Angular-first, headless,
 plugin-based editor on ProseMirror.
 
@@ -16,28 +16,30 @@ is already moving toward.
 
 The current editor already includes:
 
-| Area               | Shipped surface                                                                                     |
-| ------------------ | --------------------------------------------------------------------------------------------------- |
-| Angular primitives | `QalmaEditor`, `QalmaContent`, `QalmaToolbar`, `QalmaCommand`                                       |
-| Controller         | Signals for HTML/editability, command execution, command state, queries, content replacement, focus |
-| Formatting         | Text formatting, inline code, monospace, color, highlight, subscript/superscript, clear formatting  |
-| Structure          | Headings, lists, blockquotes, hard breaks, trailing paragraphs                                      |
-| Media and links    | Links, inline images                                                                                |
-| Productivity       | Selection state, drag handles, mentions, slash commands, paste rules, code blocks, history          |
-| Layout             | Text alignment                                                                                      |
-| Docs examples      | Live playground, consumer-owned toolbar, contextual toolbar, drag handle, link popover, mention menu |
+| Area               | Shipped surface                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Angular primitives | `QalmaEditor`, `QalmaContent`, `QalmaToolbar`, `QalmaCommand`                                                                       |
+| Controller         | Signals for HTML/editability, command execution, command state, queries, content replacement, focus                                 |
+| Formatting         | Text formatting, inline code, monospace, color, highlight, subscript/superscript, clear formatting                                  |
+| Structure          | Headings, lists, blockquotes, hard breaks, trailing paragraphs                                                                      |
+| Media and links    | Links, inline images                                                                                                                |
+| Productivity       | Selection, drag handles, mentions, slash commands, paste rules, find/replace, file events, counts, stable IDs, code blocks, history |
+| Persistence        | Lossless JSON, versioned schema envelopes and migrations, HTML, Markdown export/import entrypoint                                   |
+| Layout             | Text alignment                                                                                                                      |
+| Docs examples      | Live playground, consumer-owned toolbar, contextual toolbar, drag handle, link popover, mention menu                                |
 
 ## Near-term product priorities
 
 These are the areas the existing code suggests are most important to harden:
 
-| Priority                    | Why it matters                                                                                                                 |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Public API clarity          | The developer experience is the product, so commands, queries, options, and UI responsibilities need stable docs and examples. |
-| Plugin validation           | Configurable plugins should continue to expose Qalma-owned option interfaces with clear validation errors.                     |
-| Consumer-owned UI recipes   | Menus, popovers, toolbars, uploads, and forms should remain app code, with copyable examples.                                  |
-| Accessibility patterns      | Headless menus need strong keyboard and ARIA recipes because Qalma does not render fixed UI.                                   |
-| SSR and zoneless confidence | Angular 21, signals, `afterNextRender`, and server-safe patterns are central to the library shape.                             |
+| Priority                  | Why it matters                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Public API clarity        | The developer experience is the product, so commands, queries, options, and UI responsibilities need stable docs and examples. |
+| Plugin validation         | Configurable plugins should continue to expose Qalma-owned option interfaces with clear validation errors.                     |
+| Consumer-owned UI recipes | Menus, popovers, toolbars, uploads, and forms should remain app code, with copyable examples.                                  |
+| Accessibility patterns    | Headless menus need strong keyboard and ARIA recipes because Qalma does not render fixed UI.                                   |
+| Browser confidence        | Angular 21/22 consumers, Chromium/Firefox/WebKit, mobile WebKit, composition, SSR, and zoneless behavior stay in CI.           |
+| Collaboration design      | Yjs-style collaboration needs a deliberate provider, cursor, history, and persistence boundary before implementation.          |
 
 ## Open design areas
 
@@ -50,6 +52,7 @@ These areas should stay deliberate rather than accidental:
 | Toolbar rendering             | Keep toolbar UI consumer-owned. Do not add configuration-driven toolbar rendering to the editor library.                                          |
 | Design systems                | Keep Spartan/helm, Tailwind, icons, and product styling in apps, not in `@qalma/editor`.                                                          |
 | Node views and overlays       | Prefer command/query/event contracts that let Angular apps render their own UI.                                                                   |
+| Collaboration                 | Keep Yjs optional and provider-agnostic; do not make the core editor require a transport or backend.                                              |
 
 ## How to contribute to the roadmap
 

@@ -1,10 +1,11 @@
-import {
-  DOMParser as ProseMirrorDOMParser,
-  Schema,
-} from 'prosemirror-model';
+import { DOMParser as ProseMirrorDOMParser, Schema } from 'prosemirror-model';
 import { Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
-import { createConfigurableQalmaPlugin, createQalmaPlugin } from './qalma-plugin';
+import {
+  createConfigurableQalmaPlugin,
+  createQalmaPlugin,
+} from './qalma-plugin';
+import { normalizeQalmaUrl } from '../prosemirror/url';
 
 export interface PasteRulesPluginOptions {
   autolink: boolean;
@@ -30,9 +31,7 @@ export const PasteRulesPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     return createQalmaPlugin({
       key: 'pasteRules',
-      prosemirrorPlugins: (schema) => [
-        createPasteRulesPlugin(schema, options),
-      ],
+      prosemirrorPlugins: (schema) => [createPasteRulesPlugin(schema, options)],
     });
   },
 );
@@ -299,9 +298,7 @@ function getClipboardHref(
 }
 
 function isHrefLikeText(text: string): boolean {
-  return (
-    /^(?:[a-z][a-z0-9+.-]*:|www\.|\/|#)/i.test(text) && !/\s/.test(text)
-  );
+  return /^(?:[a-z][a-z0-9+.-]*:|www\.|\/|#)/i.test(text) && !/\s/.test(text);
 }
 
 function createLinkedTextHtml(text: string, href: string): string | null {
@@ -314,9 +311,7 @@ function createLinkedTextHtml(text: string, href: string): string | null {
     .split('\n')
     .map(
       (line) =>
-        `<p><a href="${escapeAttribute(href)}">${escapeHtml(
-          line,
-        )}</a></p>`,
+        `<p><a href="${escapeAttribute(href)}">${escapeHtml(line)}</a></p>`,
     )
     .join('');
 }
@@ -336,9 +331,7 @@ function createAutolinkHtml(
     return null;
   }
 
-  return htmlLines
-    .map((line) => `<p>${line.html || '<br>'}</p>`)
-    .join('');
+  return htmlLines.map((line) => `<p>${line.html || '<br>'}</p>`).join('');
 }
 
 interface AutolinkLine {
@@ -396,7 +389,10 @@ function trimTrailingPunctuation(text: string): TrimmedLinkCandidate {
     candidate = candidate.slice(0, -1);
   }
 
-  while (/[)\]}]$/.test(candidate) && hasUnmatchedClosingPunctuation(candidate)) {
+  while (
+    /[)\]}]$/.test(candidate) &&
+    hasUnmatchedClosingPunctuation(candidate)
+  ) {
     trailing = `${candidate[candidate.length - 1] ?? ''}${trailing}`;
     candidate = candidate.slice(0, -1);
   }
@@ -441,17 +437,11 @@ function normalizeHref(
   const href = text.toLowerCase().startsWith('www.')
     ? `${options.defaultProtocol}://${text}`
     : text;
-  const protocol = href.match(/^([a-z][a-z0-9+.-]*):/i)?.[1].toLowerCase();
 
-  if (!protocol) {
-    return options.allowRelativeLinks ? href : null;
-  }
-
-  if (!options.allowedProtocols.includes(protocol)) {
-    return null;
-  }
-
-  return href;
+  return normalizeQalmaUrl(href, {
+    allowedProtocols: options.allowedProtocols,
+    allowRelative: options.allowRelativeLinks,
+  });
 }
 
 function escapeHtml(value: string): string {
@@ -483,10 +473,7 @@ function assertPasteRulesPluginOptions(
   }
 
   for (const protocol of options.allowedProtocols) {
-    if (
-      typeof protocol !== 'string' ||
-      !/^[a-z][a-z0-9+.-]*$/.test(protocol)
-    ) {
+    if (typeof protocol !== 'string' || !/^[a-z][a-z0-9+.-]*$/.test(protocol)) {
       throw new TypeError(
         'PasteRulesPlugin allowedProtocols entries must be protocol names without colons.',
       );
@@ -494,14 +481,19 @@ function assertPasteRulesPluginOptions(
   }
 
   if (typeof options.allowRelativeLinks !== 'boolean') {
-    throw new TypeError('PasteRulesPlugin allowRelativeLinks must be a boolean.');
+    throw new TypeError(
+      'PasteRulesPlugin allowRelativeLinks must be a boolean.',
+    );
   }
 
   if (typeof options.cleanHtml !== 'boolean') {
     throw new TypeError('PasteRulesPlugin cleanHtml must be a boolean.');
   }
 
-  if (options.defaultProtocol !== 'http' && options.defaultProtocol !== 'https') {
+  if (
+    options.defaultProtocol !== 'http' &&
+    options.defaultProtocol !== 'https'
+  ) {
     throw new TypeError(
       'PasteRulesPlugin defaultProtocol must be "http" or "https".',
     );

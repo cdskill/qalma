@@ -44,6 +44,10 @@ extension points over exposing raw ProseMirror details.
 - Keep first-party plugins in `libs/editor/src/lib/plugins` until a real
   dependency, release, ownership, or bundle boundary justifies a dedicated lib.
 - Preserve unique plugin keys, schema names, command names, and shortcuts.
+- Validate every persisted first-party node/mark attribute at the ProseMirror
+  schema boundary. Treat HTML, JSON, Markdown, paste/drop, migrations, upload
+  metadata, AI output, and collaboration metadata as untrusted; build fresh
+  allowlisted DOM attributes instead of merging untrusted attribute bags.
 - Keep the public barrel intentional and small. Do not export internal
   ProseMirror helpers or compatibility aliases without a concrete need.
 - Keep `plugins/qalma` as the public agent skill pack for Codex,

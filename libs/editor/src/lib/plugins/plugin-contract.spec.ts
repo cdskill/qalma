@@ -124,6 +124,27 @@ describe('Qalma plugin contract', () => {
       'QALMA plugin "second" defines duplicate query "sharedState".',
     );
 
+    expect(() =>
+      createQalmaEditor({
+        plugins: [
+          createQalmaPlugin({
+            key: 'first',
+            contentParsers: {
+              custom: (content) => ({ html: content }),
+            },
+          }),
+          createQalmaPlugin({
+            key: 'second',
+            contentParsers: {
+              custom: (content) => ({ html: content }),
+            },
+          }),
+        ],
+      }),
+    ).toThrowError(
+      'QALMA plugin "second" defines duplicate content parser "custom".',
+    );
+
     expect(() => {
       const editor = createQalmaEditor({
         plugins: [

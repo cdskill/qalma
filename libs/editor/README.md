@@ -26,7 +26,7 @@ markup.
 npm install @qalma/editor
 ```
 
-`@angular/core` `>=21 <22` is a peer dependency. `@angular/forms` is an
+`@angular/core` `>=21 <23` is a peer dependency. `@angular/forms` is an
 optional peer dependency used only by the `@qalma/editor/forms` entrypoint.
 
 ## Quick start
@@ -76,13 +76,19 @@ Builds a `QalmaEditorController`, the headless API your components bind to:
 | `setHtml(html)`                 | Replaces the document content from an HTML string.                     |
 | `getJSON()`                     | Serializes the document to ProseMirror's native, lossless JSON.        |
 | `setJSON(doc)`                  | Replaces the document content from a `QalmaDocument` JSON object.      |
+| `getStoredDocument()`           | Wraps lossless JSON with storage, schema, and plugin versions.         |
+| `setStoredDocument(doc)`        | Validates and migrates a versioned stored document.                    |
 | `getMarkdown()`                 | Serializes the document to Markdown (CommonMark + GFM).                |
+| `setMarkdown(markdown)`         | Imports Markdown when `MarkdownPlugin` is configured.                  |
 | `setEditable(editable)`         | Toggles editability at runtime.                                        |
 | `focus()`                       | Focuses the editor view.                                               |
 
 `options.content` accepts an initial HTML string, and `options.plugins`
 accepts the list of `QalmaPlugin`s that define the schema, commands, and
-behavior available to the editor.
+behavior available to the editor. Set `schemaVersion` and `migrations` when
+persisted documents must evolve across schema changes. Use
+`options.contentLimits` to lower the default HTML/Markdown length and JSON/live
+document node, depth, and text ceilings for short-form products.
 
 ### Serializing content
 
@@ -90,20 +96,40 @@ The controller can read and write the document in three formats:
 
 - **HTML** — `html()` (a live signal) and `setHtml()`. Best for rendering and
   interop with existing HTML content.
-- **JSON** — `getJSON()` and `setJSON()`. ProseMirror's native document model;
-  **lossless** and the recommended format to persist and restore content.
-- **Markdown** — `getMarkdown()`. CommonMark plus GFM (tables, task lists,
+- **JSON** — `getJSON()` / `setJSON()` for raw interop, or
+  `getStoredDocument()` / `setStoredDocument()` for versioned persistence.
+  Both preserve ProseMirror's native document model losslessly.
+- **Markdown** — `getMarkdown()` and optional `setMarkdown()`. CommonMark plus GFM (tables, task lists,
   strikethrough). Marks Markdown cannot express (underline, text color,
   highlight, sub/superscript, mentions) fall back to inline HTML so no content
-  is dropped. Markdown is output-only — typing Markdown syntax is handled by the
-  per-plugin input rules.
+  is dropped on export. Import lives in the optional
+  `@qalma/editor/markdown` entrypoint, so apps that do not need it do not ship
+  a Markdown parser.
 
 ```ts
-const doc = editor.getJSON(); // persist this
-editor.setJSON(doc); // restore it later, losslessly
+const stored = editor.getStoredDocument(); // persist this envelope
+editor.setStoredDocument(stored); // validate and migrate it later
 
 const markdown = editor.getMarkdown(); // export to Markdown
 ```
+
+```ts
+import { MarkdownPlugin } from '@qalma/editor/markdown';
+
+const editor = createQalmaEditor({ plugins: [MarkdownPlugin] });
+editor.setMarkdown('# Imported');
+```
+
+### Security boundary
+
+First-party plugins validate persisted attributes across HTML, commands, JSON,
+paste, and serialization. Custom plugins remain trusted code: validate every
+attribute with `AttributeSpec.validate`, build fresh allowlisted DOM attribute
+objects, and never merge untrusted attribute bags. Keep Angular's normal
+sanitizer when rendering stored HTML outside the editor; do not apply
+`bypassSecurityTrustHtml()` to user-authored content. File MIME types are
+client-provided hints and require server-side validation. See the repository
+[`SECURITY.md`](../../SECURITY.md) and dated audit for the complete model.
 
 ### Components and directives
 
@@ -123,13 +149,18 @@ const markdown = editor.getMarkdown(); // export to Markdown
 ### Plugins and kits
 
 A `QalmaPlugin` contributes schema nodes/marks, commands, command-state
-queries, shortcuts, and ProseMirror plugins. A **kit** (e.g.
+queries, content parsers, shortcuts, and ProseMirror plugins. A **kit** (e.g.
 `TextFormattingKit`) is just a `readonly QalmaPlugin[]` bundling related
 plugins — spread it into `plugins` like any other entry.
 
 Configurable plugins expose a `.configure(options)` method that returns a new
 plugin instance with merged options, e.g.
 `HistoryPlugin.configure({ depth: 200 })`.
+
+The broad `EssentialsKit` is intentionally imported from
+`@qalma/editor/essentials`. Keeping the composite in a secondary entrypoint
+prevents its eager imports from retaining every included plugin in smaller
+main-entrypoint bundles.
 
 ## Available plugins
 
@@ -161,6 +192,10 @@ plugin instance with merged options, e.g.
 | `PasteRulesPlugin`                                                                    | normalizes pasted content                                                                                                  |
 | `PlaceholderPlugin`                                                                   | shows placeholder text in an empty document                                                                                |
 | `TrailingParagraphPlugin`                                                             | keeps a trailing empty paragraph at the end of the document                                                                |
+| `CharacterCountPlugin`                                                                | None (`query('characterCount')`; optional hard limit)                                                                      |
+| `FileHandlerPlugin`                                                                   | None (typed paste/drop file callbacks)                                                                                     |
+| `FindReplacePlugin`                                                                   | `setFindQuery`, `findNext`, `findPrevious`, `replaceCurrent`, `replaceAll`, `clearFind`                                    |
+| `UniqueIdPlugin`                                                                      | None (`query('uniqueId')`; stable configured-node IDs)                                                                     |
 
 Read each plugin's source under `src/lib/plugins` for configuration options
 (e.g. `HeadingsPlugin.configure({ levels: [1, 2, 3] })`,

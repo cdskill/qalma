@@ -5,12 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import {
-  FormField,
-  form,
-  submit as submitForm,
-} from '@angular/forms/signals';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { FormField, form, submit as submitForm } from '@angular/forms/signals';
 import {
   HardBreakPlugin,
   HistoryPlugin,
@@ -41,7 +36,7 @@ interface PostedReview {
   readonly author: string;
   readonly rating: number;
   readonly headline: string;
-  readonly body: SafeHtml;
+  readonly body: string;
 }
 
 type ReviewRating = '0' | '1' | '2' | '3' | '4' | '5';
@@ -94,7 +89,9 @@ const SEED: readonly {
     QalmaToolbar,
     QalmaLinkPopover,
   ],
-  providers: [provideIcons({ lucideBold, lucideItalic, lucideLink, lucideList })],
+  providers: [
+    provideIcons({ lucideBold, lucideItalic, lucideLink, lucideList }),
+  ],
   template: `
     @let postedReviews = reviews();
     @let selectedScore = selectedRating();
@@ -144,7 +141,9 @@ const SEED: readonly {
               class="qalma-comment-body mt-1 text-sm"
               [innerHTML]="review.body"
             ></div>
-            <p class="mt-1 text-xs text-muted-foreground">{{ review.author }}</p>
+            <p class="mt-1 text-xs text-muted-foreground">
+              {{ review.author }}
+            </p>
           </li>
         }
       </ul>
@@ -210,18 +209,38 @@ const SEED: readonly {
           <qalma-toolbar
             class="flex items-center gap-0.5 border-b border-border px-1.5 py-1.5"
           >
-            <button [class]="btnClass" qalmaCommand="toggleBold" aria-label="Bold">
-              <ng-icon [class]="iconClass" name="lucideBold" aria-hidden="true" />
+            <button
+              [class]="btnClass"
+              qalmaCommand="toggleBold"
+              aria-label="Bold"
+            >
+              <ng-icon
+                [class]="iconClass"
+                name="lucideBold"
+                aria-hidden="true"
+              />
             </button>
-            <button [class]="btnClass" qalmaCommand="toggleItalic" aria-label="Italic">
-              <ng-icon [class]="iconClass" name="lucideItalic" aria-hidden="true" />
+            <button
+              [class]="btnClass"
+              qalmaCommand="toggleItalic"
+              aria-label="Italic"
+            >
+              <ng-icon
+                [class]="iconClass"
+                name="lucideItalic"
+                aria-hidden="true"
+              />
             </button>
             <button
               [class]="btnClass"
               qalmaCommand="toggleBulletList"
               aria-label="Bullet list"
             >
-              <ng-icon [class]="iconClass" name="lucideList" aria-hidden="true" />
+              <ng-icon
+                [class]="iconClass"
+                name="lucideList"
+                aria-hidden="true"
+              />
             </button>
             <span
               class="mx-0.5 h-5 w-px shrink-0 self-center bg-border"
@@ -236,7 +255,11 @@ const SEED: readonly {
               (click)="linkPopover.showToolbarEditor($event)"
               aria-label="Link"
             >
-              <ng-icon [class]="iconClass" name="lucideLink" aria-hidden="true" />
+              <ng-icon
+                [class]="iconClass"
+                name="lucideLink"
+                aria-hidden="true"
+              />
             </button>
           </qalma-toolbar>
 
@@ -275,7 +298,6 @@ const SEED: readonly {
   `,
 })
 export class ProductReview {
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly posthogService = inject(PosthogService);
 
   protected readonly stars = STARS;
@@ -313,7 +335,7 @@ export class ProductReview {
       author: review.author,
       rating: review.rating,
       headline: review.headline,
-      body: this.trust(review.html),
+      body: review.html,
     })),
   );
 
@@ -343,7 +365,7 @@ export class ProductReview {
           author: 'You',
           rating,
           headline: this.reviewForm.headline().value().trim() || 'My review',
-          body: this.trust(html),
+          body: html,
         },
         ...reviews,
       ]);
@@ -354,12 +376,6 @@ export class ProductReview {
         rating,
       });
     });
-  }
-
-  // The editor only serializes schema-allowed nodes/marks — no scripts can
-  // reach this HTML — so trusting it keeps marks rendering as authored.
-  private trust(html: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
 

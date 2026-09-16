@@ -26,11 +26,17 @@ as the configurable engine-plugin example.
 | `commands(schema)`           | Register consumer-executable named commands.              |
 | `commandStates(schema)`      | Report meaningful active state for named commands.        |
 | `queries(schema)`            | Expose read-only plugin state for consumer-composed UI.   |
+| `contentParsers`             | Add an opt-in content format parser returning HTML.       |
 | `shortcuts(schema)`          | Register keyboard shortcuts backed by commands.           |
 | `prosemirrorPlugins(schema)` | Install engine behavior such as history.                  |
 
 Only add a new contract field when a real plugin cannot be expressed cleanly
 with the existing fields. That decision is an architecture change.
+
+Content parsers expose Qalma-owned `{ html }` results rather than a
+ProseMirror schema or parser object. The controller normalizes that HTML
+through the selected editor schema. Keep heavy format dependencies in optional
+secondary entrypoints, as `@qalma/editor/markdown` does.
 
 ## Naming
 
@@ -58,6 +64,12 @@ A mark plugin normally needs:
 Account for both semantic HTML tags and relevant pasted inline styles when
 defining `parseDOM`. Serialize to predictable semantic HTML.
 
+Every persisted mark attribute must define `AttributeSpec.validate`. Normalize
+at commands and `parseDOM`, but assume `setJSON()` bypasses both paths. Build a
+fresh allowlisted attribute object in `toDOM()` and never merge an untrusted
+attribute bag; generic merging must reject `__proto__`, `prototype`, and
+`constructor`.
+
 ## Node Plugin Shape
 
 A node plugin normally needs:
@@ -74,6 +86,11 @@ A node plugin normally needs:
 
 Do not introduce an Angular node view until the feature needs Angular-specific
 interactive rendering.
+
+Every persisted node attribute must define `AttributeSpec.validate`, including
+type-only attributes. URL and CSS values require centralized allowlists and
+defence-in-depth checks at serialization. Add malicious JSON tests alongside
+HTML and command tests.
 
 ## Stateful Engine Plugin Shape
 

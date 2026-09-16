@@ -66,8 +66,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
 
       - name: Lint
         run: pnpm nx run-many -t lint
@@ -95,7 +95,7 @@ jobs:
         run: pnpm nx search-index docs
 
       - name: Playwright sandbox
-        run: pnpm nx e2e sandbox-e2e -- --project=chromium
+        run: pnpm nx e2e sandbox-e2e
 
       - name: Upload Playwright artifacts
         if: failure()
@@ -106,3 +106,32 @@ jobs:
             dist/.playwright/apps/sandbox-e2e/playwright-report
             dist/.playwright/apps/sandbox-e2e/test-output
           if-no-files-found: ignore
+
+  angular-compatibility:
+    name: Angular ${{ matrix.angular }} consumer
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        angular: [21, 22]
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+          run_install: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build publishable packages
+        run: pnpm nx run-many -t build -p editor ui-kit
+
+      - name: Compile Angular consumer
+        run: node tools/verify-angular-compatibility.mjs ${{ matrix.angular }}
