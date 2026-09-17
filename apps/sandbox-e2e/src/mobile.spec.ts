@@ -41,5 +41,7 @@ test('opens and completes the slash command menu on mobile Safari', async ({
   await page.keyboard.press('Enter');
   await page.keyboard.insertText('Mobile heading');
 
-  await expect(editor.locator('h1')).toContainText('Mobile heading');
+  await expect(
+    editor.getByRole('heading', { name: 'Mobile heading', exact: true }),
+  ).toBeVisible();
 });
