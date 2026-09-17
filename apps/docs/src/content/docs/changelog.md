@@ -9,6 +9,13 @@ This page mirrors the canonical package changelog at
 `libs/editor/CHANGELOG.md`. It is regenerated from that file on every release —
 do not edit it by hand.
 
+## 0.6.0 (2026-09-17)
+
+### 🚀 Features
+
+- **repo:** expand editor plugins and harden content handling ([#26](https://github.com/cdskill/qalma/pull/26))
+- **docs:** add Pagefind static search to docs site ([#25](https://github.com/cdskill/qalma/pull/25))
+
 ## 0.5.0 (2026-07-09)
 
 This was a version bump only for editor to align it with other projects, there were no code changes.
