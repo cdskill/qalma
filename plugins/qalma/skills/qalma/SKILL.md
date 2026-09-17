@@ -28,8 +28,9 @@ plugins selected explicitly in TypeScript.
 
 ## Core Rules
 
-- Use public imports from `@qalma/editor` and optional public entrypoints such as
-  `@qalma/editor/forms` or `@qalma/editor/table`.
+- Use public imports from `@qalma/editor` and optional public entrypoints such
+  as `@qalma/editor/essentials`, `@qalma/editor/forms`,
+  `@qalma/editor/markdown`, or `@qalma/editor/table`.
 - Do not import from `@qalma/editor/src`, `libs/editor/src/lib/prosemirror`, or
   other internal paths in consumer apps.
 - Create editors with `createQalmaEditor({ content, plugins })`; plugin
@@ -40,7 +41,7 @@ plugins selected explicitly in TypeScript.
   in the consuming application — or adopt the optional `@qalma/kit` package for
   ready-made versions you can still restyle, reconfigure, and replace per piece.
 - Treat Qalma plugins as behavior providers: schema, commands, command state,
-  queries, shortcuts, and ProseMirror plugins.
+  queries, content parsers, shortcuts, and ProseMirror plugins.
 - Prefer Qalma-owned options and command names over leaking raw ProseMirror or
   third-party library details into app contracts.
 

@@ -5,10 +5,7 @@ import {
   textblockTypeInputRule,
 } from 'prosemirror-inputrules';
 import { Node as ProseMirrorNode, NodeSpec, NodeType } from 'prosemirror-model';
-import {
-  EditorState,
-  Plugin as ProseMirrorPlugin,
-} from 'prosemirror-state';
+import { EditorState, Plugin as ProseMirrorPlugin } from 'prosemirror-state';
 
 import {
   createConfigurableQalmaPlugin,
@@ -47,7 +44,14 @@ export const CodeBlockPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     const codeBlockNode: NodeSpec = {
       attrs: {
-        language: { default: options.defaultLanguage },
+        language: {
+          default: options.defaultLanguage,
+          validate: (value) => {
+            if (resolveLanguageId(value, options) !== value) {
+              throw new RangeError('Invalid code block language.');
+            }
+          },
+        },
       },
       content: 'text*',
       marks: '',
@@ -194,9 +198,13 @@ function createCodeBlockInputRule(
   codeBlock: NodeType,
   options: Readonly<CodeBlockPluginOptions>,
 ): InputRule {
-  return textblockTypeInputRule(/^```([a-zA-Z0-9-]*)\s$/, codeBlock, (match) => ({
-    language: resolveLanguageId(match[1], options) ?? options.defaultLanguage,
-  }));
+  return textblockTypeInputRule(
+    /^```([a-zA-Z0-9-]*)\s$/,
+    codeBlock,
+    (match) => ({
+      language: resolveLanguageId(match[1], options) ?? options.defaultLanguage,
+    }),
+  );
 }
 
 function createCodeBlockKeyboardPlugin(
@@ -439,10 +447,7 @@ function assertCodeBlockPluginOptions(
     seen.add(language);
   }
 
-  assertLanguageId(
-    options.defaultLanguage,
-    'CodeBlockPlugin defaultLanguage',
-  );
+  assertLanguageId(options.defaultLanguage, 'CodeBlockPlugin defaultLanguage');
 
   if (!seen.has(options.defaultLanguage)) {
     throw new Error(
@@ -476,7 +481,10 @@ function assertCodeBlockPluginOptions(
   }
 }
 
-function assertLanguageId(value: unknown, label: string): asserts value is string {
+function assertLanguageId(
+  value: unknown,
+  label: string,
+): asserts value is string {
   if (
     typeof value !== 'string' ||
     value.trim() !== value ||

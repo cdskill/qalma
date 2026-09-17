@@ -85,7 +85,14 @@ function extendNodeSpecWithTextAlign(nodeSpec: NodeSpec): NodeSpec {
     ...nodeSpec,
     attrs: {
       ...nodeSpec.attrs,
-      textAlign: { default: null },
+      textAlign: {
+        default: null,
+        validate: (value) => {
+          if (value !== null && parseTextAlignment(value) !== value) {
+            throw new RangeError('Invalid text alignment.');
+          }
+        },
+      },
     },
     parseDOM: nodeSpec.parseDOM?.map((rule) =>
       extendParseRuleWithTextAlign(rule),

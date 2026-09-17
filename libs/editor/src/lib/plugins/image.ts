@@ -11,6 +11,7 @@ import {
   QalmaCommandHandler,
   QalmaPlugin,
 } from './qalma-plugin';
+import { assertQalmaUrlAttribute, normalizeQalmaUrl } from '../prosemirror/url';
 
 export interface ImageCommandValue {
   src: string;
@@ -50,7 +51,14 @@ export const ImagePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     const imageNode: NodeSpec = {
       attrs: {
-        src: {},
+        src: {
+          validate: (value) =>
+            assertQalmaUrlAttribute(
+              value,
+              imageUrlPolicy(options),
+              'image src',
+            ),
+        },
         alt: { default: options.defaultAlt },
         title: { default: null },
         previewSrc: { default: null },
@@ -84,11 +92,15 @@ export const ImagePlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
       ],
       selectable: true,
       toDOM: (node) => {
-        const attrs: Record<string, string> = {
-          src: node.attrs['src'],
-          alt: normalizeAlt(node.attrs['alt']),
-        };
+        const attrs: Record<string, string> = {};
+        const src = normalizeImageSrc(node.attrs['src'], options);
         const title = normalizeTitle(node.attrs['title']);
+
+        if (src) {
+          attrs['src'] = src;
+        }
+
+        attrs['alt'] = normalizeAlt(node.attrs['alt']);
 
         if (title) {
           attrs['title'] = title;
@@ -178,7 +190,9 @@ function createUpdateImageCommand(
 
       dispatch(
         transaction
-          .setSelection(NodeSelection.create(transaction.doc, selectedImage.from))
+          .setSelection(
+            NodeSelection.create(transaction.doc, selectedImage.from),
+          )
           .scrollIntoView(),
       );
     }
@@ -290,22 +304,19 @@ function resolveImageAttrs(
 }
 
 function normalizeImageSrc(
-  value: string | null | undefined,
+  value: unknown,
   options: Readonly<ImagePluginOptions>,
 ): string | null {
-  const src = value?.trim();
+  return normalizeQalmaUrl(value, imageUrlPolicy(options));
+}
 
-  if (!src) {
-    return null;
-  }
-
-  const protocol = src.match(/^([a-z][a-z0-9+.-]*):/i)?.[1].toLowerCase();
-
-  if (!protocol) {
-    return options.allowRelativeImages && !src.startsWith('//') ? src : null;
-  }
-
-  return options.allowedProtocols.includes(protocol) ? src : null;
+function imageUrlPolicy(
+  options: Readonly<ImagePluginOptions>,
+): Readonly<{ allowedProtocols: readonly string[]; allowRelative: boolean }> {
+  return {
+    allowedProtocols: options.allowedProtocols,
+    allowRelative: options.allowRelativeImages,
+  };
 }
 
 function normalizeAlt(value: unknown): string {

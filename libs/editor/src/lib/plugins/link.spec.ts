@@ -61,14 +61,54 @@ describe('LinkPlugin', () => {
   it('parses and serializes allowed links while dropping unsafe hrefs', () => {
     const mounted = mountEditor({
       content:
-        '<p><a href="https://angular.dev" target="_blank" rel="noopener">Angular</a> <a href="javascript:alert(1)">bad</a></p>',
+        '<p><a href="https://angular.dev" target="_blank" rel="noopener">Angular</a> <a href="javascript:alert(1)">bad</a> <a href="java&#10;script:alert(1)">obfuscated</a> <a href="//evil.example">network-path</a></p>',
       plugins: [LinkPlugin],
     });
 
     try {
       expect(mounted.editor.html()).toBe(
-        '<p><a href="https://angular.dev" target="_blank" rel="noopener">Angular</a> bad</p>',
+        '<p><a href="https://angular.dev" target="_blank" rel="noopener">Angular</a> bad obfuscated network-path</p>',
       );
+    } finally {
+      mounted.unmount();
+    }
+  });
+
+  it('rejects parser bypasses and unsafe JSON link attributes', () => {
+    const mounted = mountEditor({
+      content: '<p>Qalma</p>',
+      plugins: [LinkPlugin],
+    });
+
+    try {
+      const { editor } = mounted;
+
+      selectText(editor, 'Qalma');
+
+      expect(editor.canExecute('setLink', 'java\nscript:alert(1)')).toBe(false);
+      expect(editor.canExecute('setLink', '//evil.example')).toBe(false);
+      expect(editor.canExecute('setLink', '\\\\evil.example')).toBe(false);
+      expect(editor.canExecute('setLink', 'data:text/html,unsafe')).toBe(false);
+
+      expect(() =>
+        editor.setJSON({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'unsafe',
+                  marks: [
+                    { type: 'link', attrs: { href: 'javascript:alert(1)' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      ).toThrow(/Invalid link href URL/);
     } finally {
       mounted.unmount();
     }

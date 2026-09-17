@@ -55,6 +55,37 @@ describe('HighlightPlugin', () => {
     }
   });
 
+  it('rejects unsafe highlight attributes loaded from JSON', () => {
+    const editor = mountEditor({ plugins: [HighlightPlugin] });
+
+    try {
+      expect(() =>
+        editor.editor.setJSON({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'unsafe',
+                  marks: [
+                    {
+                      type: 'highlight',
+                      attrs: { color: 'red" onmouseover="alert(1)' },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      ).toThrow(/Invalid highlight color/);
+    } finally {
+      editor.unmount();
+    }
+  });
+
   it('exposes immutable defaults and validates configuration', () => {
     const configured = HighlightPlugin.configure({
       defaultColor: '#bae6fd',

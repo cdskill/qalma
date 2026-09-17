@@ -27,8 +27,8 @@ npm install @qalma/editor @qalma/kit @ng-icons/core @ng-icons/lucide
 
 Peer dependencies:
 
-- `@angular/core` `>=21 <22`
-- `@angular/common` `>=21 <22`
+- `@angular/core` `>=21 <23`
+- `@angular/common` `>=21 <23`
 - `@qalma/editor`
 - `@ng-icons/core`
 - `@ng-icons/lucide`

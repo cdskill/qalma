@@ -65,4 +65,35 @@ describe('ColorPlugin', () => {
       mounted.unmount();
     }
   });
+
+  it('rejects unsafe color attributes loaded from JSON', () => {
+    const editor = mountEditor({ plugins: [ColorPlugin] });
+
+    try {
+      expect(() =>
+        editor.editor.setJSON({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'unsafe',
+                  marks: [
+                    {
+                      type: 'textStyle',
+                      attrs: { color: 'red" onmouseover="alert(1)' },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      ).toThrow(/Invalid color color/);
+    } finally {
+      editor.unmount();
+    }
+  });
 });

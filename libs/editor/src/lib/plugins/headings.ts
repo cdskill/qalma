@@ -43,7 +43,14 @@ export const HeadingsPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     const headingNode: NodeSpec = {
       attrs: {
-        level: { default: options.levels[0] },
+        level: {
+          default: options.levels[0],
+          validate: (value) => {
+            if (!options.levels.includes(value as HeadingLevel)) {
+              throw new RangeError('Invalid heading level.');
+            }
+          },
+        },
       },
       content: 'inline*',
       defining: true,

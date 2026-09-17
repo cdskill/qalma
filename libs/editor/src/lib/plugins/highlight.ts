@@ -58,7 +58,14 @@ export const HighlightKit: readonly QalmaPlugin[] = [HighlightPlugin];
 function createHighlightMark(defaultColor: string): MarkSpec {
   return {
     attrs: {
-      color: { default: defaultColor },
+      color: {
+        default: defaultColor,
+        validate: (value) => {
+          if (!normalizeCssColor(value, 'background-color')) {
+            throw new RangeError('Invalid highlight color.');
+          }
+        },
+      },
     },
     parseDOM: [
       {
@@ -103,9 +110,7 @@ function createSetHighlightCommand(
     }
 
     if (dispatch) {
-      dispatch(
-        updateHighlightMarks(state, mark, () => color).scrollIntoView(),
-      );
+      dispatch(updateHighlightMarks(state, mark, () => color).scrollIntoView());
     }
 
     return true;
@@ -238,7 +243,7 @@ function normalizeCssColor(
 
   const color = value.trim();
 
-  if (!color || /[;{}<>]/.test(color)) {
+  if (!color || /[;{}<>"']/.test(color)) {
     return null;
   }
 

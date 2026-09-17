@@ -2,13 +2,24 @@ export * from './lib/editor/command';
 export * from './lib/editor/content';
 export * from './lib/editor/editor';
 export * from './lib/editor/qalma-editor-controller';
+export {
+  QALMA_STORED_DOCUMENT_FORMAT,
+  QALMA_STORED_DOCUMENT_FORMAT_VERSION,
+} from './lib/editor/stored-document';
+export type {
+  QalmaDocumentMigration,
+  QalmaStoredDocument,
+} from './lib/editor/stored-document';
 export * from './lib/editor/toolbar';
 export type { QalmaDocument } from './lib/prosemirror/json';
 export * from './lib/plugins/blockquote';
+export * from './lib/plugins/character-count';
 export * from './lib/plugins/clear-formatting';
 export * from './lib/plugins/code-block';
 export * from './lib/plugins/color';
 export * from './lib/plugins/drag-handle';
+export * from './lib/plugins/file-handler';
+export * from './lib/plugins/find-replace';
 export * from './lib/plugins/hard-break';
 export * from './lib/plugins/highlight';
 export * from './lib/plugins/history';
@@ -30,3 +41,4 @@ export * from './lib/plugins/task-list';
 export * from './lib/plugins/text-align';
 export * from './lib/plugins/text-formatting';
 export * from './lib/plugins/trailing-paragraph';
+export * from './lib/plugins/unique-id';

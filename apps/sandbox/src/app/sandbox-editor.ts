@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   HostListener,
@@ -12,13 +13,19 @@ import {
 import {
   BlockquotePlugin,
   ClearFormattingPlugin,
+  CharacterCountPlugin,
+  CharacterCountState,
   CodeBlockPlugin,
   ColorPlugin,
   DragHandlePlugin,
+  FileHandlerPlugin,
+  FindReplacePlugin,
+  FindReplaceState,
   HardBreakPlugin,
   HeadingsPlugin,
   HighlightPlugin,
   HistoryPlugin,
+  HorizontalRulePlugin,
   ImageCommandValue,
   ImagePlugin,
   InlineCodePlugin,
@@ -38,6 +45,7 @@ import {
   createQalmaEditor,
   TextFormattingKit,
   TrailingParagraphPlugin,
+  UniqueIdPlugin,
 } from '@qalma/editor';
 import {
   LinkPopoverController,
@@ -96,7 +104,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
 
       <div
         #mentionSurface
-        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_.hljs-attr]:text-sky-300 [&_.ProseMirror_.hljs-built_in]:text-cyan-300 [&_.ProseMirror_.hljs-comment]:text-slate-500 [&_.ProseMirror_.hljs-keyword]:text-violet-300 [&_.ProseMirror_.hljs-literal]:text-orange-300 [&_.ProseMirror_.hljs-meta]:text-slate-400 [&_.ProseMirror_.hljs-number]:text-orange-300 [&_.ProseMirror_.hljs-params]:text-slate-200 [&_.ProseMirror_.hljs-string]:text-emerald-300 [&_.ProseMirror_.hljs-title]:text-amber-200 [&_.ProseMirror_.hljs-type]:text-cyan-200 [&_.ProseMirror_.hljs-variable]:text-sky-200 [&_.ProseMirror_blockquote]:mb-3 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-slate-300 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-slate-700 [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_pre]:mb-3 [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:bg-slate-950 [&_.ProseMirror_pre]:p-3 [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:leading-6 [&_.ProseMirror_pre]:text-slate-100 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
+        class="block min-h-64 p-4 [&_.ProseMirror]:min-h-56 [&_.ProseMirror]:break-words [&_.ProseMirror]:whitespace-pre-wrap [&_.ProseMirror]:outline-none [&_.ProseMirror_.hljs-attr]:text-sky-300 [&_.ProseMirror_.hljs-built_in]:text-cyan-300 [&_.ProseMirror_.hljs-comment]:text-slate-500 [&_.ProseMirror_.hljs-keyword]:text-violet-300 [&_.ProseMirror_.hljs-literal]:text-orange-300 [&_.ProseMirror_.hljs-meta]:text-slate-400 [&_.ProseMirror_.hljs-number]:text-orange-300 [&_.ProseMirror_.hljs-params]:text-slate-200 [&_.ProseMirror_.hljs-string]:text-emerald-300 [&_.ProseMirror_.hljs-title]:text-amber-200 [&_.ProseMirror_.hljs-type]:text-cyan-200 [&_.ProseMirror_.hljs-variable]:text-sky-200 [&_.ProseMirror_.qalma-find-match-active]:bg-orange-300 [&_.ProseMirror_.qalma-find-match]:bg-amber-200 [&_.ProseMirror_blockquote]:mb-3 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-slate-300 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-slate-700 [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-extrabold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h3]:mb-2.5 [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_li>p]:mb-1 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_pre]:mb-3 [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:bg-slate-950 [&_.ProseMirror_pre]:p-3 [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:leading-6 [&_.ProseMirror_pre]:text-slate-100 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6"
         (mouseover)="linkPopover.showPreview($event)"
         (mouseout)="linkPopover.scheduleHideFromEvent($event)"
         (focus)="
@@ -111,6 +119,66 @@ import { SandboxToolbar } from './sandbox-toolbar';
         <qalma-content />
       </div>
     </qalma-editor>
+
+    <section
+      class="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-slate-300 bg-white p-3"
+      aria-label="Find and replace"
+    >
+      <label class="grid gap-1 text-xs font-semibold text-slate-700">
+        Find
+        <input
+          #findInput
+          class="h-9 rounded border border-slate-300 px-2 text-sm"
+          type="search"
+          (input)="setFindQuery(findInput.value)"
+        />
+      </label>
+      <button
+        type="button"
+        class="h-9 rounded border border-slate-300 px-3 text-sm"
+        [disabled]="findReplace().total === 0"
+        (click)="editor.execute('findPrevious')"
+      >
+        Previous
+      </button>
+      <button
+        type="button"
+        class="h-9 rounded border border-slate-300 px-3 text-sm"
+        [disabled]="findReplace().total === 0"
+        (click)="editor.execute('findNext')"
+      >
+        Next
+      </button>
+      <label class="grid gap-1 text-xs font-semibold text-slate-700">
+        Replace
+        <input
+          #replacementInput
+          class="h-9 rounded border border-slate-300 px-2 text-sm"
+          type="text"
+        />
+      </label>
+      <button
+        type="button"
+        class="h-9 rounded border border-slate-300 px-3 text-sm"
+        [disabled]="findReplace().activeMatch === null"
+        (click)="editor.execute('replaceCurrent', replacementInput.value)"
+      >
+        Replace
+      </button>
+      <button
+        type="button"
+        class="h-9 rounded border border-slate-300 px-3 text-sm"
+        [disabled]="findReplace().total === 0"
+        (click)="editor.execute('replaceAll', replacementInput.value)"
+      >
+        Replace all
+      </button>
+      <p class="ml-auto text-xs text-slate-600" aria-live="polite">
+        {{ findReplace().activeMatch ?? 0 }}/{{ findReplace().total }} matches ·
+        {{ characterCount().characters }} characters ·
+        {{ characterCount().words }} words
+      </p>
+    </section>
 
     @if (slashCommandController.open()) {
       <qalma-slash-command-menu
@@ -162,6 +230,11 @@ export class SandboxEditor {
     viewChild.required<ElementRef<HTMLElement>>('mentionSurface');
   private readonly imageUpload =
     viewChild.required<ElementRef<HTMLInputElement>>('imageUpload');
+  private readonly fileHandlerPlugin = FileHandlerPlugin.configure({
+    allowedMimeTypes: ['image/*'],
+    onPaste: ({ files }) => this.insertImageFile(files[0]),
+    onDrop: ({ files }) => this.insertImageFile(files[0]),
+  });
 
   protected readonly editor = createQalmaEditor({
     content: `<h1><strong>Qalma</strong></h1><p style="text-align: center;">Build headless editing primitives with a plugin stack that remains fully selected by the consumer.</p><blockquote><p>Quote important passages without taking ownership away from the consuming app.</p></blockquote><img src="${SANDBOX_EXAMPLE_IMAGE_SRC}" alt="${SANDBOX_EXAMPLE_IMAGE_ALT}" title="${SANDBOX_EXAMPLE_IMAGE_TITLE}"><p>Use the toolbar to shape content without surrendering UI ownership: try <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <code>inline code</code>, <span data-qalma-monospace="">monospace labels</span>, <mark>highlight</mark>, <span style="color: rgb(14, 116, 144); background-color: rgb(254, 240, 138);">color</span>, formulas like H<sub>2</sub>O and E=mc<sup>2</sup>, <span data-qalma-mention data-mention-id="ada-lovelace" data-mention-label="Ada Lovelace" data-mention-trigger="@">@Ada Lovelace</span>, and <a href="https://angular.dev" target="_blank" rel="noopener noreferrer">links</a>.</p><pre><code class="language-typescript">import { createQalmaEditor } from "@qalma/editor";&#10;&#10;const editor = createQalmaEditor({&#10;  plugins: [CodeBlockPlugin],&#10;});&#10;&#10;editor.execute("setCodeBlockLanguage", "typescript");</code></pre><pre><code class="language-go">package main&#10;&#10;import "fmt"&#10;&#10;func main() {&#10;  fmt.Println("Qalma")&#10;}</code></pre><ul><li><p>Compose plugins in TypeScript.</p></li><li><p>Keep toolbar markup in the consuming app.</p></li></ul><ol><li><p>Pick capabilities for the current product surface.</p></li><li><p>Render controls with Angular templates and qalmaCommand.</p></li></ol><ul data-type="task-list"><li data-type="task-item" data-checked="true"><div data-task-item-content><p>Ship engine behavior from a plugin.</p></div></li><li data-type="task-item" data-checked="false"><div data-task-item-content><p>Style task checkboxes in the consuming app.</p></div></li></ul><p>Switch paragraphs into lists, nest items with Tab, and lift them back out with Shift+Tab.</p>`,
@@ -176,6 +249,11 @@ export class SandboxEditor {
       MonospacePlugin,
       DragHandlePlugin,
       SelectionPlugin,
+      CharacterCountPlugin.configure({
+        limit: 20_000,
+      }),
+      this.fileHandlerPlugin,
+      FindReplacePlugin,
       SubscriptSuperscriptPlugin,
       HighlightPlugin,
       ColorPlugin,
@@ -194,8 +272,12 @@ export class SandboxEditor {
         defaultLanguage: SANDBOX_DEFAULT_CODE_BLOCK_LANGUAGE,
       }),
       HardBreakPlugin,
+      HorizontalRulePlugin,
       ClearFormattingPlugin,
       TrailingParagraphPlugin,
+      UniqueIdPlugin.configure({
+        nodeTypes: ['horizontalRule'],
+      }),
       SandboxCodeHighlightPlugin,
       HistoryPlugin.configure({
         depth: 200,
@@ -213,6 +295,27 @@ export class SandboxEditor {
     this.editor,
   );
   private readonly imagePreviewUrls: string[] = [];
+  protected readonly characterCount = computed(
+    () =>
+      this.editor.query<CharacterCountState>('characterCount') ?? {
+        characters: 0,
+        words: 0,
+        limit: null,
+        remaining: null,
+        isOverLimit: false,
+      },
+  );
+  protected readonly findReplace = computed(
+    () =>
+      this.editor.query<FindReplaceState>('findReplace') ?? {
+        query: '',
+        caseSensitive: false,
+        wholeWord: false,
+        total: 0,
+        activeMatch: null,
+        current: null,
+      },
+  );
 
   constructor() {
     effect(() => {
@@ -320,16 +423,29 @@ export class SandboxEditor {
       return;
     }
 
-    const file = input.files?.item(0);
+    this.insertImageFile(input.files?.item(0));
+  }
 
-    if (!file || !file.type.startsWith('image/')) {
+  protected setFindQuery(query: string): void {
+    if (query === '') {
+      this.editor.execute('clearFind');
+
       return;
+    }
+
+    this.editor.execute('setFindQuery', query);
+  }
+
+  private insertImageFile(file: File | null | undefined): boolean {
+    if (!file || !file.type.startsWith('image/')) {
+      return false;
     }
 
     const previewSrc = URL.createObjectURL(file);
 
     this.imagePreviewUrls.push(previewSrc);
-    this.editor.execute('insertImage', {
+
+    return this.editor.execute('insertImage', {
       src: createUploadedImageSrc(file),
       alt: createImageAltText(file),
       title: file.name,

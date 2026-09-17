@@ -18,15 +18,15 @@ const editor = createQalmaEditor({
 
 ## Output formats
 
-| Format | Read | Write | Lossless | Best for |
-| ------ | ---- | ----- | -------- | -------- |
-| HTML | `html()` signal | `setHtml()` | Yes | Rendering, interop with existing HTML |
-| JSON | `getJSON()` | `setJSON()` | **Yes** | Persisting and restoring documents |
-| Markdown | `getMarkdown()` | — (input rules) | No | Exporting to Markdown, plain-text storage |
+| Format   | Read            | Write                                 | Lossless | Best for                              |
+| -------- | --------------- | ------------------------------------- | -------- | ------------------------------------- |
+| HTML     | `html()` signal | `setHtml()`                           | Yes      | Rendering, interop with existing HTML |
+| JSON     | `getJSON()`     | `setJSON()`                           | **Yes**  | Persisting and restoring documents    |
+| Markdown | `getMarkdown()` | `setMarkdown()` (optional entrypoint) | No       | Markdown interchange                  |
 
-JSON is ProseMirror's native document model and the recommended format to
-persist content. Markdown is output-only: typing Markdown syntax is handled by
-each plugin's [input rules](/docs/plugins), not by a Markdown parser.
+JSON is ProseMirror's native document model. For application storage, prefer
+the versioned envelope described below. Markdown import is optional so the
+parser never enters bundles that only export Markdown.
 
 ## Initial content
 
@@ -78,6 +78,29 @@ loadSavedDocument(html: string): void {
 Before the content surface is mounted, `setHtml()` updates only the signal.
 After mount, it rebuilds the editor state with the same schema, plugins, and
 base keymaps.
+
+### Content limits
+
+All import paths and live document transactions enforce configurable complexity
+limits. Defaults allow 1,000,000 HTML/Markdown characters, 50,000 JSON values
+or document nodes/marks, 100 levels of nesting, and 1,000,000 aggregate JSON or
+document text characters.
+
+```typescript
+const editor = createQalmaEditor({
+  contentLimits: {
+    maxHtmlLength: 250_000,
+    maxMarkdownLength: 250_000,
+    maxJsonNodes: 20_000,
+    maxJsonDepth: 50,
+    maxJsonTextLength: 250_000,
+  },
+});
+```
+
+Rejected content throws a `RangeError` before it replaces the current
+document. Lower the limits for short-form surfaces such as comments. See
+[Security](/docs/security) for the complete trust-boundary guidance.
 
 ## Saving content
 
@@ -132,6 +155,39 @@ Unlike HTML, JSON preserves every node attribute and mark exactly, so a
 `getJSON()` → `setJSON()` round-trip reproduces the document without loss.
 Prefer it over HTML when you control both the save and load sides.
 
+Raw JSON is still untrusted input. First-party plugins validate their persisted
+attributes during `setJSON()`, and custom plugins must provide equivalent
+`AttributeSpec.validate` rules.
+
+## Versioned document storage
+
+Raw JSON does not say which schema produced it. Use
+`getStoredDocument()`/`setStoredDocument()` for durable persistence:
+
+```typescript
+const editor = createQalmaEditor({
+  plugins: [HeadingsPlugin],
+  schemaVersion: 2,
+  migrations: [
+    {
+      fromVersion: 1,
+      toVersion: 2,
+      migrate: (document) => migrateLegacyHeadings(document),
+    },
+  ],
+});
+
+localStorage.setItem('qalma-draft', JSON.stringify(editor.getStoredDocument()));
+
+editor.setStoredDocument(JSON.parse(savedDraft));
+```
+
+The envelope records its format version, your `schemaVersion`, schema-owning
+plugin keys, and the lossless document JSON. Restoring rejects future schemas,
+missing schema plugins, malformed envelopes, and gaps in the migration chain.
+Migrations must advance exactly one version at a time. Keep `setJSON()` for raw
+ProseMirror interop or intentionally unversioned data.
+
 ## Markdown
 
 `getMarkdown()` serializes the document to Markdown
@@ -148,21 +204,33 @@ Marks and nodes that Markdown cannot express fall back to inline HTML — which
 CommonMark permits — so the output stays complete instead of silently dropping
 content:
 
-| Content | Markdown output |
-| ------- | --------------- |
-| Bold, italic, strikethrough | `**b**`, `*i*`, `~~s~~` |
-| Inline code, code block | `` `code` ``, fenced ` ``` ` with language |
-| Links, images | `[text](href)`, `![alt](src)` |
-| Headings, blockquote, lists, task lists, tables | `#`, `>`, `-`/`1.`, `- [x]`, GFM pipe table |
-| Underline | `&lt;u&gt;...&lt;/u&gt;` |
-| Monospace | `&lt;span data-qalma-monospace=""&gt;...&lt;/span&gt;` |
-| Subscript / superscript | `&lt;sub&gt;...&lt;/sub&gt;` / `&lt;sup&gt;...&lt;/sup&gt;` |
-| Text color / highlight | `&lt;span style&gt;` / `&lt;mark&gt;` |
-| Mention | the mention label as plain text |
+| Content                                         | Markdown output                                             |
+| ----------------------------------------------- | ----------------------------------------------------------- |
+| Bold, italic, strikethrough                     | `**b**`, `*i*`, `~~s~~`                                     |
+| Inline code, code block                         | `` `code` ``, fenced ` ``` ` with language                  |
+| Links, images                                   | `[text](href)`, `![alt](src)`                               |
+| Headings, blockquote, lists, task lists, tables | `#`, `>`, `-`/`1.`, `- [x]`, GFM pipe table                 |
+| Underline                                       | `&lt;u&gt;...&lt;/u&gt;`                                    |
+| Monospace                                       | `&lt;span data-qalma-monospace=""&gt;...&lt;/span&gt;`      |
+| Subscript / superscript                         | `&lt;sub&gt;...&lt;/sub&gt;` / `&lt;sup&gt;...&lt;/sup&gt;` |
+| Text color / highlight                          | `&lt;span style&gt;` / `&lt;mark&gt;`                       |
+| Mention                                         | the mention label as plain text                             |
 
-Markdown is **output-only**. To restore content, persist
-[JSON](#json) instead; to let users *type* Markdown shortcuts, rely on each
-plugin's input rules.
+To import Markdown, opt into the secondary entrypoint:
+
+```typescript
+import { MarkdownPlugin } from '@qalma/editor/markdown';
+
+const editor = createQalmaEditor({
+  plugins: [MarkdownPlugin, HeadingsPlugin, ...TextFormattingKit],
+});
+
+editor.setMarkdown('# Imported\n\n**Bold** text');
+```
+
+The generated HTML is parsed through the plugins you selected, so unsupported
+Markdown structures normalize to that schema. To let users _type_ Markdown
+shortcuts, use each feature plugin's input rules instead.
 
 ## Plugin-owned serialization
 

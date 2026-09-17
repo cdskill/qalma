@@ -15,19 +15,32 @@ import { resolve } from 'node:path';
 const QALMA_LOCAL_DIST = process.env.QALMA_LOCAL_DIST
   ? resolve(process.env.QALMA_LOCAL_DIST)
   : null;
+const QALMA_KIT_LOCAL_DIST = process.env.QALMA_KIT_LOCAL_DIST
+  ? resolve(process.env.QALMA_KIT_LOCAL_DIST)
+  : null;
 const QALMA_VERSION = process.env.QALMA_VERSION ?? null;
 
-const FRAMEWORK_EXTERNALS = [
-  '@angular/*',
-  'rxjs',
-  'rxjs/*',
-  'zone.js',
-];
+const FRAMEWORK_EXTERNALS = ['@angular/*', 'rxjs', 'rxjs/*', 'zone.js'];
 
 const TARGETS = [
-  { id: 'qalma', label: '@qalma/editor', pkg: '@qalma/editor', engine: 'ProseMirror' },
-  { id: 'ngx-editor', label: 'ngx-editor', pkg: 'ngx-editor', engine: 'ProseMirror' },
-  { id: 'tiptap', label: 'Tiptap (ngx-tiptap)', pkg: '@tiptap/core', engine: 'ProseMirror' },
+  {
+    id: 'qalma',
+    label: '@qalma/editor',
+    pkg: '@qalma/editor',
+    engine: 'ProseMirror',
+  },
+  {
+    id: 'ngx-editor',
+    label: 'ngx-editor',
+    pkg: 'ngx-editor',
+    engine: 'ProseMirror',
+  },
+  {
+    id: 'tiptap',
+    label: 'Tiptap (ngx-tiptap)',
+    pkg: '@tiptap/core',
+    engine: 'ProseMirror',
+  },
   { id: 'quill', label: 'Quill (ngx-quill)', pkg: 'quill', engine: 'Quill' },
 ];
 
@@ -41,30 +54,54 @@ function version(pkg) {
       .version;
   }
 
+  if (pkg === '@qalma/kit' && QALMA_KIT_LOCAL_DIST) {
+    return JSON.parse(
+      readFileSync(`${QALMA_KIT_LOCAL_DIST}/package.json`, 'utf8'),
+    ).version;
+  }
+
   try {
-    return JSON.parse(readFileSync(`node_modules/${pkg}/package.json`, 'utf8')).version;
+    return JSON.parse(readFileSync(`node_modules/${pkg}/package.json`, 'utf8'))
+      .version;
   } catch {
     return '?';
   }
 }
 
-function qalmaLocalPlugin() {
-  if (!QALMA_LOCAL_DIST) {
+function qalmaLocalPlugin(target) {
+  if (!QALMA_LOCAL_DIST && !QALMA_KIT_LOCAL_DIST) {
     return null;
   }
 
   return {
     name: 'qalma-local-dist',
     setup(build) {
-      build.onResolve({ filter: /^@qalma\/editor$/ }, () => ({
-        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor.mjs`,
-      }));
-      build.onResolve({ filter: /^@qalma\/editor\/forms$/ }, () => ({
-        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-forms.mjs`,
-      }));
-      build.onResolve({ filter: /^@qalma\/editor\/table$/ }, () => ({
-        path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-table.mjs`,
-      }));
+      if (QALMA_LOCAL_DIST && !target.external?.includes('@qalma/editor')) {
+        build.onResolve({ filter: /^@qalma\/editor$/ }, () => ({
+          path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor.mjs`,
+        }));
+        build.onResolve({ filter: /^@qalma\/editor\/forms$/ }, () => ({
+          path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-forms.mjs`,
+        }));
+        build.onResolve({ filter: /^@qalma\/editor\/essentials$/ }, () => ({
+          path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-essentials.mjs`,
+        }));
+        build.onResolve({ filter: /^@qalma\/editor\/markdown$/ }, () => ({
+          path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-markdown.mjs`,
+        }));
+        build.onResolve({ filter: /^@qalma\/editor\/table$/ }, () => ({
+          path: `${QALMA_LOCAL_DIST}/fesm2022/qalma-editor-table.mjs`,
+        }));
+      }
+
+      if (QALMA_KIT_LOCAL_DIST) {
+        build.onResolve({ filter: /^@qalma\/kit$/ }, () => ({
+          path: `${QALMA_KIT_LOCAL_DIST}/fesm2022/qalma-kit.mjs`,
+        }));
+        build.onResolve({ filter: /^@qalma\/kit\/headless$/ }, () => ({
+          path: `${QALMA_KIT_LOCAL_DIST}/fesm2022/qalma-kit-headless.mjs`,
+        }));
+      }
     },
   };
 }
@@ -79,8 +116,8 @@ async function measure(target) {
     platform: 'browser',
     target: 'es2022',
     legalComments: 'none',
-    external: FRAMEWORK_EXTERNALS,
-    plugins: [qalmaLocalPlugin()].filter(Boolean),
+    external: [...FRAMEWORK_EXTERNALS, ...(target.external ?? [])],
+    plugins: [qalmaLocalPlugin(target)].filter(Boolean),
     write: false,
     logLevel: 'silent',
   });
@@ -122,8 +159,28 @@ const pmBaseline = await measure({
   engine: 'ProseMirror',
 });
 
-console.log('\nStandard editor — tree-shaken & minified payload (Angular excluded)\n');
-const header = ['Editor', 'Engine', 'Version', 'Minified', 'Gzip', 'Brotli', 'vs lightest'];
+// Optional styled UI layer. The editor is external because this number answers
+// "what does @qalma/kit add on top of an existing Qalma editor?"
+const qalmaKit = await measure({
+  id: 'qalma-kit',
+  label: '@qalma/kit (styled surface)',
+  pkg: '@qalma/kit',
+  engine: 'Qalma UI',
+  external: ['@qalma/editor'],
+});
+
+console.log(
+  '\nStandard editor — tree-shaken & minified payload (Angular excluded)\n',
+);
+const header = [
+  'Editor',
+  'Engine',
+  'Version',
+  'Minified',
+  'Gzip',
+  'Brotli',
+  'vs lightest',
+];
 const table = rows.map((r) => [
   r.label,
   r.engine,
@@ -131,7 +188,9 @@ const table = rows.map((r) => [
   `${kb(r.raw)} KB`,
   `${kb(r.gzip)} KB`,
   `${kb(r.brotli)} KB`,
-  r === baseline ? '—' : `+${Math.round(((r.gzip - baseline.gzip) / baseline.gzip) * 100)}%`,
+  r === baseline
+    ? '—'
+    : `+${Math.round(((r.gzip - baseline.gzip) / baseline.gzip) * 100)}%`,
 ]);
 
 const widths = header.map((h, i) =>
@@ -143,12 +202,14 @@ console.log(widths.map((w) => '-'.repeat(w)).join('  '));
 table.forEach((row) => console.log(fmt(row)));
 
 const qalmaStd = rows.find((r) => r.id === 'qalma');
-const pmEngine = pmBaseline.engine === 'ProseMirror' ? pmBaseline : null;
 console.log(
   `\nProseMirror engine floor (shared by all PM editors): ${kb(pmBaseline.gzip)} KB gzip` +
     `\nQalma toolkit overhead on top of the engine: ${kb(qalmaStd.gzip - pmBaseline.gzip)} KB gzip` +
     `\nTiptap toolkit overhead on top of the engine: ${kb(rows.find((r) => r.id === 'tiptap').gzip - pmBaseline.gzip)} KB gzip` +
     `\nQalma minimal vs standard: ${kb(qalmaMin.gzip)} KB → ${kb(qalmaStd.gzip)} KB (plugins add little over the engine).`,
+);
+console.log(
+  `\nOptional @qalma/kit styled surface (editor excluded): ${kb(qalmaKit.gzip)} KB gzip`,
 );
 
 const out = {
@@ -157,6 +218,7 @@ const out = {
   note: 'Gzip/brotli of an esbuild-bundled, tree-shaken, minified standard editor. Angular + rxjs marked external.',
   standard: rows,
   qalmaMinimal: qalmaMin,
+  qalmaKit,
   prosemirrorBaseline: pmBaseline,
 };
 writeFileSync('results.json', JSON.stringify(out, null, 2) + '\n');

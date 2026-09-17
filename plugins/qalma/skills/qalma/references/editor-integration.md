@@ -52,11 +52,31 @@ Common controller members:
 - `canExecute(command, value?)` checks whether a command can currently run.
 - `isCommandActive(command)` reports toggle state for UI.
 - `query<T>(name)` reads plugin-provided state.
-- `setHtml(html)`, `getJSON()`, `setJSON(doc)`, `getMarkdown()`,
+- `setHtml(html)`, `getJSON()`, `setJSON(doc)`, `getStoredDocument()`,
+  `setStoredDocument(doc)`, `getMarkdown()`, `setMarkdown(markdown)`,
   `setEditable(editable)`, and `focus()` cover common app integration needs.
 
-Prefer JSON for lossless persistence when the app controls storage. Use HTML for
-rendering and interop with existing HTML content. Markdown is an export format.
+Prefer the versioned stored-document envelope for durable persistence. Use raw
+JSON for lossless ProseMirror interop and HTML for rendering/interchange.
+Markdown export is built in; Markdown import requires `MarkdownPlugin` from the
+optional `@qalma/editor/markdown` entrypoint. Set `schemaVersion` and a complete
+one-version-at-a-time `migrations` chain when the persisted schema evolves.
+Use `contentLimits` to set product-appropriate ceilings for HTML, Markdown,
+JSON values/depth/text, and the live ProseMirror document.
+
+## Security Boundary
+
+- Treat HTML, Markdown, JSON, stored documents, paste/drop metadata, uploads,
+  migrations, AI output, and collaboration messages as untrusted.
+- Keep Angular's normal sanitizer when rendering `editor.html()` outside
+  `<qalma-content>`; never use `bypassSecurityTrustHtml()` for user content.
+- MIME filters are not file validation. Enforce size, magic-byte, decoded
+  resource, malware, filename, authorization, and storage checks server-side.
+- Remote images make browser requests. Proxy them or restrict `img-src` when
+  document authors are untrusted.
+- Custom plugins are trusted code. Every persisted attribute needs
+  `AttributeSpec.validate`; `toDOM()` must build a fresh allowlisted attribute
+  object and must not merge attacker-controlled objects.
 
 ## UI Composition
 
@@ -138,6 +158,10 @@ Most capabilities ship in two public shapes:
 
 Prefer the kit for a feature's default experience; reach for the individual
 plugin when you need fine-grained selection or custom configuration.
+`EssentialsKit` from `@qalma/editor/essentials` is a practical readonly
+article-editor baseline; spread it only when its full schema matches the
+product. The secondary entrypoint prevents the broad composite from retaining
+plugins in consumers that do not import it.
 
 ## First-Party Plugin Selection
 
@@ -153,7 +177,8 @@ Select only the capabilities the user needs. Common public plugins include:
   `CodeBlockPlugin`, `TablePlugin` from `@qalma/editor/table`.
 - Productivity and interaction: `HistoryPlugin`, `PasteRulesPlugin`,
   `PlaceholderPlugin`, `SelectionPlugin`, `SlashCommandPlugin`,
-  `DragHandlePlugin`, `TextAlignPlugin`.
+  `DragHandlePlugin`, `TextAlignPlugin`, `CharacterCountPlugin`,
+  `FileHandlerPlugin`, `FindReplacePlugin`, `UniqueIdPlugin`.
 
 If the exact options or commands matter, inspect the installed package types or
 the current docs before coding.

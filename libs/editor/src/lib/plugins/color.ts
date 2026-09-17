@@ -60,8 +60,14 @@ type TextStyleAttributeName = keyof TextStyleAttrs;
 function createTextStyleMark(): MarkSpec {
   return {
     attrs: {
-      color: { default: null },
-      backgroundColor: { default: null },
+      color: {
+        default: null,
+        validate: (value) => assertCssColorAttribute(value, 'color'),
+      },
+      backgroundColor: {
+        default: null,
+        validate: (value) => assertCssColorAttribute(value, 'background-color'),
+      },
     },
     parseDOM: [
       {
@@ -81,10 +87,7 @@ function createTextStyleMark(): MarkSpec {
             return false;
           }
 
-          const color = normalizeCssColor(
-            node.getAttribute('color'),
-            'color',
-          );
+          const color = normalizeCssColor(node.getAttribute('color'), 'color');
 
           return color ? { color, backgroundColor: null } : false;
         },
@@ -292,7 +295,7 @@ function normalizeCssColor(
 
   const color = value.trim();
 
-  if (!color || /[;{}<>]/.test(color)) {
+  if (!color || /[;{}<>"']/.test(color)) {
     return null;
   }
 
@@ -305,6 +308,15 @@ function normalizeCssColor(
   element.style.setProperty(cssPropertyName, color);
 
   return element.style.getPropertyValue(cssPropertyName) || null;
+}
+
+function assertCssColorAttribute(
+  value: unknown,
+  cssPropertyName: 'color' | 'background-color',
+): void {
+  if (value !== null && !normalizeCssColor(value, cssPropertyName)) {
+    throw new RangeError(`Invalid ${cssPropertyName} color.`);
+  }
 }
 
 function getCssPropertyName(

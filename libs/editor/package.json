@@ -35,8 +35,8 @@
     "tag": "latest"
   },
   "peerDependencies": {
-    "@angular/core": ">=21.0.0 <22.0.0",
-    "@angular/forms": ">=21.0.0 <22.0.0"
+    "@angular/core": ">=21.0.0 <23.0.0",
+    "@angular/forms": ">=21.0.0 <23.0.0"
   },
   "peerDependenciesMeta": {
     "@angular/forms": {
@@ -44,6 +44,7 @@
     }
   },
   "dependencies": {
+    "marked": "^15.0.7",
     "prosemirror-commands": "^1.7.1",
     "prosemirror-history": "^1.5.0",
     "prosemirror-inputrules": "^1.5.1",

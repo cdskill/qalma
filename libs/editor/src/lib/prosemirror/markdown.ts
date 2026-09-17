@@ -19,9 +19,12 @@ import {
   MarkdownSerializerState,
   backticksFor,
 } from './markdown-serializer';
+import { normalizeQalmaUrl } from './url';
 
 /** Code-block language sentinel meaning "no language" — never emitted. */
 const PLAINTEXT_LANGUAGE = 'plaintext';
+const MARKDOWN_LINK_PROTOCOLS = ['http', 'https', 'mailto', 'tel'] as const;
+const MARKDOWN_IMAGE_PROTOCOLS = ['http', 'https'] as const;
 
 const nodes: MarkdownNodeSerializerMap = {
   paragraph(state, node) {
@@ -47,7 +50,7 @@ const nodes: MarkdownNodeSerializerMap = {
     // Pick a fence longer than any backtick run inside the block.
     const backticks = node.textContent.match(/`{3,}/gm);
     const fence = backticks ? backticks.sort().slice(-1)[0] + '`' : '```';
-    const language = String(node.attrs['language'] ?? '');
+    const language = safeMarkdownLanguage(node.attrs['language']);
     const info = language && language !== PLAINTEXT_LANGUAGE ? language : '';
 
     state.write(fence + info + '\n');
@@ -96,13 +99,22 @@ const nodes: MarkdownNodeSerializerMap = {
   },
 
   image(state, node) {
-    const src = String(node.attrs['src'] ?? '').replace(/[()]/g, '\\$&');
+    const src = safeMarkdownDestination(
+      node.attrs['src'],
+      MARKDOWN_IMAGE_PROTOCOLS,
+    );
     const alt = state.esc(String(node.attrs['alt'] ?? ''));
-    const title = node.attrs['title']
-      ? ` "${String(node.attrs['title']).replace(/"/g, '\\"')}"`
-      : '';
+    const title = escapeMarkdownTitle(node.attrs['title']);
 
-    state.write(`![${alt}](${src}${title})`);
+    if (!src) {
+      state.text(String(node.attrs['alt'] ?? ''));
+
+      return;
+    }
+
+    state.write(
+      `![${alt}](${escapeMarkdownDestination(src)}${title ? ` "${title}"` : ''})`,
+    );
   },
 
   hardBreak(state, node, parent, index) {
@@ -122,19 +134,39 @@ const nodes: MarkdownNodeSerializerMap = {
 };
 
 const marks: MarkdownMarkSerializerMap = {
-  strong: { open: '**', close: '**', mixable: true, expelEnclosingWhitespace: true },
+  strong: {
+    open: '**',
+    close: '**',
+    mixable: true,
+    expelEnclosingWhitespace: true,
+  },
   em: { open: '*', close: '*', mixable: true, expelEnclosingWhitespace: true },
-  strike: { open: '~~', close: '~~', mixable: true, expelEnclosingWhitespace: true },
+  strike: {
+    open: '~~',
+    close: '~~',
+    mixable: true,
+    expelEnclosingWhitespace: true,
+  },
   code: {
-    open: (_state, _mark, parent, index) => backticksFor(parent.child(index), -1),
+    open: (_state, _mark, parent, index) =>
+      backticksFor(parent.child(index), -1),
     close: (_state, _mark, parent, index) =>
       backticksFor(parent.child(index - 1), 1),
     escape: false,
   },
   link: {
-    open: '[',
-    close: (_state, mark) =>
-      '](' + String(mark.attrs['href']).replace(/[()"]/g, '\\$&') + ')',
+    open: (_state, mark) =>
+      safeMarkdownDestination(mark.attrs['href'], MARKDOWN_LINK_PROTOCOLS)
+        ? '['
+        : '',
+    close: (_state, mark) => {
+      const href = safeMarkdownDestination(
+        mark.attrs['href'],
+        MARKDOWN_LINK_PROTOCOLS,
+      );
+
+      return href ? `](${escapeMarkdownDestination(href)})` : '';
+    },
   },
   // Marks below have no CommonMark/GFM syntax: fall back to inline HTML.
   underline: { open: '<u>', close: '</u>' },
@@ -145,10 +177,13 @@ const marks: MarkdownMarkSerializerMap = {
   subscript: { open: '<sub>', close: '</sub>' },
   superscript: { open: '<sup>', close: '</sup>' },
   highlight: {
-    open: (_state, mark) =>
-      mark.attrs['color']
-        ? `<mark style="background-color: ${String(mark.attrs['color'])}">`
-        : '<mark>',
+    open: (_state, mark) => {
+      const color = safeCssColor(mark.attrs['color']);
+
+      return color
+        ? `<mark style="background-color: ${escapeHtmlAttribute(color)}">`
+        : '<mark>';
+    },
     close: '</mark>',
   },
   textStyle: {
@@ -163,16 +198,76 @@ const marks: MarkdownMarkSerializerMap = {
 
 function textStyleToCss(mark: Mark): string {
   const declarations: string[] = [];
+  const color = safeCssColor(mark.attrs['color']);
+  const backgroundColor = safeCssColor(mark.attrs['backgroundColor']);
 
-  if (mark.attrs['color']) {
-    declarations.push(`color: ${String(mark.attrs['color'])}`);
+  if (color) {
+    declarations.push(`color: ${escapeHtmlAttribute(color)}`);
   }
 
-  if (mark.attrs['backgroundColor']) {
-    declarations.push(`background-color: ${String(mark.attrs['backgroundColor'])}`);
+  if (backgroundColor) {
+    declarations.push(
+      `background-color: ${escapeHtmlAttribute(backgroundColor)}`,
+    );
   }
 
   return declarations.join('; ');
+}
+
+function safeMarkdownLanguage(value: unknown): string {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return /^[a-z][a-z0-9-]*$/.test(value) ? value : '';
+}
+
+function safeMarkdownDestination(
+  value: unknown,
+  allowedProtocols: readonly string[],
+): string | null {
+  return normalizeQalmaUrl(value, {
+    allowedProtocols,
+    allowRelative: true,
+  });
+}
+
+function escapeMarkdownDestination(value: string): string {
+  return value.replace(/\\/g, '%5C').replace(/[()"]/g, '\\$&');
+}
+
+function escapeMarkdownTitle(value: unknown): string | null {
+  if (typeof value !== 'string' || hasAsciiControlCharacters(value)) {
+    return null;
+  }
+
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function hasAsciiControlCharacters(value: string): boolean {
+  return Array.from(value).some((character) => {
+    const code = character.charCodeAt(0);
+
+    return code <= 0x1f || code === 0x7f;
+  });
+}
+
+function safeCssColor(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const color = value.trim();
+
+  return color && !/[;{}<>"']/.test(color) ? color : null;
+}
+
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 /**
@@ -180,7 +275,10 @@ function textStyleToCss(mark: Mark): string {
  * GFM cells are single-line, so each cell's content is flattened to inline
  * text (block breaks collapse to spaces, pipes are escaped).
  */
-function renderTable(state: MarkdownSerializerState, node: ProseMirrorNode): void {
+function renderTable(
+  state: MarkdownSerializerState,
+  node: ProseMirrorNode,
+): void {
   const rows: ProseMirrorNode[] = [];
 
   node.forEach((row) => {
@@ -193,7 +291,10 @@ function renderTable(state: MarkdownSerializerState, node: ProseMirrorNode): voi
     return;
   }
 
-  const columnCount = rows.reduce((max, row) => Math.max(max, row.childCount), 1);
+  const columnCount = rows.reduce(
+    (max, row) => Math.max(max, row.childCount),
+    1,
+  );
   const renderRow = (row: ProseMirrorNode): string => {
     const cells: string[] = [];
 
@@ -228,7 +329,10 @@ function serializeCell(
 
   inner.renderContent(cell);
 
-  return inner.out.trim().replace(/\r?\n+/g, ' ').replace(/\|/g, '\\|');
+  return inner.out
+    .trim()
+    .replace(/\r?\n+/g, ' ')
+    .replace(/\|/g, '\\|');
 }
 
 export function createQalmaMarkdownSerializer(): MarkdownSerializer {

@@ -15,6 +15,8 @@ import {
   SubscriptSuperscriptPlugin,
   TaskListPlugin,
   TextFormattingKit,
+  createQalmaEditor,
+  createQalmaPlugin,
 } from '../../index';
 import { TablePlugin } from '@qalma/editor/table';
 import { mountEditor } from '../../../testing/editor-test-utils';
@@ -74,7 +76,9 @@ describe('Markdown serialization', () => {
   it('serializes headings with the matching number of hashes', () => {
     expect(markdownOf('<h1>One</h1>', [HeadingsPlugin]).trim()).toBe('# One');
     expect(
-      markdownOf('<h3>Three</h3>', [HeadingsPlugin.configure({ levels: [1, 2, 3] })]).trim(),
+      markdownOf('<h3>Three</h3>', [
+        HeadingsPlugin.configure({ levels: [1, 2, 3] }),
+      ]).trim(),
     ).toBe('### Three');
   });
 
@@ -91,13 +95,48 @@ describe('Markdown serialization', () => {
 
   it('serializes links', () => {
     expect(
-      markdownOf('<p><a href="https://qalma.dev">Qalma</a></p>', [LinkPlugin]).trim(),
+      markdownOf('<p><a href="https://qalma.dev">Qalma</a></p>', [
+        LinkPlugin,
+      ]).trim(),
     ).toBe('[Qalma](https://qalma.dev)');
+  });
+
+  it('emits non-allowlisted link destinations as plain text even for custom schemas', () => {
+    const unsafeFixture = createQalmaPlugin({
+      key: 'unsafe-link-fixture',
+      marks: {
+        link: {
+          attrs: { href: {} },
+          toDOM: (mark) => ['a', { href: mark.attrs['href'] }, 0],
+        },
+      },
+    });
+    const editor = createQalmaEditor({ plugins: [unsafeFixture] });
+
+    editor.setJSON({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: 'unsafe',
+              marks: [{ type: 'link', attrs: { href: 'custom-handler:run' } }],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(editor.getMarkdown()).toBe('unsafe');
   });
 
   it('serializes blockquotes', () => {
     expect(
-      markdownOf('<blockquote><p>quoted</p></blockquote>', [BlockquotePlugin]).trim(),
+      markdownOf('<blockquote><p>quoted</p></blockquote>', [
+        BlockquotePlugin,
+      ]).trim(),
     ).toBe('> quoted');
   });
 
@@ -135,12 +174,16 @@ describe('Markdown serialization', () => {
 
   it('serializes horizontal rules and hard breaks', () => {
     expect(markdownOf('<hr>', [HorizontalRulePlugin]).trim()).toBe('---');
-    expect(markdownOf('<p>a<br>b</p>', [HardBreakPlugin]).trim()).toBe('a\\\nb');
+    expect(markdownOf('<p>a<br>b</p>', [HardBreakPlugin]).trim()).toBe(
+      'a\\\nb',
+    );
   });
 
   it('serializes images', () => {
     expect(
-      markdownOf('<p><img src="a.png" alt="Alt text"></p>', [ImagePlugin]).trim(),
+      markdownOf('<p><img src="a.png" alt="Alt text"></p>', [
+        ImagePlugin,
+      ]).trim(),
     ).toBe('![Alt text](a.png)');
   });
 
@@ -162,10 +205,9 @@ describe('Markdown serialization', () => {
         markdownOf('<p><u>under</u></p>', [...TextFormattingKit]).trim(),
       ).toBe('<u>under</u>');
       expect(
-        markdownOf(
-          '<p><span data-qalma-monospace="">token</span></p>',
-          [MonospacePlugin],
-        ).trim(),
+        markdownOf('<p><span data-qalma-monospace="">token</span></p>', [
+          MonospacePlugin,
+        ]).trim(),
       ).toBe('<span data-qalma-monospace="">token</span>');
       expect(
         markdownOf('<p><sub>lo</sub><sup>hi</sup></p>', [

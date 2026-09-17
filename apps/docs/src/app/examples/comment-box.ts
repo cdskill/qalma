@@ -8,7 +8,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   HardBreakPlugin,
   HistoryPlugin,
@@ -55,7 +54,7 @@ interface PostedComment {
   readonly id: number;
   readonly author: CommentAuthor;
   readonly time: string;
-  readonly body: SafeHtml;
+  readonly body: string;
 }
 
 /** Teammates the @-menu suggests — drives the mention plugin in this demo. */
@@ -159,7 +158,9 @@ const SEED_COMMENTS: readonly {
             </span>
             <div class="min-w-0">
               <div class="flex items-baseline gap-2">
-                <span class="text-sm font-medium">{{ comment.author.name }}</span>
+                <span class="text-sm font-medium">{{
+                  comment.author.name
+                }}</span>
                 <span class="text-xs text-muted-foreground">{{
                   comment.time
                 }}</span>
@@ -181,8 +182,16 @@ const SEED_COMMENTS: readonly {
           <qalma-toolbar
             class="flex items-center gap-0.5 border-b border-border px-1.5 py-1.5"
           >
-            <button [class]="btnClass" qalmaCommand="toggleBold" aria-label="Bold">
-              <ng-icon [class]="iconClass" name="lucideBold" aria-hidden="true" />
+            <button
+              [class]="btnClass"
+              qalmaCommand="toggleBold"
+              aria-label="Bold"
+            >
+              <ng-icon
+                [class]="iconClass"
+                name="lucideBold"
+                aria-hidden="true"
+              />
             </button>
             <button
               [class]="btnClass"
@@ -200,14 +209,22 @@ const SEED_COMMENTS: readonly {
               qalmaCommand="toggleInlineCode"
               aria-label="Inline code"
             >
-              <ng-icon [class]="iconClass" name="lucideCode" aria-hidden="true" />
+              <ng-icon
+                [class]="iconClass"
+                name="lucideCode"
+                aria-hidden="true"
+              />
             </button>
             <button
               [class]="btnClass"
               qalmaCommand="toggleBulletList"
               aria-label="Bullet list"
             >
-              <ng-icon [class]="iconClass" name="lucideList" aria-hidden="true" />
+              <ng-icon
+                [class]="iconClass"
+                name="lucideList"
+                aria-hidden="true"
+              />
             </button>
             <span
               class="mx-0.5 h-5 w-px shrink-0 self-center bg-border"
@@ -222,7 +239,11 @@ const SEED_COMMENTS: readonly {
               (click)="linkPopover.showToolbarEditor($event)"
               aria-label="Link"
             >
-              <ng-icon [class]="iconClass" name="lucideLink" aria-hidden="true" />
+              <ng-icon
+                [class]="iconClass"
+                name="lucideLink"
+                aria-hidden="true"
+              />
             </button>
           </qalma-toolbar>
 
@@ -230,7 +251,9 @@ const SEED_COMMENTS: readonly {
             #surface
             class="block max-h-56 overflow-y-auto px-3 py-2.5 text-sm [&_.ProseMirror]:min-h-[3.5rem] [&_.ProseMirror]:break-words [&_.ProseMirror]:outline-none"
             (keydown)="onKeydown($event)"
-            (focus)="linkPopover.showPreview($event); mentionController.refresh()"
+            (focus)="
+              linkPopover.showPreview($event); mentionController.refresh()
+            "
             (blur)="linkPopover.scheduleHideFromEvent($event)"
             (focusin)="linkPopover.showPreview($event)"
             (focusout)="linkPopover.scheduleHideFromEvent($event)"
@@ -284,7 +307,6 @@ const SEED_COMMENTS: readonly {
 })
 export class CommentBox {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly posthogService = inject(PosthogService);
 
   // `#surface` sits on <qalma-content>, so without `read` the query resolves to
@@ -320,7 +342,7 @@ export class CommentBox {
       id: index,
       author: comment.author,
       time: comment.time,
-      body: this.trust(comment.html),
+      body: comment.html,
     })),
   );
 
@@ -374,7 +396,7 @@ export class CommentBox {
         id: this.nextId++,
         author: { name: 'You', initials: 'YO' },
         time: 'just now',
-        body: this.trust(html),
+        body: html,
       },
     ]);
 
@@ -385,13 +407,6 @@ export class CommentBox {
 
   protected onMentionPick(option: QalmaMentionOption): void {
     this.mentionController.insert(option);
-  }
-
-  // The editor only serializes nodes/marks its schema allows — no scripts can
-  // reach this HTML — so trusting it is safe and keeps mention pills + marks
-  // rendering exactly as authored (Angular's sanitizer would strip data-* here).
-  private trust(html: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
 

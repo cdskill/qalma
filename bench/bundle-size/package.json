@@ -5,11 +5,12 @@
   "type": "module",
   "description": "Reproducible bundle-size benchmark: tree-shaken, minified, gzipped payload that each Angular rich-text editor adds to an app bundle (Angular itself excluded).",
   "scripts": {
-    "bench": "cd ../.. && pnpm nx build editor && cd bench/bundle-size && QALMA_LOCAL_DIST=../../dist/libs/editor QALMA_VERSION=0.1.0-beta.2 node build.mjs",
+    "bench": "cd ../.. && pnpm nx run-many -t build -p editor ui-kit && cd bench/bundle-size && QALMA_LOCAL_DIST=../../dist/libs/editor QALMA_KIT_LOCAL_DIST=../../dist/libs/ui-kit node build.mjs",
     "bench:published": "node build.mjs"
   },
   "dependencies": {
-    "@qalma/editor": "0.0.1-alpha.5",
+    "@qalma/editor": "0.5.0",
+    "@qalma/kit": "0.5.0",
     "@tiptap/core": "3.26.1",
     "@tiptap/pm": "3.26.1",
     "@tiptap/starter-kit": "3.26.1",

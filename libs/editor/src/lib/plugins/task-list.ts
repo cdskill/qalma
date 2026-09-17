@@ -27,7 +27,7 @@ const taskListNode: NodeSpec = {
 
 const taskItemNode: NodeSpec = {
   attrs: {
-    checked: { default: false },
+    checked: { default: false, validate: 'boolean' },
   },
   content: 'paragraph block*',
   defining: true,

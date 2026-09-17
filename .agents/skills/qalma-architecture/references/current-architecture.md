@@ -5,6 +5,9 @@
 - `libs/editor`: the current headless editor library and intentional public API.
 - `libs/editor/src/lib/editor`: Angular primitives and the editor controller.
 - `libs/editor/src/lib/plugins`: first-party plugin contracts and plugins.
+- `libs/editor/markdown`: optional Markdown parser secondary entrypoint.
+- `libs/editor/essentials`: broad kit secondary entrypoint, isolated so its
+  composite imports do not defeat main-entrypoint tree-shaking.
 - `libs/editor/src/lib/prosemirror`: internal ProseMirror integration helpers.
 - `libs/editor/src/index.ts`: public package barrel.
 - `apps/sandbox`: real consumer, playground, and executable documentation.
@@ -15,8 +18,8 @@
 1. A consumer calls `createQalmaEditor()` with content, editor options, and a
    plugin array.
 2. `QalmaEditorController` combines plugin contributions into one schema, command
-   registry, command-state registry, query registry, and ProseMirror editor
-   state.
+   registry, command-state registry, query registry, content-parser registry,
+   and ProseMirror editor state.
 3. `<qalma-editor [editor]="editor">` provides the controller to projected
    descendants.
 4. `<qalma-content />` mounts and destroys the ProseMirror `EditorView`.
@@ -31,9 +34,16 @@ The public barrel intentionally exposes:
 
 - Editor primitives and `createQalmaEditor`.
 - The `QalmaPlugin` and configurable-plugin contracts.
-- First-party text-formatting plugins and `TextFormattingKit`.
+- First-party plugins and focused kits, plus `EssentialsKit` from the optional
+  `@qalma/editor/essentials` entrypoint.
 - The configurable `LinkPlugin` and its Qalma-owned state/options.
 - The configurable `HistoryPlugin` and its Qalma-owned options/defaults.
+- Lossless raw JSON plus the versioned `QalmaStoredDocument` persistence
+  envelope and schema migrations.
+- Configurable `QalmaContentLimits` enforced on imports and live document
+  transactions.
+- Markdown export in the main entrypoint and opt-in Markdown import from
+  `@qalma/editor/markdown`.
 
 Keep helpers under `lib/prosemirror` private unless a consumer use case requires
 an explicit escape hatch.
@@ -48,12 +58,18 @@ A `QalmaPlugin` has a unique `key` and can contribute:
 - `commands(schema)`
 - `commandStates(schema)`
 - `queries(schema)`
+- `contentParsers`
 - `shortcuts(schema)`
 - `prosemirrorPlugins(schema)`
 
 The core validates duplicate plugin keys, schema names, commands, command
-states, queries, and shortcuts. Preserve those checks as the extension surface
-grows.
+states, queries, content parser formats, and shortcuts. Preserve those checks
+as the extension surface grows.
+
+First-party persisted node and mark attributes validate at the schema boundary
+so raw JSON cannot bypass command or HTML normalization. Custom plugins are
+trusted code: they must validate attributes and construct fresh allowlisted DOM
+attribute objects rather than merging untrusted bags.
 
 ## Placement Rules
 

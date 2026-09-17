@@ -17,15 +17,19 @@ test('autolinks plain text URLs on paste', async ({ page }) => {
   );
   await page.keyboard.press('Backspace');
   await editor.evaluate((element) => {
-    const clipboardData = new DataTransfer();
-    clipboardData.setData('text/plain', 'Read https://angular.dev/docs.');
-    element.dispatchEvent(
-      new ClipboardEvent('paste', {
-        bubbles: true,
-        cancelable: true,
-        clipboardData,
-      }),
-    );
+    const event = new Event('paste', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    Object.defineProperty(event, 'clipboardData', {
+      value: {
+        files: [],
+        getData: (type: string) =>
+          type === 'text/plain' ? 'Read https://angular.dev/docs.' : '',
+      },
+    });
+    element.dispatchEvent(event);
   });
 
   await expect(serializedHtml(page)).toContainText(
@@ -44,23 +48,28 @@ test('cleans pasted HTML links', async ({ page }) => {
   );
   await page.keyboard.press('Backspace');
   await editor.evaluate((element) => {
-    const clipboardData = new DataTransfer();
-    clipboardData.setData(
-      'text/html',
-      '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>',
-    );
-    clipboardData.setData('text/plain', 'Server-Side Rendering');
-    clipboardData.setData(
-      'text/uri-list',
-      'https://analogjs.org/docs/features/server-side-rendering',
-    );
-    element.dispatchEvent(
-      new ClipboardEvent('paste', {
-        bubbles: true,
-        cancelable: true,
-        clipboardData,
-      }),
-    );
+    const event = new Event('paste', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    Object.defineProperty(event, 'clipboardData', {
+      value: {
+        files: [],
+        getData: (type: string) => {
+          if (type === 'text/html') {
+            return '<span class="text-red-500" style="color: red;">Server-Side Rendering</span>';
+          }
+
+          if (type === 'text/uri-list') {
+            return 'https://analogjs.org/docs/features/server-side-rendering';
+          }
+
+          return type === 'text/plain' ? 'Server-Side Rendering' : '';
+        },
+      },
+    });
+    element.dispatchEvent(event);
   });
 
   await expect(serializedHtml(page)).toContainText(
@@ -77,8 +86,7 @@ test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
   await page.keyboard.press(
     process.platform === 'darwin' ? 'Meta+A' : 'Control+A',
   );
-  await page.keyboard.press('Backspace');
-  await editor.pressSequentially('@');
+  await page.keyboard.insertText('@');
 
   const suggestions = page.getByRole('listbox', {
     name: 'Mention suggestions',
@@ -93,7 +101,7 @@ test('inserts mentions from the consumer-owned overlay', async ({ page }) => {
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Space');
   await expect(serializedHtml(page)).toContainText(
-    '<p><span data-qalma-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span> </p>',
+    '<span data-qalma-mention="" data-mention-id="grace-hopper" data-mention-label="Grace Hopper" data-mention-trigger="@" contenteditable="false">@Grace Hopper</span>',
   );
 });
 

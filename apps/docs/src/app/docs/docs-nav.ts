@@ -94,6 +94,10 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { title: 'Paste Rules', href: '/docs/paste-rules' },
       { title: 'Placeholder', href: '/docs/placeholder' },
       { title: 'Code Block', href: '/docs/code-block' },
+      { title: 'Character Count', href: '/docs/character-count' },
+      { title: 'File Handler', href: '/docs/file-handler' },
+      { title: 'Find & Replace', href: '/docs/find-replace' },
+      { title: 'Unique IDs', href: '/docs/unique-id' },
     ],
   },
   {
@@ -109,6 +113,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { title: 'Theming & Styling', href: '/docs/theming' },
       { title: 'Accessibility', href: '/docs/accessibility' },
       { title: 'SSR & Zoneless', href: '/docs/ssr' },
+      { title: 'Security', href: '/docs/security' },
     ],
   },
   {
@@ -122,6 +127,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     title: 'Resources',
     items: [
       { title: 'Bundle Size', href: '/docs/bundle-size' },
+      { title: 'Comparison', href: '/docs/comparison' },
       { title: 'Changelog', href: '/docs/changelog' },
       { title: 'Roadmap', href: '/docs/roadmap' },
       { title: 'Testing Strategy', href: '/docs/testing-strategy' },

@@ -189,11 +189,15 @@ extraire ces features en vrais composants exportés par `@qalma/kit`, que
       (`/kit/theming`, `/kit/button`, etc.) avec preview + snippet expansible.
       Switcher `Docs | UI Kit` en tête de sidebar pour passer d'une section à
       l'autre (voir log 2026-07-06).
-- [ ] Ajouter `@qalma/kit` au bench `bench/bundle-size`.
-- [ ] Page "recipes" Material / Kendo / ng-zorro dans `apps/docs`.
-- [ ] Mettre à jour la page comparative.
+- [x] Ajouter `@qalma/kit` au bench `bench/bundle-size`.
+- [x] Page "recipes" Material / Kendo / ng-zorro dans `apps/docs`.
+- [x] Mettre à jour la page comparative.
 
 ## Log
+
+- 2026-07-24 — Phase 6 terminée : le benchmark mesure désormais la surface
+  stylée `@qalma/kit` séparément de l'éditeur, les recettes Material/Kendo/
+  ng-zorro sont publiées, et une page comparative explicite les compromis.
 
 - 2026-07-04 — Branche `feature/ui-kit` créée, plan initial rédigé dans ce
   fichier, Phase 0 marquée faite (décisions actées en conversation).

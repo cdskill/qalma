@@ -12,9 +12,9 @@ you can run yourself — and if you do, you should get the same numbers.
 > **TL;DR**
 >
 > - Among ProseMirror-based Angular editors, **Qalma is the lightest**.
-> - A standard Qalma editor is **~77 KB gzip** — **38% lighter than Tiptap**
->   and **16% lighter than ngx-editor**.
-> - Qalma adds just **~14 KB on top of the ProseMirror engine**; Tiptap's
+> - A standard Qalma editor is **~78 KB gzip** — **37% lighter than Tiptap**
+>   and **15% lighter than ngx-editor**.
+> - Qalma adds just **~15 KB on top of the ProseMirror engine**; Tiptap's
 >   abstraction layer adds **~61 KB** — about **4× more**.
 > - **Quill is lighter** (~58 KB), but it's a different, monolithic engine.
 >   We don't hide that — see [Caveats](#honest-caveats).
@@ -38,14 +38,14 @@ Tree-shaken, minified, then compressed. **Angular, RxJS and zone.js are
 excluded** because every Angular app already ships them — these numbers are the
 code the editor itself adds to your bundle.
 
-| Editor | Engine | Minified + gzip | Brotli | vs Qalma |
-| ------ | ------ | --------------: | -----: | -------: |
-| **Quill** <sub>(ngx-quill)</sub> | Quill | **58.0 KB** | 50.3 KB | −24% |
-| **@qalma/editor** | ProseMirror | **76.8 KB** | 67.3 KB | — |
-| **ngx-editor** | ProseMirror | **91.0 KB** | 78.6 KB | +18% |
-| **Tiptap** <sub>(ngx-tiptap)</sub> | ProseMirror | **124.2 KB** | 98.1 KB | +62% |
+| Editor                             | Engine      | Minified + gzip |  Brotli | vs Qalma |
+| ---------------------------------- | ----------- | --------------: | ------: | -------: |
+| **Quill** <sub>(ngx-quill)</sub>   | Quill       |     **58.0 KB** | 50.3 KB |     −24% |
+| **@qalma/editor**                  | ProseMirror |     **77.8 KB** | 68.1 KB |        — |
+| **ngx-editor**                     | ProseMirror |     **91.0 KB** | 78.6 KB |     +17% |
+| **Tiptap** <sub>(ngx-tiptap)</sub> | ProseMirror |    **124.2 KB** | 98.1 KB |     +60% |
 
-<sub>Measured with esbuild + zlib. `@qalma/editor@0.1.0-beta.2`,
+<sub>Measured with esbuild + zlib. `@qalma/editor@0.5.0`,
 `ngx-editor@18.0.0`, `@tiptap/*@3.26.1`, `quill@2.0.3`, Node 24.</sub>
 
 Among the three editors built on **the same engine (ProseMirror)**, Qalma is the
@@ -58,12 +58,12 @@ state, view, base commands, keymap and history. That floor is identical for
 Qalma, ngx-editor and Tiptap. What differs is how much each **toolkit adds on
 top** of it:
 
-| Layer | Minified + gzip |
-| ----- | --------------: |
-| ProseMirror engine (shared floor) | 62.7 KB |
-| → Qalma adds | **+14.1 KB** |
-| → ngx-editor adds | +28.2 KB |
-| → Tiptap adds | **+61.4 KB** |
+| Layer                             | Minified + gzip |
+| --------------------------------- | --------------: |
+| ProseMirror engine (shared floor) |         62.7 KB |
+| → Qalma adds                      |    **+15.0 KB** |
+| → ngx-editor adds                 |        +28.2 KB |
+| → Tiptap adds                     |    **+61.4 KB** |
 
 This is the number that matters when you compare ProseMirror editors: **Qalma's
 overhead over the raw engine is roughly a quarter of Tiptap's.** Tiptap's
@@ -75,23 +75,36 @@ Qalma is plugin-based and every plugin is side-effect-free, so a bundler drops
 the ones you never import. The **ProseMirror engine is the floor** (~63 KB), so
 the spread is bounded — but unused plugins genuinely fall away.
 
-| Qalma editor | Minified + gzip |
-| ------------ | --------------: |
-| Minimal (bold/italic/underline/strike + history) | 70.6 KB |
-| Standard (the full set above) | 76.8 KB |
+| Qalma editor                                     | Minified + gzip |
+| ------------------------------------------------ | --------------: |
+| Minimal (bold/italic/underline/strike + history) |         71.6 KB |
+| Standard (the full set above)                    |         77.8 KB |
 
 You start just above the engine floor and add only what you use — the full
-standard set is **~6 KB** over a minimal editor. Heavier optional plugins ship
-from their own subpath (e.g. `@qalma/editor/table`, which pulls
+standard set is **~6 KB** over a minimal editor. Broad composites and heavier
+optional features ship from their own subpaths (e.g.
+`@qalma/editor/essentials` and `@qalma/editor/table`, which pulls
 `prosemirror-tables`) so they never weigh on editors that don't use them. (Quill
 behaves differently: it's monolithic, so its ~58 KB is a fixed cost you pay even
 for a minimal editor.)
+
+## Optional UI kit
+
+The styled `@qalma/kit` surface is measured separately, with
+`@qalma/editor` external:
+
+| Optional layer                    | Minified + gzip |  Brotli |
+| --------------------------------- | --------------: | ------: |
+| `@qalma/kit@0.5.0` styled surface |     **23.8 KB** | 20.2 KB |
+
+This is the incremental UI layer, including its default toolbar icon provider.
+Apps using Material, Kendo, ng-zorro, or their own controls do not ship it.
 
 ## Honest caveats
 
 We'd rather you trust the numbers than be impressed by them.
 
-- **Quill is lighter on bytes.** At ~58 KB it beats Qalma's ~77 KB. Quill is a
+- **Quill is lighter on bytes.** At ~58 KB it beats Qalma's ~78 KB. Quill is a
   highly tuned monolith with a different architecture. Qalma's pitch isn't "the
   smallest possible editor" — it's the lightest **ProseMirror-based,
   Angular-native, headless** editor, with signals and a typed API instead of a

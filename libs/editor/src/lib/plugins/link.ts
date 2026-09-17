@@ -12,6 +12,7 @@ import {
   QalmaCommandHandler,
 } from './qalma-plugin';
 import { isMarkActive } from '../prosemirror/queries';
+import { assertQalmaUrlAttribute, normalizeQalmaUrl } from '../prosemirror/url';
 
 export interface LinkCommandValue {
   href: string;
@@ -72,7 +73,10 @@ export const LinkPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
 
     const linkMark: MarkSpec = {
       attrs: {
-        href: {},
+        href: {
+          validate: (value) =>
+            assertQalmaUrlAttribute(value, linkUrlPolicy(options), 'link href'),
+        },
         target: { default: null },
         rel: { default: null },
       },
@@ -102,8 +106,14 @@ export const LinkPlugin = /* @__PURE__ */ createConfigurableQalmaPlugin(
         },
       ],
       toDOM: (mark) => {
+        const href = normalizeHref(mark.attrs['href'], options);
+
+        if (!href) {
+          return ['span', 0];
+        }
+
         const attrs: Record<string, string> = {
-          href: mark.attrs['href'],
+          href,
         };
         const target = normalizeTarget(mark.attrs['target']);
         const rel = normalizeRel(mark.attrs['rel']);
@@ -448,22 +458,19 @@ function resolveLinkAttrs(
 }
 
 function normalizeHref(
-  value: string | null | undefined,
+  value: unknown,
   options: Readonly<LinkPluginOptions>,
 ): string | null {
-  const href = value?.trim();
+  return normalizeQalmaUrl(value, linkUrlPolicy(options));
+}
 
-  if (!href) {
-    return null;
-  }
-
-  const protocol = href.match(/^([a-z][a-z0-9+.-]*):/i)?.[1].toLowerCase();
-
-  if (!protocol) {
-    return options.allowRelativeLinks ? href : null;
-  }
-
-  return options.allowedProtocols.includes(protocol) ? href : null;
+function linkUrlPolicy(
+  options: Readonly<LinkPluginOptions>,
+): Readonly<{ allowedProtocols: readonly string[]; allowRelative: boolean }> {
+  return {
+    allowedProtocols: options.allowedProtocols,
+    allowRelative: options.allowRelativeLinks,
+  };
 }
 
 function normalizeTarget(value: unknown): '_blank' | null {
