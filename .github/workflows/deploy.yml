@@ -39,7 +39,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # Computes NX_BASE / NX_HEAD (last successful deploy → current SHA).
-      - uses: nrwl/nx-set-shas@v4
+      - uses: nrwl/nx-set-shas@v5
 
       - id: resolve
         shell: bash
