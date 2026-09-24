@@ -107,7 +107,7 @@
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-playwright": "^1.6.2",
     "jsdom": "^22.0.0",
-    "ng-packagr": "21.2.5",
+    "ng-packagr": "21.2.7",
     "nx": "22.7.5",
     "pagefind": "1.5.2",
     "postcss": "^8.5.15",
