@@ -103,7 +103,7 @@
     "@vitest/coverage-v8": "^4.0.0",
     "@vitest/ui": "^4.0.0",
     "angular-eslint": "^21.2.0",
-    "eslint": "^9.8.0",
+    "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-playwright": "^1.6.2",
     "jsdom": "^22.0.0",
