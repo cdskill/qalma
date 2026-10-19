@@ -8,7 +8,13 @@
     "types": []
   },
   "angularCompilerOptions": {
-    "compilationMode": "partial"
+    "compilationMode": "partial",
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    }
   },
   "include": ["src/**/*.ts", "forms/**/*.ts", "table/**/*.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]

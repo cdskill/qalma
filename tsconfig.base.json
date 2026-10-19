@@ -23,7 +23,12 @@
       "@qalma/editor/table": ["./libs/editor/table/src/index.ts"],
       "@qalma/kit": ["./libs/ui-kit/src/index.ts"],
       "@qalma/kit/headless": ["./libs/ui-kit/headless/src/index.ts"]
-    }
+    },
+    "strict": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tmp"]
 }

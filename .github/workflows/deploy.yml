@@ -25,21 +25,21 @@ jobs:
       apps: ${{ steps.resolve.outputs.apps }}
       any: ${{ steps.resolve.outputs.any }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 10.23.0
           run_install: false
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24.x'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
       # Computes NX_BASE / NX_HEAD (last successful deploy → current SHA).
-      - uses: nrwl/nx-set-shas@v4
+      - uses: nrwl/nx-set-shas@v5
 
       - id: resolve
         shell: bash
@@ -66,12 +66,12 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.affected.outputs.apps) }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           version: 10.23.0
           run_install: false
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24.x'
           cache: pnpm

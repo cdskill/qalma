@@ -363,7 +363,7 @@ function resolveParsedLanguage(
     return options.defaultLanguage;
   }
 
-  const code = node.matches('code') ? node : node.querySelector('code');
+  const code = node.localName === 'code' ? node : node.querySelector('code');
   const language =
     resolveLanguageFromElement(code, options) ??
     resolveLanguageFromElement(node, options);

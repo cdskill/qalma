@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": false,
     "emitDecoratorMetadata": false,
-    "experimentalDecorators": false
+    "experimentalDecorators": false,
+    "ignoreDeprecations": "6.0"
   },
   "files": [],
   "include": [],
