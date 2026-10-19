@@ -1,3 +1,7 @@
+# 1.0.0 (2026-10-19)
+
+This was a version bump only for ui-kit to align it with other projects, there were no code changes.
+
 ## 0.6.0 (2026-09-17)
 
 ### 🚀 Features
