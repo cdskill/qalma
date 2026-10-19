@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -81,6 +82,7 @@ import { SandboxToolbar } from './sandbox-toolbar';
     SandboxToolbar,
   ],
   selector: 'app-sandbox-editor',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <qalma-editor
       class="block overflow-hidden rounded-lg border border-slate-300 bg-white text-slate-900 shadow-sm"

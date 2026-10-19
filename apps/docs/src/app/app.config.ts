@@ -8,7 +8,10 @@ import {
   withFetch,
   withInterceptors,
 } from '@angular/common/http';
-import { provideClientHydration } from '@angular/platform-browser';
+import {
+  provideClientHydration,
+  withNoIncrementalHydration,
+} from '@angular/platform-browser';
 import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
 import { provideContent, withMarkdownRenderer } from '@analogjs/content';
 import { TitleStrategy, withPreloading } from '@angular/router';
@@ -22,11 +25,11 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideFileRouter(withPreloading(CriticalDocsPreloadingStrategy)),
     { provide: TitleStrategy, useClass: SeoTitleStrategy },
-    provideClientHydration(),
+    provideClientHydration(withNoIncrementalHydration()),
     provideContent(withMarkdownRenderer()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([requestContextInterceptor])
+      withInterceptors([requestContextInterceptor]),
     ),
   ],
 };

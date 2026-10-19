@@ -51,3 +51,5 @@ Thumbs.db
 
 # Vendored third-party AI skill (PostHog generator, not project infra) — keep local
 .claude/skills/integration-angular/
+
+.nx/migrate-runs

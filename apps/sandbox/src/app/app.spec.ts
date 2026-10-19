@@ -147,15 +147,13 @@ describe('App', () => {
     expect(
       compiled.querySelector('.ProseMirror [data-qalma-mention]')?.textContent,
     ).toBe('@Ada Lovelace');
-    expect(
-      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.alt,
-    ).toBe(SANDBOX_EXAMPLE_IMAGE_ALT);
-    expect(
-      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.src,
-    ).toBe(SANDBOX_EXAMPLE_IMAGE_SRC);
-    expect(
-      compiled.querySelector<HTMLImageElement>('.ProseMirror img')?.title,
-    ).toBe(SANDBOX_EXAMPLE_IMAGE_TITLE);
+    const image = compiled.querySelector<HTMLImageElement>(
+      '.ProseMirror img:not(.ProseMirror-separator)',
+    );
+
+    expect(image?.alt).toBe(SANDBOX_EXAMPLE_IMAGE_ALT);
+    expect(image?.src).toBe(SANDBOX_EXAMPLE_IMAGE_SRC);
+    expect(image?.title).toBe(SANDBOX_EXAMPLE_IMAGE_TITLE);
     expect(compiled.querySelector('.ProseMirror mark')?.textContent).toContain(
       'highlight',
     );
