@@ -9,6 +9,10 @@ This page mirrors the canonical package changelog at
 `libs/editor/CHANGELOG.md`. It is regenerated from that file on every release —
 do not edit it by hand.
 
+# 1.0.0 (2026-10-19)
+
+This was a version bump only for editor to align it with other projects, there were no code changes.
+
 ## 0.6.0 (2026-09-17)
 
 ### 🚀 Features
