@@ -95,7 +95,7 @@
     "@oxc-project/runtime": "^0.155.0",
     "@playwright/test": "^1.36.0",
     "@schematics/angular": "22.1.9",
-    "@swc-node/register": "~1.11.1",
+    "@swc-node/register": "~1.12.1",
     "@swc/core": "~1.16.2",
     "@swc/helpers": "~0.5.18",
     "@tailwindcss/postcss": "^4.3.0",
