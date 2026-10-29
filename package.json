@@ -43,7 +43,7 @@
     "@angular/platform-server": "22.1.8",
     "@angular/router": "22.1.8",
     "@ng-icons/core": "^33.2.3",
-    "@ng-icons/lucide": "^33.2.3",
+    "@ng-icons/lucide": "^35.1.0",
     "@spartan-ng/brain": "0.0.1-alpha.711",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
