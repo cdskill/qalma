@@ -107,7 +107,7 @@ jobs:
           esac
 
       - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ steps.cfg.outputs.role }}
           aws-region: ${{ vars.AWS_REGION }}
